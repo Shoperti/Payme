@@ -17,7 +17,7 @@ class PaymeManager extends Manager implements Contracts\Factory {
 
 	protected function createBanwireDriver()
 	{
-		return
+		return new \Dinkbit\Payme\Gateways\Banwire;
 	}
 
 	/**
