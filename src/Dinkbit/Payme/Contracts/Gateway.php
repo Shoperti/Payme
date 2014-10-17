@@ -2,16 +2,13 @@
 
 interface Gateway {
 
+	/**
+	 * Charge the credit card.
+	 *
+	 * @param $amount
+	 * @param $reference
+	 * @param array $options
+	 */
 	public function charge($amount, $reference, $options = array());
-
-	public function save();
-
-	public function delete();
-
-	public function update();
-
-	public function refund();
-
-	public function subscribe();
 
 }
