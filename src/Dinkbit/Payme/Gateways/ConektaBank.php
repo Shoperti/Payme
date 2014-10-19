@@ -1,20 +1,19 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
+use Dinkbit\Payme\Transaction;
+
 class ConektaBank extends Conekta {
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $reference, $options = array())
+	public function charge($amount, $payment, $options = array())
 	{
-		$options['description'] = 'Cargo';
-		$options['bank'] = ['type' => 'banorte'];
+		$params = [];
 
-		$params = array_merge($options, [
-			'amount' => $this->getAmountInteger($amount),
-			'reference_id' => $reference,
-			'currency' => $this->getCurrency()
-		]);
+		$params['bank']['type'] = $payment;
+
+		$params = $this->addOrder($params, $amount, $options);
 
 		return $this->commit('post', $this->buildUrlFromString('charges'), $params);
 	}

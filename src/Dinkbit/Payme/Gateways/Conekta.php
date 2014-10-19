@@ -1,24 +1,37 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
 use Dinkbit\Payme\Contracts\Gateway as GatewayInterface;
+use Dinkbit\Payme\Transaction;
 
 class Conekta extends AbstractGateway implements GatewayInterface {
+
+	protected $liveEndpoint = 'https://api.conekta.io';
+	protected $defaultCurrency = 'MXN';
 
 	protected $apiVersion = "0.3.0";
 	protected $locale = 'es';
 
 	/**
+	 * @param $config
+	 */
+	public function __construct($config)
+	{
+		$this->requires($config, ['private_key']);
+
+		$config['version'] = $this->apiVersion;
+
+		$this->config = $config;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $reference, $options = array())
+	public function charge($amount, $payment, $options = array())
 	{
-		$options['description'] = 'Cargo';
+		$params = [];
 
-		$params = array_merge($options, [
-			'amount' => $this->getAmountInteger($amount),
-			'reference_id' => $reference,
-			'currency' => $this->getCurrency()
-		]);
+		$params = $this->addOrder($params, $amount, $options);
+		$params = $this->addPaymentMethod($params, $payment, $options);
 
 		return $this->commit('post', $this->buildUrlFromString('charges'), $params);
 	}
@@ -85,15 +98,71 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return false;
 	}
 
+	protected function addOrder($params, $money, $options)
+	{
+		$params['description'] = $this->array_get($options, 'description', "Payme Purchase");
+        $params['reference_id'] = $this->array_get($options, 'order_id');
+        $params['currency'] = $this->array_get($options, 'currency', $this->getCurrency());
+        $params['amount'] = $this->getAmountInteger($money);
+
+		return $params;
+	}
+
+	protected function addPaymentMethod($params, $payment, $options)
+	{
+		if (is_string($payment))
+		{
+			$params['card'] = $payment;
+		}
+		else if ($payment instanceof \Dinkbit\Payme\CreditCard)
+		{
+			$params['card'] = [];
+			$params['card']['name'] = $payment->name;
+			$params['card']['cvc'] = $payment->cvc;
+			$params['card']['number'] = $payment->number;
+			$params['card']['exp_month'] = $payment->exp_month;
+			$params['card']['exp_year'] = $payment->exp_year;
+			$params['card'] = $this->addAddress($params['card'], $options);
+		}
+
+		return $params;
+	}
+
+	protected function addAddress($params, $options)
+	{
+		if ($address = $this->array_get($options, 'address') or $this->array_get($options, 'billing_address'))
+		{
+			$params['address'] = [];
+			$params['address']['street1'] = $this->array_get($address, 'address1');
+			$params['address']['street2'] = $this->array_get($address, 'address2');
+			$params['address']['street3'] = $this->array_get($address, 'address3');
+			$params['address']['city'] = $this->array_get($address, 'city');
+			$params['address']['country'] = $this->array_get($address, 'country');
+			$params['address']['state'] = $this->array_get($address, 'state');
+			$params['address']['zip'] = $this->array_get($address, 'zip');
+
+			return $params;
+		}
+	}
+
+	protected function addCustomer($params, $creditcard, $options)
+	{
+		return $params['customer'] = array_key_exists('customer', $options) ? $options['customer'] : '';
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function commit($method = 'post', $url, $params = [], $options = [])
 	{
 		$success = false;
 		$rawResponse = $this->getHttpClient()->{$method}($url, [
 			'exceptions' => false,
 			'headers' => [
-				'Accept' => "application/vnd.conekta-v{$this->apiVersion}+json",
+				'Accept' => "application/vnd.conekta-v{$this->config['version']}+json",
 				'Accept-Language' => $this->locale,
-				'Authorization' => 'Basic ' . base64_encode($this->config['private_key'] . ':' )
+				'Authorization' => 'Basic ' . base64_encode($this->config['private_key'] . ':' ),
+				'RaiseHtmlError' => 'false'
 			],
 			'body' => $params
 		]);
@@ -101,7 +170,7 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		if ($rawResponse->getStatusCode() == 200)
 		{
 			$response = $this->parseResponse($rawResponse->getBody());
-			$success = ! array_key_exists('error', $response);
+			$success = ! ($this->array_get($response, 'object', 'error') == 'error');
 		}
 		else
 		{
@@ -137,6 +206,10 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return json_decode($body, true);
 	}
 
+	/**
+	 * @param $rawResponse
+	 * @return array
+	 */
 	protected function responseError($rawResponse)
 	{
 		if ( ! $this->isJson($rawResponse->getBody()))
@@ -147,6 +220,10 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return $this->parseResponse($rawResponse->getBody());
 	}
 
+	/**
+	 * @param $rawResponse
+	 * @return array
+	 */
 	public function jsonError($rawResponse)
 	{
 		$msg = 'Respuesta no válida recibida de la API de Conekta. Por favor, póngase en contacto con contacto@conekta.com si sigues recibiendo este mensaje.';
@@ -157,6 +234,10 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		];
 	}
 
+	/**
+	 * @param $string
+	 * @return bool
+	 */
 	protected function isJson($string)
 	{
 		json_decode($string);
@@ -164,13 +245,11 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return (json_last_error() == JSON_ERROR_NONE);
 	}
 
-	protected function getDefaultCurrency()
-	{
-		return 'MXN';
-	}
-
+	/**
+	 * @return string
+	 */
 	protected function getRequestUrl()
 	{
-		return 'https://api.conekta.io';
+		return $this->liveEndpoint;
 	}
 }

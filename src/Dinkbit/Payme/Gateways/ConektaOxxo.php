@@ -1,20 +1,19 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
+use Dinkbit\Payme\Transaction;
+
 class ConektaOxxo extends Conekta {
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $reference, $options = array())
+	public function charge($amount, $payment, $options = array())
 	{
-		$options['description'] = 'Cargo';
-		$options['cash'] = ['type' => 'oxxo'];
+		$params = [];
 
-		$params = array_merge($options, [
-			'amount' => $this->getAmountInteger($amount),
-			'reference_id' => $reference,
-			'currency' => $this->getCurrency()
-		]);
+		$params['cash']['type'] = $payment;
+
+		$params = $this->addOrder($params, $amount, $options);
 
 		return $this->commit('post', $this->buildUrlFromString('charges'), $params);
 	}

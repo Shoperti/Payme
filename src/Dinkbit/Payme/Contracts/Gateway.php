@@ -6,9 +6,10 @@ interface Gateway {
 	 * Charge the credit card.
 	 *
 	 * @param $amount
-	 * @param $reference
+	 * @param $payment
 	 * @param array $options
+	 * @return
 	 */
-	public function charge($amount, $reference, $options = array());
+	public function charge($amount, $payment, $options = array());
 
 }

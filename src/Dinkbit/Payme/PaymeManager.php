@@ -65,14 +65,14 @@ class PaymeManager extends Manager implements Contracts\Factory {
 
 	/**
 	 * Create an instance of the specified driver.
-	 * 
-	 * @return Gateways\PaypalStandard
+	 *
+	 * @return Gateways\PaypalExpress
 	 */
-	protected function createPaypalStandardDriver()
+	protected function createPaypalExpressDriver()
 	{
 		$config = $this->app['config']['services.paypal'];
 
-		return new \Dinkbit\Payme\Gateways\PaypalStandard();
+		return new \Dinkbit\Payme\Gateways\PaypalExpress($config);
 	}
 
 	/**

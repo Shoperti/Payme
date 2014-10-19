@@ -22,14 +22,7 @@ abstract class AbstractGateway implements GatewayInterface {
 	 */
 	protected $customer;
 
-	/**
-	 * @param $config
-	 */
-	public function __construct($config)
-	{
-		$this->config = $config;
-	}
-
+	abstract public function __construct($config);
 
 	/**
 	 * @param $success
@@ -37,11 +30,6 @@ abstract class AbstractGateway implements GatewayInterface {
 	 * @return mixed
 	 */
 	abstract public function mapResponseToTransaction($success, $response);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function getDefaultCurrency();
 
 	/**
 	 * @return mixed
@@ -68,6 +56,14 @@ abstract class AbstractGateway implements GatewayInterface {
 		$this->customer = $customer;
 
 		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getDefaultCurrency()
+	{
+		return $this->defaultCurrency;
 	}
 
 	/**
@@ -176,7 +172,8 @@ abstract class AbstractGateway implements GatewayInterface {
 	 * @var string
 	 * @return mixed
 	 */
-	protected function cleanAccents($string) {
+	protected function cleanAccents($string)
+	{
 		$notAllowed = array("á","é","í","ó","ú","Á","É","Í","Ó","Ú","ñ","À","Ã","Ì","Ò","Ù","Ã™","Ã ","Ã¨","Ã¬","Ã²","Ã¹","ç","Ç","Ã¢","ê","Ã®","Ã´","Ã»","Ã‚","ÃŠ","ÃŽ","Ã”","Ã›","ü","Ã¶","Ã–","Ã¯","Ã¤","«","Ò","Ã","Ã„","Ã‹");
 		$allowed = array("a","e","i","o","u","A","E","I","O","U","n","N","A","E","I","O","U","a","e","i","o","u","c","C","a","e","i","o","u","A","E","I","O","U","u","o","O","i","a","e","U","I","A","E");
 		$text = str_replace($notAllowed, $allowed ,$string);
@@ -185,17 +182,33 @@ abstract class AbstractGateway implements GatewayInterface {
 	}
 
 	/**
+	 * @param $array
+	 * @param $key
+	 * @param null $default
+	 * @return null
+	 */
+	public function array_get($array, $key, $default = null)
+	{
+		return isset($array[$key]) ? $array[$key] : $default;
+	}
+
+	/**
 	 * @param $options
 	 * @param array $required
+	 * @return bool
 	 */
 	protected function requires($options, array $required = [])
 	{
-		foreach ($options as $key => $option)
+		foreach ($required as $key)
 		{
-			if ( ! in_array($key, $required))
+			if ( ! array_key_exists(trim($key), $options))
 			{
 				throw new \InvalidArgumentException("Missing required parameter: {$key}");
+				break;
+				return false;
 			}
 		}
+
+		return true;
 	}
 }
