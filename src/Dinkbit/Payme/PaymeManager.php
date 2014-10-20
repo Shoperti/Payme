@@ -20,11 +20,11 @@ class PaymeManager extends Manager implements Contracts\Factory {
 	 *
 	 * @return Gateways\Banwire
 	 */
-	protected function createBanwireDriver()
+	protected function createBanwireRecurrentDriver()
 	{
 		$config = $this->app['config']['services.banwire'];
 
-		return new \Dinkbit\Payme\Gateways\Banwire($config);
+		return new \Dinkbit\Payme\Gateways\BanwireRecurrent($config);
 	}
 
 	/**
