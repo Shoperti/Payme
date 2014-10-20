@@ -10,15 +10,8 @@ abstract class AbstractGateway {
 	protected $config;
 
 	/**
-	 * @var
+	 * @param $config
 	 */
-	protected $card;
-
-	/**
-	 * @var
-	 */
-	protected $customer;
-
 	abstract public function __construct($config);
 
 	/**
