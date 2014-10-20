@@ -1,9 +1,10 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
-use Dinkbit\Payme\Contracts\Gateway as GatewayInterface;
+use Dinkbit\Payme\Contracts\Charge;
+use Dinkbit\Payme\Contracts\Store;
 use Dinkbit\Payme\Transaction;
 
-class Conekta extends AbstractGateway implements GatewayInterface {
+class Conekta extends AbstractGateway implements Charge, Store {
 
 	protected $liveEndpoint = 'https://api.conekta.io';
 	protected $defaultCurrency = 'MXN';
@@ -19,6 +20,7 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		$this->requires($config, ['private_key']);
 
 		$config['version'] = $this->apiVersion;
+		$config['locale'] = $this->locale;
 
 		$this->config = $config;
 	}
@@ -26,7 +28,7 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $payment, $options = array())
+	public function charge($amount, $payment, $options = [])
 	{
 		$params = [];
 
@@ -36,68 +38,48 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return $this->commit('post', $this->buildUrlFromString('charges'), $params);
 	}
 
-	public function save()
+	/**
+	 * {@inheritdoc}
+	 */
+	public function store($creditcard, $options = [])
 	{
-		$customer = $this->findOrCreate($this->customer->getBillableId());
-
-		$response = $this->commit('post', $this->buildUrlFromString('customers/' . $customer . '/cards'), [
-			'token' => $this->card->getCardToken()
-		]);
-
-		$card = $this->parseResponse($response->getBody());
-
-		$this->card->setCardToken($card['id']);
-		$this->card->setCardBrand($card['brand']);
-		$this->card->setCardName($card['name']);
-		$this->card->setExpiryMonth($card['exp_month']);
-		$this->card->setExpiryYear($card['exp_year']);
-		$this->card->setLastFour($card['last4']);
-
-		return $this->card;
-	}
-
-	public function update()
-	{
-	}
-
-	public function findOrCreate($id)
-	{
-		$customer = $this->getCustomer($id);
-
-		if ($customer)
+		if (isset($options['customer']))
 		{
-			return $id;
+			$params['token'] = $creditcard;
+
+			return $this->commit('post', $this->buildUrlFromString('customers/' . $options['customer'] . '/cards'), $params);
 		}
-
-		return $this->createCustomer();
-	}
-
-	public function createCustomer()
-	{
-		$url = $this->buildUrlFromString('customers');
-
-		$request = $this->commit('post', $url, [
-			'name' => $this->customer->getName(),
-			'email' => $this->customer->getEmail()
-		]);
-
-		return $this->parseId($request->getBody());
-	}
-
-	public function getCustomer($id)
-	{
-		if (! $id) return false;
-
-		$customer_id = $this->parseId($this->request('get', $this->buildUrlFromString('customers' . '/' . $id))->getBody());
-
-		if ($customer_id == $id)
+		else
 		{
-			return true;
-		}
+			$params['email'] = $this->array_get($options, 'email');
+			$params['name'] = $this->array_get($options, 'name');
+			$params['cards'] = [$creditcard];
 
-		return false;
+			return $this->commit('post', $this->buildUrlFromString('customers'), $params);
+		}
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function unstore($reference, $options = [])
+	{
+		if (isset($options['card_id']))
+		{
+			return $this->commit('delete', $this->buildUrlFromString('customers/' . $reference . '/cards/' . $options['card_id']));
+		}
+		else
+		{
+			return $this->commit('delete', $this->buildUrlFromString('customers/' . $reference));
+		}
+	}
+
+	/**
+	 * @param $params
+	 * @param $money
+	 * @param $options
+	 * @return mixed
+	 */
 	protected function addOrder($params, $money, $options)
 	{
 		$params['description'] = $this->array_get($options, 'description', "Payme Purchase");
@@ -108,26 +90,37 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		return $params;
 	}
 
+	/**
+	 * @param $params
+	 * @param $payment
+	 * @param $options
+	 * @return mixed
+	 */
 	protected function addPaymentMethod($params, $payment, $options)
 	{
 		if (is_string($payment))
 		{
 			$params['card'] = $payment;
 		}
-		else if ($payment instanceof \Dinkbit\Payme\CreditCard)
+		else if ($payment instanceof CreditCard)
 		{
 			$params['card'] = [];
-			$params['card']['name'] = $payment->name;
-			$params['card']['cvc'] = $payment->cvc;
-			$params['card']['number'] = $payment->number;
-			$params['card']['exp_month'] = $payment->exp_month;
-			$params['card']['exp_year'] = $payment->exp_year;
+			$params['card']['name'] = $payment->getName();
+			$params['card']['cvc'] = $payment->getCvv();
+			$params['card']['number'] = $payment->getNumber();
+			$params['card']['exp_month'] = $payment->getExpiryMonth();
+			$params['card']['exp_year'] = $payment->getExpiryYear();
 			$params['card'] = $this->addAddress($params['card'], $options);
 		}
 
 		return $params;
 	}
 
+	/**
+	 * @param $params
+	 * @param $options
+	 * @return mixed
+	 */
 	protected function addAddress($params, $options)
 	{
 		if ($address = $this->array_get($options, 'address') or $this->array_get($options, 'billing_address'))
@@ -145,6 +138,12 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 		}
 	}
 
+	/**
+	 * @param $params
+	 * @param $creditcard
+	 * @param $options
+	 * @return string
+	 */
 	protected function addCustomer($params, $creditcard, $options)
 	{
 		return $params['customer'] = array_key_exists('customer', $options) ? $options['customer'] : '';
@@ -155,16 +154,29 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 	 */
 	protected function commit($method = 'post', $url, $params = [], $options = [])
 	{
+		$user_agent = [
+			'bindings_version' => $this->config['version'],
+			'lang' => 'php',
+			'lang_version' => phpversion(),
+			'publisher' => 'conekta',
+			'uname' => php_uname()
+		];
+
 		$success = false;
 		$rawResponse = $this->getHttpClient()->{$method}($url, [
 			'exceptions' => false,
+			'timeout' => '80',
+			'connect_timeout' => '30',
 			'headers' => [
 				'Accept' => "application/vnd.conekta-v{$this->config['version']}+json",
-				'Accept-Language' => $this->locale,
+				'Accept-Language' => $this->config['locale'],
 				'Authorization' => 'Basic ' . base64_encode($this->config['private_key'] . ':' ),
-				'RaiseHtmlError' => 'false'
+				'Content-Type' => 'application/json',
+				'RaiseHtmlError' => 'false',
+				'X-Conekta-Client-User-Agent' => json_encode($user_agent),
+				'User-Agent' => 'Conekta PaymeBindings/' . $this->config['version']
 			],
-			'body' => $params
+			'json' => $params
 		]);
 
 		if ($rawResponse->getStatusCode() == 200)
@@ -191,10 +203,30 @@ class Conekta extends AbstractGateway implements GatewayInterface {
 			'message' 		=> $success ? 'Transacción aprovada' : $response['message_to_purchaser'],
 			'test' 			=> array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $success ? $response['id'] : $response['type'],
-			'status'		=> $success ? $response['status'] : false,
-			'reference' 	=> $success ? $response['id'] : false,
-			'code' 			=> $success ? $response['payment_method']['auth_code'] : $response['code'],
+			'status'		=> $success ? $this->array_get($response, 'status', true) : false,
+			'reference' 	=> $success ? $this->getReference($response) : false,
+			'code' 			=> $success ? false : $response['code'],
 		]);
+	}
+
+	/**
+	 * @param $response
+	 * @return null
+	 */
+	protected function getReference($response)
+	{
+		$object = $this->array_get($response, 'object');
+
+		if ($object == 'customer')
+		{
+			return $this->array_get($response, 'default_card_id');
+		}
+		elseif ($object == 'card')
+		{
+			return $this->array_get($response, 'customer_id');
+		}
+
+		return $response['payment_method']['auth_code'];
 	}
 
 	/**

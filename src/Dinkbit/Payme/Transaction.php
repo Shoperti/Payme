@@ -2,7 +2,7 @@
 
 use ArrayAccess;
 
-abstract class AbstractTransaction implements ArrayAccess, Contracts\Transaction {
+class Transaction implements ArrayAccess, Contracts\Transaction {
 
 	public $success;
 	public $isRedirect;

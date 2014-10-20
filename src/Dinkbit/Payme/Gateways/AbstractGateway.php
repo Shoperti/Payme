@@ -1,11 +1,8 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
-use Dinkbit\Payme\Contracts\CreditCard;
-use Dinkbit\Payme\Contracts\Customer;
-use Dinkbit\Payme\Contracts\Gateway as GatewayInterface;
 use Dinkbit\Payme\Currency;
 
-abstract class AbstractGateway implements GatewayInterface {
+abstract class AbstractGateway {
 
 	/**
 	 * @var
@@ -25,6 +22,15 @@ abstract class AbstractGateway implements GatewayInterface {
 	abstract public function __construct($config);
 
 	/**
+	 * @param string $method
+	 * @param $url
+	 * @param array $params
+	 * @param array $options
+	 * @return mixed
+	 */
+	abstract protected function commit($method = 'post', $url, $params = [], $options = []);
+
+	/**
 	 * @param $success
 	 * @param $response
 	 * @return mixed
@@ -35,28 +41,6 @@ abstract class AbstractGateway implements GatewayInterface {
 	 * @return mixed
 	 */
 	abstract protected function getRequestUrl();
-
-	/**
-	 * @param CreditCard $card
-	 * @return $this
-	 */
-	public function setCard(CreditCard $card)
-	{
-		$this->card = $card;
-
-		return $this;
-	}
-
-	/**
-	 * @param $customer
-	 * @return $this
-	 */
-	public function setCustomer(Customer $customer)
-	{
-		$this->customer = $customer;
-
-		return $this;
-	}
 
 	/**
 	 * @return string

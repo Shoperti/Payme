@@ -19,7 +19,7 @@ class Banwire extends AbstractGateway implements GatewayInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $options = array())
+	public function charge($amount, $payment, $options = array())
 	{
 		$url = $this->buildUrlFromString($this->recurrentEndPoint, 'ejecuta_pago_ondemand');
 

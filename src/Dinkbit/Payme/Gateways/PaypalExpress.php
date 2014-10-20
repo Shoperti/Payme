@@ -1,9 +1,8 @@
 <?php  namespace Dinkbit\Payme\Gateways;
 
-use Dinkbit\Payme\Contracts\Gateway as GatewayInterface;
 use Dinkbit\Payme\Gateways\Paypal\PaypalCommon;
 
-class PaypalExpress extends PaypalCommon implements GatewayInterface {
+class PaypalExpress extends PaypalCommon {
 
 	protected $liveEndpoint = 'https://www.paypal.com/webscr';
 	protected $testEndpoint = 'https://www.sandbox.paypal.com/webscr';
@@ -14,11 +13,6 @@ class PaypalExpress extends PaypalCommon implements GatewayInterface {
 	public function __construct($config)
 	{
 		$this->requires($config, ['login', 'password', 'signature']);
-	}
-
-	public function charge($amount, $options = array())
-	{
-		return $this->mapTransactionToObject($options);
 	}
 
 	/**
