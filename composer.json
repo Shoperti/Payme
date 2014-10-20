@@ -1,6 +1,7 @@
 {
     "name": "dinkbit/payme",
     "description": "Multi-gateway payment processing library for Laravel",
+    "license": "MIT",
     "keywords": [
         "payme",
         "payments",
