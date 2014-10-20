@@ -70,7 +70,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	 */
 	protected function addUser($params, $options = [])
 	{
-		$params['cliente_id'] = $this->array_get($options, 'customer_id');
+		$params['cliente_id'] = $this->array_get($options, 'customer');
 
 		return $params;
 	}
@@ -121,7 +121,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	protected function commit($method = 'post', $url, $params = [], $options = [])
 	{
 		$params['usr_banwire'] = $this->config['merchant'];
-		$params['email'] = $this->config['mail'];
+		$params['email'] = $this->config['email'];
 
 		$rawResponse = $this->getHttpClient()->{$method}($url, [
 			'exceptions' => false,

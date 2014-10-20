@@ -21,7 +21,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction {
 	 */
 	public function success()
 	{
-		return (bool) $this->isSuccessful;
+		return (bool) $this->success;
 	}
 
 	/**
@@ -44,6 +44,11 @@ class Transaction implements ArrayAccess, Contracts\Transaction {
 		return (bool) $this->test;
 	}
 
+	/**
+	 * Return authorization code
+	 *
+	 * @return mixed
+	 */
 	public function authorization()
 	{
 		return $this->authorization;
@@ -94,7 +99,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction {
 	 *
 	 * @return array
 	 */
-	public function data()
+	public function raw()
 	{
 		return $this->transaction;
 	}

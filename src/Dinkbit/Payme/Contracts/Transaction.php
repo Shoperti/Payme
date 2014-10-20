@@ -63,6 +63,6 @@ interface Transaction {
 	 *
 	 * @return array
 	 */
-	public function data();
+	public function raw();
 
 }
