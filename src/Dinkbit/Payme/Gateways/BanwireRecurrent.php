@@ -7,6 +7,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 
 	protected $liveEndpoint = 'https://banwiresecure.com/Recurrentes2013/recurrente';
 	protected $defaultCurrency = 'MXN';
+	protected $displayName = 'banwirerecurrent';
 
 	/**
 	 * @param $config

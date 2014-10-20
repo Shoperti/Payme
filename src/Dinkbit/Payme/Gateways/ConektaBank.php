@@ -4,6 +4,8 @@ use Dinkbit\Payme\Transaction;
 
 class ConektaBank extends Conekta {
 
+	protected $displayName = 'conektabank';
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -29,7 +31,7 @@ class ConektaBank extends Conekta {
 			'message' 		=> $success ? $response['payment_method']['reference'] : $response['message_to_purchaser'],
 			'test' 			=> array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $success ? $response['id'] : $response['type'],
-			'status'		=> $success ? $response['status'] : false,
+			'status'		=> $success ? $this->getStatus($this->array_get($response, 'status', 'paid')) : new Status('failed'),
 			'reference' 	=> $success ? $response['payment_method']['reference'] : false,
 			'code' 			=> $success ? $response['payment_method']['service_number'] : $response['code'],
 		]);

@@ -2,12 +2,14 @@
 
 use Dinkbit\Payme\Contracts\Charge;
 use Dinkbit\Payme\Contracts\Store;
+use Dinkbit\Payme\Status;
 use Dinkbit\Payme\Transaction;
 
 class Conekta extends AbstractGateway implements Charge, Store {
 
 	protected $liveEndpoint = 'https://api.conekta.io';
 	protected $defaultCurrency = 'MXN';
+	protected $displayName = 'conekta';
 
 	protected $apiVersion = "0.3.0";
 	protected $locale = 'es';
@@ -203,7 +205,7 @@ class Conekta extends AbstractGateway implements Charge, Store {
 			'message' 		=> $success ? 'Transacción aprovada' : $response['message_to_purchaser'],
 			'test' 			=> array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $success ? $response['id'] : $response['type'],
-			'status'		=> $success ? $this->array_get($response, 'status', true) : false,
+			'status'		=> $success ? $this->getStatus($this->array_get($response, 'status', 'paid')) : new Status('failed'),
 			'reference' 	=> $success ? $this->getReference($response) : false,
 			'code' 			=> $success ? false : $response['code'],
 		]);
@@ -227,6 +229,31 @@ class Conekta extends AbstractGateway implements Charge, Store {
 		}
 
 		return $response['payment_method']['auth_code'];
+	}
+
+	/**
+	 * @param $status
+	 * @return Status
+	 */
+	protected function getStatus($status)
+	{
+		switch ($status)
+		{
+			case 'pending_payment';
+				return new Status('pending');
+				break;
+			case 'paid':
+			case 'refunded':
+			case 'paused':
+			case 'active':
+			case 'canceled':
+				return new Status($status);
+				break;
+			case 'in_trial';
+				return new Status('trial');
+				break;
+		}
+
 	}
 
 	/**

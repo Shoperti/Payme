@@ -81,7 +81,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction {
 	 */
 	public function status()
 	{
-		return $this->status;
+		return (string) $this->status;
 	}
 
 	/**

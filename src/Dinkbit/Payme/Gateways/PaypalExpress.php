@@ -6,6 +6,7 @@ class PaypalExpress extends PaypalCommon {
 
 	protected $liveEndpoint = 'https://www.paypal.com/webscr';
 	protected $testEndpoint = 'https://www.sandbox.paypal.com/webscr';
+	protected $displayName = 'paypalexpress';
 
 	/**
 	 * @param $config

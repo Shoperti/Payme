@@ -4,6 +4,8 @@ use Dinkbit\Payme\Transaction;
 
 class ConektaOxxo extends Conekta {
 
+	protected $displayName = 'conektaoxxo';
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -29,7 +31,7 @@ class ConektaOxxo extends Conekta {
 			'message' 		=> $success ? $response['payment_method']['barcode_url'] : $response['message_to_purchaser'],
 			'test' 			=> array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $success ? $response['id'] : $response['type'],
-			'status'		=> $success ? $response['status'] : false,
+			'status'		=> $success ? $this->getStatus($this->array_get($response, 'status', 'paid')) : new Status('failed'),
 			'reference' 	=> $success ? $response['payment_method']['barcode_url'] : false,
 			'code' 			=> $success ? $response['payment_method']['barcode'] : $response['code'],
 		]);

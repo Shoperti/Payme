@@ -38,6 +38,14 @@ abstract class AbstractGateway {
 	/**
 	 * @return string
 	 */
+	public function displayName()
+	{
+		return $this->displayName;
+	}
+
+	/**
+	 * @return string
+	 */
 	protected function getDefaultCurrency()
 	{
 		return $this->defaultCurrency;
