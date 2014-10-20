@@ -1,10 +1,16 @@
 {
     "name": "dinkbit/payme",
-    "description": "Payme library to charge from",
+    "description": "Multi-gateway payment processing library for Laravel",
+    "keywords": [
+        "payme",
+        "payments",
+        "laravel",
+        "dinkbit"
+    ],
     "authors": [
         {
-            "name": "Joseph Cohen",
-            "email": "joseph.cohen@dinkbit.com"
+            "name": "Dinkbit",
+            "homepage": "https://github.com/dinkbit/payme"
         }
     ],
     "require": {
