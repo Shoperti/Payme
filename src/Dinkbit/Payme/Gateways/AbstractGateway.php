@@ -91,16 +91,17 @@ abstract class AbstractGateway {
 	{
 		if (null === $money) return null;
 
-		$cents = $money * 100;
-
-		if ( ! is_numeric($money) or $money < 0)
+		if (is_string($money) or $money < 0)
 		{
 			throw new \InvalidArgumentException('Money amount must be a positive number.');
 		}
 
-		return ($this->getMoneyFormat() == 'cents')
-			? number_format($cents, 0, '', '')
-			: number_format($money, 2);
+		if ($this->getMoneyFormat() == 'cents')
+		{
+			return number_format($money, 0, '', '');
+		}
+
+		return sprintf("%.2f", number_format($money, 2, '.', '') / 100);
 	}
 
 	/**
