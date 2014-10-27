@@ -52,6 +52,14 @@ abstract class AbstractGateway {
 	}
 
 	/**
+	 * @return string
+	 */
+	protected function getMoneyFormat()
+	{
+		return $this->moneyFormat;
+	}
+
+	/**
 	 * Get a fresh instance of the Guzzle HTTP client.
 	 *
 	 * @return \GuzzleHttp\Client
@@ -68,6 +76,31 @@ abstract class AbstractGateway {
 	protected function buildUrlFromString($endpoint)
 	{
 		return $this->getRequestUrl() . '/' . $endpoint;
+	}
+
+	/**
+	 * Accepts the anount of money in base unit and returns cants or base unit
+	 * amount according to the @see $money_format propery.
+	 *
+	 * @throws \InvalidArgumentException
+	 * @param  $money The amount of money in base unit, not in cents.
+	 * @access public
+	 * @return integer|float
+	 */
+	public function amount($money)
+	{
+		if (null === $money) return null;
+
+		$cents = $money * 100;
+
+		if ( ! is_numeric($money) or $money < 0)
+		{
+			throw new \InvalidArgumentException('Money amount must be a positive number.');
+		}
+
+		return ($this->getMoneyFormat() == 'cents')
+			? number_format($cents, 0, '', '')
+			: number_format($money, 2);
 	}
 
 	/**

@@ -10,6 +10,7 @@ class Conekta extends AbstractGateway implements Charge, Store {
 	protected $liveEndpoint = 'https://api.conekta.io';
 	protected $defaultCurrency = 'MXN';
 	protected $displayName = 'conekta';
+	protected $moneyFormat = 'cents';
 
 	protected $apiVersion = "0.3.0";
 	protected $locale = 'es';
@@ -87,7 +88,7 @@ class Conekta extends AbstractGateway implements Charge, Store {
 		$params['description'] = $this->array_get($options, 'description', "Payme Purchase");
         $params['reference_id'] = $this->array_get($options, 'order_id');
         $params['currency'] = $this->array_get($options, 'currency', $this->getCurrency());
-        $params['amount'] = $this->getAmountInteger($money);
+        $params['amount'] = $this->amount($money);
 
 		return $params;
 	}

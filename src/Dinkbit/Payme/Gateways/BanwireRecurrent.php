@@ -8,6 +8,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	protected $liveEndpoint = 'https://banwiresecure.com/Recurrentes2013/recurrente';
 	protected $defaultCurrency = 'MXN';
 	protected $displayName = 'banwirerecurrent';
+	protected $moneyFormat = 'dollars';
 
 	/**
 	 * @param $config
@@ -41,7 +42,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	 */
 	protected function addOrder($params, $money)
 	{
-		$params['monto'] = $this->getAmount($money);
+		$params['monto'] = $this->amount($money);
 
 		return $params;
 	}
