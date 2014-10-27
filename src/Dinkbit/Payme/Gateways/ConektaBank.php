@@ -1,5 +1,6 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
+use Dinkbit\Payme\Status;
 use Dinkbit\Payme\Transaction;
 
 class ConektaBank extends Conekta {

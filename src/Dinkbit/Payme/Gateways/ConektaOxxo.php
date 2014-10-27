@@ -1,5 +1,6 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
+use Dinkbit\Payme\Status;
 use Dinkbit\Payme\Transaction;
 
 class ConektaOxxo extends Conekta {
@@ -15,9 +16,17 @@ class ConektaOxxo extends Conekta {
 
 		$params['cash']['type'] = $payment;
 
+		$params = $this->addExpiry($params, $options);
 		$params = $this->addOrder($params, $amount, $options);
 
 		return $this->commit('post', $this->buildUrlFromString('charges'), $params);
+	}
+
+	public function addExpiry($params, $options)
+	{
+		$params['cash']['expires_at'] = $this->array_get($options, 'expires', date("Y-m-d", time() + 172800));
+
+		return $params;
 	}
 
 	/**
