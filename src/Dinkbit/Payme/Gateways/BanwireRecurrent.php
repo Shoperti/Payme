@@ -1,6 +1,7 @@
 <?php namespace Dinkbit\Payme\Gateways;
 
 use Dinkbit\Payme\Contracts\Charge;
+use Dinkbit\Payme\Status;
 use Dinkbit\Payme\Transaction;
 
 class BanwireRecurrent extends AbstractGateway implements Charge {
@@ -15,7 +16,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	 */
 	public function __construct($config)
 	{
-		$this->requires($config, ['merchant', 'mail']);
+		$this->requires($config, ['merchant', 'email']);
 
 		$this->config = $config;
 	}
@@ -23,7 +24,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function charge($amount, $payment, $options = array())
+	public function charge($amount, $payment, $options = [])
 	{
 		$params = [];
 
@@ -58,10 +59,10 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 		$params['id_tarjeta'] = $this->array_get($options, 'card_id');
 
 		$name = $this->array_get($options, 'card_name');
-		list($cardName, $cardLastname) = explode(' ', "$name ", 2);
+		list($cardName, $cardLastName) = explode(' ', "$name ", 2);
 
-		$params['card_name'] = trim($cardName);
-		$params['card_lastname'] = trim($cardLastname);
+		$params['card_name'] = $cardName;
+		$params['card_lastname'] = $cardLastName;
 
 		return $params;
 	}
@@ -147,10 +148,10 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 		return (new Transaction)->setRaw($response)->map([
 			'isRedirect' 	=> false,
 			'success'	 	=> $success,
-			'message' 		=> $success ? 'Transacción aprovada' : $this->getTransactionMessage($response['code_auth']),
+			'message' 		=> $success ? 'Transacción aprovada' : $this->getTransactionMessage($this->array_get($response, 'code_auth'), $this->array_get($response, 'message')),
 			'test' 			=> false, //array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $this->array_get($response, 'code_auth', false),
-			'status'		=> $success ? $this->array_get($response, 'message', true) : false,
+			'status'		=> $success ? $this->array_get($response, 'message', true) : new Status('failed'),
 			'reference' 	=> $this->array_get($response, 'status', false),
 			'code' 			=> $this->array_get($response, 'code_auth', false)
 		]);
