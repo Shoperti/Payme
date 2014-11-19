@@ -203,7 +203,7 @@ class Conekta extends AbstractGateway implements Charge, Store {
 		return (new Transaction)->setRaw($response)->map([
 			'isRedirect' 	=> false,
 			'success'	 	=> $success,
-			'message' 		=> $success ? 'Transacción aprovada' : $response['message_to_purchaser'],
+			'message' 		=> $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
 			'test' 			=> array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $success ? $response['id'] : $response['type'],
 			'status'		=> $success ? $this->getStatus($this->array_get($response, 'status', 'paid')) : new Status('failed'),

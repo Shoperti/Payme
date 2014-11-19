@@ -148,7 +148,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge {
 		return (new Transaction)->setRaw($response)->map([
 			'isRedirect' 	=> false,
 			'success'	 	=> $success,
-			'message' 		=> $success ? 'Transacción aprovada' : $this->getTransactionMessage($this->array_get($response, 'code_auth'), $this->array_get($response, 'message')),
+			'message' 		=> $success ? 'Transacción aprobada' : $this->getTransactionMessage($this->array_get($response, 'code_auth'), $this->array_get($response, 'message')),
 			'test' 			=> false, //array_key_exists('livemode', $response) ? $response["livemode"] : false,
 			'authorization' => $this->array_get($response, 'code_auth', false),
 			'status'		=> $success ? $this->array_get($response, 'message', true) : new Status('failed'),
