@@ -4,7 +4,7 @@
 
 **Warning**: Beta version API can change.
 
-Based on [Active Merchant](http://github.com/Shopify/active_merchant) for Ruby and [Aktive-Merchant](https://github.com/akDeveloper/Aktive-Merchant) for PHP
+Based on [Active Merchant](http://github.com/Shopify/active_merchant) for Ruby.
 
 Supported Gateways:
 * Conekta
