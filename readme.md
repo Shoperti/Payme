@@ -1,6 +1,8 @@
-# Dinkbit Payme
+# Dinkbit PayMe
 
-**Warning**: Alpha version, do not use in production.
+[![Build Status](https://img.shields.io/travis/dinkbit/payme.svg?style=flat-square)](https://travis-ci.org/dinkbit/payme)
+
+**Warning**: Beta version API can change.
 
 Based on [Active Merchant](http://github.com/Shopify/active_merchant) for Ruby and [Aktive-Merchant](https://github.com/akDeveloper/Aktive-Merchant) for PHP
 
@@ -26,15 +28,15 @@ $payme->driver('banwirerecurrent')->charge($amount, '8305ab68d4acf7dc650364d3f31
   'card_id' => '1407',
   'card_name' => 'Joseph Co',
   'customer' => '1'
-])
+]);
 
-$payme->driver('conekta')->store('tok_test_visa_4242', ['name' => 'Joe Co', 'email' => 'store.guy@mail.com'])
+$payme->driver('conekta')->store('tok_test_visa_4242', ['name' => 'Joe Co', 'email' => 'store.guy@mail.com']);
 
-$payme->driver('conekta')->store('tok_test_visa_4242', ['customer' => 'cus_test'])
+$payme->driver('conekta')->store('tok_test_visa_4242', ['customer' => 'cus_test']);
 
-$payme->driver('conekta')->unstore('cus_test', ['card_id' => 'tok_test_visa_4242'])
+$payme->driver('conekta')->unstore('cus_test', ['card_id' => 'tok_test_visa_4242']);
 
-$payme->driver('conekta')->unstore('cus_test')
+$payme->driver('conekta')->unstore('cus_test');
 
 ```
 
@@ -42,5 +44,4 @@ $payme->driver('conekta')->unstore('cus_test')
 
 - [ ] Add tests
 - [ ] Fix credit cards implementation
-- [ ] Add CI
 - [ ] Add more gateways
