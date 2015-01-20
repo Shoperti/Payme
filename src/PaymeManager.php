@@ -3,6 +3,7 @@
 namespace Dinkbit\PayMe;
 
 use Dinkbit\PayMe\Gateways\BanwireRecurrent;
+use Dinkbit\PayMe\Gateways\Bogus;
 use Dinkbit\PayMe\Gateways\Conekta;
 use Dinkbit\PayMe\Gateways\ConektaBank;
 use Dinkbit\PayMe\Gateways\ConektaOxxo;
@@ -22,6 +23,18 @@ class PaymeManager extends Manager implements Contracts\Factory
     public function with($driver)
     {
         return $this->driver($driver);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return \Dinkbit\PayMe\Gateways\Bogus
+     */
+    protected function createBogusDriver()
+    {
+        $config = $this->app['config']['services.bogus'];
+
+        return new Bogus($config);
     }
 
     /**

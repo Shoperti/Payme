@@ -87,11 +87,11 @@ $payme->driver($driver)->charge($amount, $payment, $params);
 ```php
 $amount = 1000; //cents
 
-$payme->driver('conekta')->charge($amount, 'tok_test_card_declined')
+$payme->driver('conekta')->charge($amount, 'tok_test_card_declined');
 
-$payme->driver('conektaoxxo')->charge($amount, 'oxxo')
+$payme->driver('conektaoxxo')->charge($amount, 'oxxo');
 
-$payme->driver('conektabank')->charge($amount, 'banorte')
+$payme->driver('conektabank')->charge($amount, 'banorte');
 
 $payme->driver('banwirerecurrent')->charge($amount, '8305ab68d4acf7dc650364d3f31a7318', [
   'card_id' => '1407',
@@ -106,6 +106,10 @@ $payme->driver('conekta')->store('tok_test_visa_4242', ['customer' => 'cus_test'
 $payme->driver('conekta')->unstore('cus_test', ['card_id' => 'tok_test_visa_4242']);
 
 $payme->driver('conekta')->unstore('cus_test');
+
+$payme->driver('bogus')->charge($amount, 'success');
+
+$payme->driver('bogus')->charge($amount, 'fail');
 
 ```
 
