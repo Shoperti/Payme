@@ -14,7 +14,7 @@ class Status
     protected $status;
 
     /**
-     * Available statuses.
+     * Valid statuses.
      *
      * @var string[]
      */
@@ -42,16 +42,18 @@ class Status
      */
     public function __construct($status)
     {
-        $this->disallowInvalidMethod($status);
+        $this->disallowInvalidStatus($status);
         $this->status = $status;
     }
 
     /**
+     * Validate status provided.
+     * 
      * @param $status
      *
      * @throws \InvalidArgumentException
      */
-    protected function disallowInvalidMethod($status)
+    protected function disallowInvalidStatus($status)
     {
         if (! in_array($status, $this->statuses)) {
             throw new InvalidArgumentException('Invalid status provided.');
