@@ -1,4 +1,6 @@
-<?php namespace Dinkbit\Payme\Gateways\Paypal;
+<?php 
+
+namespace Dinkbit\Payme\Gateways\Paypal;
 
 use Dinkbit\Payme\Gateways\AbstractGateway;
 

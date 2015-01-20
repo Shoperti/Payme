@@ -1,4 +1,6 @@
-<?php namespace Dinkbit\Payme\Exceptions;
+<?php 
+
+namespace Dinkbit\Payme\Exceptions;
 
 class TransactionErrorException extends \Exception
 {

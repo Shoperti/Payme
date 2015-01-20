@@ -1,4 +1,6 @@
-<?php namespace Dinkbit\Payme;
+<?php 
+
+namespace Dinkbit\Payme;
 
 trait CreditCardTrait
 {

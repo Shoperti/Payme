@@ -1,4 +1,6 @@
-<?php namespace Dinkbit\Payme\Contracts;
+<?php 
+
+namespace Dinkbit\Payme\Contracts;
 
 interface Charge
 {
