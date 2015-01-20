@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 class Arr
 {
-	/**
+    /**
      * Get an item from an array.
      *
      * @param array  $array

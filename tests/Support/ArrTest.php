@@ -1,7 +1,6 @@
 <?php
 
 use Dinkbit\PayMe\Support\Arr;
-
 use InvalidArgumentException;
 
 class ArrTest extends PHPUnit_Framework_TestCase

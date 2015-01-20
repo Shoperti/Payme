@@ -48,7 +48,7 @@ class Status
 
     /**
      * Validate status provided.
-     * 
+     *
      * @param $status
      *
      * @throws \InvalidArgumentException

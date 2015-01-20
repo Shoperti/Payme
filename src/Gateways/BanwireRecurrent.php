@@ -4,33 +4,65 @@ namespace Dinkbit\PayMe\Gateways;
 
 use Dinkbit\PayMe\Contracts\Charge;
 use Dinkbit\PayMe\Status;
+use Dinkbit\PayMe\Support\Arr;
 use Dinkbit\PayMe\Transaction;
 
 class BanwireRecurrent extends AbstractGateway implements Charge
 {
-    protected $liveEndpoint = 'https://banwiresecure.com/Recurrentes2013/recurrente';
-    protected $defaultCurrency = 'MXN';
+    /**
+     * Gateway API endpoint.
+     *
+     * @var string
+     */
+    protected $endpoint = 'https://banwiresecure.com/Recurrentes2013/recurrente';
+
+    /**
+     * Gateway display name.
+     *
+     * @var string
+     */
     protected $displayName = 'banwirerecurrent';
+
+    /**
+     * Gateway default currency.
+     *
+     * @var string
+     */
+    protected $defaultCurrency = 'MXN';
+
+    /**
+     * Gateway money format.
+     *
+     * @var string
+     */
     protected $moneyFormat = 'dollars';
 
     /**
+     * Inject the configuration for a Gateway.
+     *
      * @param $config
      */
     public function __construct($config)
     {
-        $this->requires($config, ['merchant', 'email']);
+        Arr::requires($config, ['merchant', 'email']);
 
         $this->config = $config;
     }
 
     /**
-     * {@inheritdoc}
+     * Charge the credit card.
+     *
+     * @param $amount
+     * @param $payment
+     * @param string[] $options
+     *
+     * @return \Dinkbit\Payme\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
         $params = [];
 
-        $params = $this->addOrder($params, $amount);
+        $params = $this->addOrder($params, $amount, $options);
         $params = $this->addPayMent($params, $payment, $options);
         $params = $this->addUser($params, $options);
 
@@ -38,14 +70,15 @@ class BanwireRecurrent extends AbstractGateway implements Charge
     }
 
     /**
-     * @param $params
+     * Add order params to request.
+     *
+     * @param $params[]
      * @param $money
+     * @param $options[]
      *
-     * @throws InvalidRequestException
-     *
-     * @return mixed
+     * @return array
      */
-    protected function addOrder($params, $money)
+    protected function addOrder(array $params, $money, array $options)
     {
         $params['monto'] = $this->amount($money);
 
@@ -53,16 +86,20 @@ class BanwireRecurrent extends AbstractGateway implements Charge
     }
 
     /**
-     * @param $params
+     * Add payment method to request.
+     *
+     * @param $params[]
      * @param $payment
-     * @param array $options
+     * @param $options[]
+     *
+     * @return array
      */
-    protected function addPayMent($params, $payment, $options = [])
+    protected function addPayment(array $params, $payment, array $options)
     {
         $params['token'] = $payment;
-        $params['id_tarjeta'] = $this->array_get($options, 'card_id');
+        $params['id_tarjeta'] = Arr::get($options, 'card_id');
 
-        $name = $this->array_get($options, 'card_name');
+        $name = Arr::get($options, 'card_name');
         list($cardName, $cardLastName) = explode(' ', "$name ", 2);
 
         $params['card_name'] = $cardName;
@@ -72,18 +109,24 @@ class BanwireRecurrent extends AbstractGateway implements Charge
     }
 
     /**
-     * @param $params
-     * @param array $options
+     * Add user to request.
+     *
+     * @param $params[]
+     * @param $options[]
+     *
+     * @return array
      */
-    protected function addUser($params, $options = [])
+    protected function addUser(array $params, array $options)
     {
-        $params['cliente_id'] = $this->array_get($options, 'customer');
+        $params['cliente_id'] = Arr::get($options, 'customer');
 
         return $params;
     }
 
     /**
-     * @param $code
+     * Map transaction code to message.
+     *
+     * @param string $code
      * @param string $message
      *
      * @return string
@@ -123,7 +166,14 @@ class BanwireRecurrent extends AbstractGateway implements Charge
     }
 
     /**
-     * {@inheritdoc}
+     * Commit a HTTP request.
+     *
+     * @param string   $method
+     * @param string   $url
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return mixed
      */
     protected function commit($method = 'post', $url, $params = [], $options = [])
     {
@@ -141,33 +191,48 @@ class BanwireRecurrent extends AbstractGateway implements Charge
 
         $success = $this->getSuccess($response);
 
-        return $this->mapResponseToTransaction($success, $response);
+        if (! $success) {
+            $response = $this->responseError($rawResponse);
+        }
+
+        return $this->mapTransaction($success, $response);
     }
 
     /**
-     * {@inheritdoc}
+     * Map HTTP response to transaction object.
+     *
+     * @param bool  $success
+     * @param array $response
+     *
+     * @return \Dinkbit\PayMe\Transaction
      */
-    public function mapResponseToTransaction($success, $response)
+    public function mapTransaction($success, $response)
     {
         return (new Transaction())->setRaw($response)->map([
             'isRedirect'      => false,
             'success'         => $success,
-            'message'         => $success ? 'Transacción aprobada' : $this->getTransactionMessage($this->array_get($response, 'code_auth'), $this->array_get($response, 'message')),
-            'test'            => false, //array_key_exists('livemode', $response) ? $response["livemode"] : false,
-            'authorization'   => $this->array_get($response, 'code_auth', false),
-            'status'          => $success ? $this->array_get($response, 'message', true) : new Status('failed'),
-            'reference'       => $this->array_get($response, 'status', false),
-            'code'            => $this->array_get($response, 'code_auth', false),
+            'message'         => $success ? 'Transacción aprobada' : $this->getTransactionMessage(Arr::get($response, 'code_auth'), Arr::get($response, 'message')),
+            'test'            => false,
+            'authorization'   => Arr::get($response, 'code_auth', false),
+            'status'          => $success ? Arr::get($response, 'message', true) : new Status('failed'),
+            'reference'       => Arr::get($response, 'status', false),
+            'code'            => Arr::get($response, 'code_auth', false),
         ]);
     }
 
     /**
+     * Is Banwire response success?
+     *
      * @param $transaction
      *
      * @return bool
      */
     protected function getSuccess($transaction)
     {
+        if (null === $transaction) {
+            return false;
+        }
+
         if (isset($transaction['response']) and $transaction['response'] == 'ok') {
             return true;
         }
@@ -182,22 +247,53 @@ class BanwireRecurrent extends AbstractGateway implements Charge
     }
 
     /**
-     * @param $body
+     * Parse JSON response to array.
+     *
+     * @param  $body
      *
      * @return array
      */
     protected function parseResponse($body)
     {
-        parse_str($body, $output);
-
-        return $output;
+        return json_decode($body, true);
     }
 
     /**
+     * Get error response from server or fallback to general error.
+     *
+     * @param string $rawResponse
+     *
+     * @return array
+     */
+    protected function responseError($rawResponse)
+    {
+        return $this->parseResponse($rawResponse->getBody()) ?: $this->jsonError($rawResponse);
+    }
+
+    /**
+     * Default JSON response.
+     *
+     * @param $rawResponse
+     *
+     * @return array
+     */
+    public function jsonError($rawResponse)
+    {
+        $msg = 'API Response not valid.';
+        $msg .= " (Raw response API {$rawResponse->getBody()})";
+
+        return [
+            'message' => $msg
+        ];
+    }
+
+    /**
+     * Get the request url.
+     *
      * @return string
      */
     protected function getRequestUrl()
     {
-        return $this->liveEndpoint;
+        return $this->endpoint;
     }
 }

@@ -7,7 +7,7 @@ class Helper
     /**
      * Remove all accents from string.
      *
-     * @var string
+     * @param string
      *
      * @return mixed
      */
