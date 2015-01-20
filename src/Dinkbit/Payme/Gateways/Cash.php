@@ -1,5 +1,7 @@
-<?php  namespace Dinkbit\Payme\Gateways;
+<?php
 
-class Cash {
+namespace Dinkbit\Payme\Gateways;
 
+class Cash
+{
 }

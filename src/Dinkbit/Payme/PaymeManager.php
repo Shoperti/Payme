@@ -1,87 +1,90 @@
-<?php  namespace Dinkbit\Payme;
+<?php
+
+namespace Dinkbit\Payme;
 
 use Illuminate\Support\Manager;
 
-class PaymeManager extends Manager implements Contracts\Factory {
+class PaymeManager extends Manager implements Contracts\Factory
+{
+    /**
+     * Get a driver instance.
+     *
+     * @param string $driver
+     *
+     * @return mixed
+     */
+    public function with($driver)
+    {
+        return $this->driver($driver);
+    }
 
-	/**
-	 * Get a driver instance.
-	 *
-	 * @param  string  $driver
-	 * @return mixed
-	 */
-	public function with($driver)
-	{
-		return $this->driver($driver);
-	}
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return Gateways\Banwire
+     */
+    protected function createBanwireRecurrentDriver()
+    {
+        $config = $this->app['config']['services.banwire'];
 
-	/**
-	 * Create an instance of the specified driver.
-	 *
-	 * @return Gateways\Banwire
-	 */
-	protected function createBanwireRecurrentDriver()
-	{
-		$config = $this->app['config']['services.banwire'];
+        return new \Dinkbit\Payme\Gateways\BanwireRecurrent($config);
+    }
 
-		return new \Dinkbit\Payme\Gateways\BanwireRecurrent($config);
-	}
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return Gateways\Conekta
+     */
+    protected function createConektaDriver()
+    {
+        $config = $this->app['config']['services.conekta'];
 
-	/**
-	 * Create an instance of the specified driver.
-	 *
-	 * @return Gateways\Conekta
-	 */
-	protected function createConektaDriver()
-	{
-		$config = $this->app['config']['services.conekta'];
+        return new \Dinkbit\Payme\Gateways\Conekta($config);
+    }
 
-		return new \Dinkbit\Payme\Gateways\Conekta($config);
-	}
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return Gateways\ConektaBank
+     */
+    protected function createConektaBankDriver()
+    {
+        $config = $this->app['config']['services.conekta'];
 
-	/**
-	 * Create an instance of the specified driver.
-	 *
-	 * @return Gateways\ConektaBank
-	 */
-	protected function createConektaBankDriver()
-	{
-		$config = $this->app['config']['services.conekta'];
+        return new \Dinkbit\Payme\Gateways\ConektaBank($config);
+    }
 
-		return new \Dinkbit\Payme\Gateways\ConektaBank($config);
-	}
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return Gateways\ConektaOxxo
+     */
+    protected function createConektaOxxoDriver()
+    {
+        $config = $this->app['config']['services.conekta'];
 
-	/**
-	 * Create an instance of the specified driver.
-	 *
-	 * @return Gateways\ConektaOxxo
-	 */
-	protected function createConektaOxxoDriver()
-	{
-		$config = $this->app['config']['services.conekta'];
+        return new \Dinkbit\Payme\Gateways\ConektaOxxo($config);
+    }
 
-		return new \Dinkbit\Payme\Gateways\ConektaOxxo($config);
-	}
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return Gateways\PaypalExpress
+     */
+    protected function createPaypalExpressDriver()
+    {
+        $config = $this->app['config']['services.paypal'];
 
-	/**
-	 * Create an instance of the specified driver.
-	 *
-	 * @return Gateways\PaypalExpress
-	 */
-	protected function createPaypalExpressDriver()
-	{
-		$config = $this->app['config']['services.paypal'];
+        return new \Dinkbit\Payme\Gateways\PaypalExpress($config);
+    }
 
-		return new \Dinkbit\Payme\Gateways\PaypalExpress($config);
-	}
-
-	/**
-	 * Get the default driver name.
-	 *
-	 * @return string
-	 */
-	public function getDefaultDriver()
-	{
-		throw new \InvalidArgumentException("No Payme driver was specified.");
-	}
+    /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver()
+    {
+        throw new \InvalidArgumentException("No Payme driver was specified.");
+    }
 }
