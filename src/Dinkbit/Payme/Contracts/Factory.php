@@ -1,13 +1,15 @@
-<?php  namespace Dinkbit\Payme\Contracts;
+<?php
 
-interface Factory {
+namespace Dinkbit\Payme\Contracts;
 
-	/**
-	 * Get a Gateway implementation.
-	 *
-	 * @param  string  $driver
-	 * @return \Dinkbit\Payme\Contracts\Gateway
-	 */
-	public function driver($driver = null);
-
+interface Factory
+{
+    /**
+     * Get a Gateway implementation.
+     *
+     * @param string $driver
+     *
+     * @return \Dinkbit\Payme\Contracts\Gateway
+     */
+    public function driver($driver = null);
 }
