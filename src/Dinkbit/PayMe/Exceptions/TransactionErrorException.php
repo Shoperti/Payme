@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\Payme\Exceptions;
+namespace Dinkbit\PayMe\Exceptions;
 
 /**
  * Invalid Transaction Exception.
