@@ -74,7 +74,7 @@ class Currency
      *
      * @param string $code The three letter currency code
      *
-     * @return mixed A Currency object, or null if no currency was found
+     * @return null|\Dinkbit\PayMe\Currency
      */
     public static function find($code)
     {
