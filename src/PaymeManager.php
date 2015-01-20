@@ -8,6 +8,7 @@ use Dinkbit\PayMe\Gateways\Conekta;
 use Dinkbit\PayMe\Gateways\ConektaBank;
 use Dinkbit\PayMe\Gateways\ConektaOxxo;
 use Dinkbit\PayMe\Gateways\PaypalExpress;
+use Dinkbit\PayMe\Gateways\Stripe;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -95,6 +96,18 @@ class PaymeManager extends Manager implements Contracts\Factory
         $config = $this->app['config']['services.paypal'];
 
         return new PaypalExpress($config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return \Dinkbit\PayMe\Gateways\Stripe
+     */
+    protected function createStripeDriver()
+    {
+        $config = $this->app['config']['services.stripe'];
+
+        return new Stripe($config);
     }
 
     /**

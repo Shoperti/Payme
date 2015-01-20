@@ -87,7 +87,18 @@ $payme->driver($driver)->charge($amount, $payment, $params);
 ```php
 $amount = 1000; //cents
 
+$payme->driver('stripe')->charge($amount, 'tok_TOKEN'); // JS Token
+$payme->driver('stripe')->charge($amount, 'card_TOKEN', ['customer' => 'cus_TOKEN']);
+$payme->driver('stripe')->store('tok_test_visa_4242', ['name' => 'Joe Co', 'email' => 'store.guy@example.com']);
+$payme->driver('stripe')->store('tok_test_visa_4242', ['customer' => 'cus_test']);
+$payme->driver('stripe')->unstore('cus_test', ['card_id' => 'tok_test']);
+$payme->driver('stripe')->unstore('cus_test');
+
 $payme->driver('conekta')->charge($amount, 'tok_test_card_declined');
+$payme->driver('conekta')->store('tok_test_visa_4242', ['name' => 'Joe Co', 'email' => 'store.guy@example.com']);
+$payme->driver('conekta')->store('tok_test_visa_4242', ['customer' => 'cus_test']);
+$payme->driver('conekta')->unstore('cus_test', ['card_id' => 'tok_test']);
+$payme->driver('conekta')->unstore('cus_test');
 
 $payme->driver('conektaoxxo')->charge($amount, 'oxxo');
 
@@ -99,16 +110,7 @@ $payme->driver('banwirerecurrent')->charge($amount, '8305ab68d4acf7dc650364d3f31
   'customer' => '1'
 ]);
 
-$payme->driver('conekta')->store('tok_test_visa_4242', ['name' => 'Joe Co', 'email' => 'store.guy@mail.com']);
-
-$payme->driver('conekta')->store('tok_test_visa_4242', ['customer' => 'cus_test']);
-
-$payme->driver('conekta')->unstore('cus_test', ['card_id' => 'tok_test_visa_4242']);
-
-$payme->driver('conekta')->unstore('cus_test');
-
 $payme->driver('bogus')->charge($amount, 'success');
-
 $payme->driver('bogus')->charge($amount, 'fail');
 
 ```
