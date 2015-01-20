@@ -2,8 +2,6 @@
 
 [![Build Status](https://img.shields.io/travis/dinkbit/payme.svg?style=flat-square)](https://travis-ci.org/dinkbit/payme)
 
-**Warning**: Beta version API can change.
-
 Based on [Active Merchant](http://github.com/Shopify/active_merchant) for Ruby.
 
 Supported Gateways:
