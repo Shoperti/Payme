@@ -5,24 +5,62 @@ namespace Dinkbit\PayMe\Gateways;
 use Dinkbit\PayMe\Contracts\Charge;
 use Dinkbit\PayMe\Contracts\Store;
 use Dinkbit\PayMe\Status;
+use Dinkbit\PayMe\Support\Arr;
+use Dinkbit\PayMe\Support\Helper;
 use Dinkbit\PayMe\Transaction;
 
 class Conekta extends AbstractGateway implements Charge, Store
 {
-    protected $liveEndpoint = 'https://api.conekta.io';
-    protected $defaultCurrency = 'MXN';
+    /**
+     * Gateway API endpoint.
+     *
+     * @var string
+     */
+    protected $endpoint = 'https://api.conekta.io';
+
+    /**
+     * Gateway display name.
+     *
+     * @var string
+     */
     protected $displayName = 'conekta';
+
+    /**
+     * Gateway default currency.
+     *
+     * @var string
+     */
+    protected $defaultCurrency = 'MXN';
+
+    /**
+     * Gateway money format.
+     *
+     * @var string
+     */
     protected $moneyFormat = 'cents';
 
+    /**
+     * Conekta API version.
+     *
+     * @var string
+     */
     protected $apiVersion = "0.3.0";
+
+    /**
+     * Conekta API locale.
+     *
+     * @var string
+     */
     protected $locale = 'es';
 
     /**
+     * Inject the configuration for a Gateway.
+     *
      * @param $config
      */
     public function __construct($config)
     {
-        $this->requires($config, ['private_key']);
+        Arr::requires($config, ['private_key']);
 
         $config['version'] = $this->apiVersion;
         $config['locale'] = $this->locale;
@@ -31,7 +69,13 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * {@inheritdoc}
+     * Charge the credit card.
+     *
+     * @param $amount
+     * @param $payment
+     * @param string[] $options
+     *
+     * @return \Dinkbit\Payme\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
@@ -39,12 +83,18 @@ class Conekta extends AbstractGateway implements Charge, Store
 
         $params = $this->addOrder($params, $amount, $options);
         $params = $this->addPayMentMethod($params, $payment, $options);
+        $params = $this->addOrderDetails($params, $options);
 
         return $this->commit('post', $this->buildUrlFromString('charges'), $params);
     }
 
     /**
-     * {@inheritdoc}
+     * Stores a credit card.
+     *
+     * @param $creditcard
+     * @param string[] $options
+     *
+     * @return mixed
      */
     public function store($creditcard, $options = [])
     {
@@ -53,8 +103,8 @@ class Conekta extends AbstractGateway implements Charge, Store
 
             return $this->commit('post', $this->buildUrlFromString('customers/'.$options['customer'].'/cards'), $params);
         } else {
-            $params['email'] = $this->array_get($options, 'email');
-            $params['name'] = $this->array_get($options, 'name');
+            $params['email'] = Arr::get($options, 'email');
+            $params['name'] = Arr::get($options, 'name');
             $params['cards'] = [$creditcard];
 
             return $this->commit('post', $this->buildUrlFromString('customers'), $params);
@@ -62,7 +112,12 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * {@inheritdoc}
+     * Unstores a credit card.
+     *
+     * @param $reference
+     * @param string[] $options
+     *
+     * @return mixed
      */
     public function unstore($reference, $options = [])
     {
@@ -74,30 +129,59 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * @param $params
-     * @param $money
-     * @param $options
+     * Add order params to request.
      *
-     * @return mixed
+     * @param $params[]
+     * @param $money
+     * @param $options[]
+     *
+     * @return array
      */
-    protected function addOrder($params, $money, $options)
+    protected function addOrder(array $params, $money, array $options)
     {
-        $params['description'] = $this->array_get($options, 'description', "PayMe Purchase");
-        $params['reference_id'] = $this->array_get($options, 'order_id');
-        $params['currency'] = $this->array_get($options, 'currency', $this->getCurrency());
+        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', "PayMe Purchase"));
+        $params['reference_id'] = Arr::get($options, 'order_id');
+        $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
 
         return $params;
     }
 
     /**
-     * @param $params
-     * @param $payment
-     * @param $options
+     * Add order details params.
+     *
+     * @param $params[]
+     * @param $options[]
      *
      * @return mixed
      */
-    protected function addPayMentMethod($params, $payment, $options)
+    protected function addOrderDetails(array $params, array $options)
+    {
+        if (isset($options['name'])) {
+            $params['details']['name'] = Arr::get($options, 'name', '');
+        }
+
+        if (isset($options['email'])) {
+            $params['details']['email'] = Arr::get($options, 'email', '');
+        }
+
+        if (isset($options['phone'])) {
+            $params['details']['phone'] = Arr::get($options, 'phone', '');
+        }
+
+        return $params;
+    }
+
+    /**
+     * Add payment method to request.
+     *
+     * @param $params[]
+     * @param $payment
+     * @param $options[]
+     *
+     * @return array
+     */
+    protected function addPayMentMethod(array $params, $payment, array $options)
     {
         if (is_string($payment)) {
             $params['card'] = $payment;
@@ -115,41 +199,52 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * @param $params
-     * @param $options
+     * Add address to request.
      *
-     * @return mixed
+     * @param $params[]
+     * @param $options[]
+     *
+     * @return array
      */
-    protected function addAddress($params, $options)
+    protected function addAddress(array $params, array $options)
     {
-        if ($address = $this->array_get($options, 'address') or $this->array_get($options, 'billing_address')) {
+        if ($address = Arr::get($options, 'address') or Arr::get($options, 'billing_address')) {
             $params['address'] = [];
-            $params['address']['street1'] = $this->array_get($address, 'address1');
-            $params['address']['street2'] = $this->array_get($address, 'address2');
-            $params['address']['street3'] = $this->array_get($address, 'address3');
-            $params['address']['city'] = $this->array_get($address, 'city');
-            $params['address']['country'] = $this->array_get($address, 'country');
-            $params['address']['state'] = $this->array_get($address, 'state');
-            $params['address']['zip'] = $this->array_get($address, 'zip');
+            $params['address']['street1'] = Arr::get($address, 'address1');
+            $params['address']['street2'] = Arr::get($address, 'address2');
+            $params['address']['street3'] = Arr::get($address, 'address3');
+            $params['address']['city'] = Arr::get($address, 'city');
+            $params['address']['country'] = Arr::get($address, 'country');
+            $params['address']['state'] = Arr::get($address, 'state');
+            $params['address']['zip'] = Arr::get($address, 'zip');
 
             return $params;
         }
     }
 
     /**
-     * @param $params
-     * @param $creditcard
-     * @param $options
+     * Add customer to request.
      *
-     * @return string
+     * @param $params[]
+     * @param $creditcard
+     * @param $options[]
+     *
+     * @return array
      */
-    protected function addCustomer($params, $creditcard, $options)
+    protected function addCustomer(array $params, $creditcard, array $options)
     {
         return $params['customer'] = array_key_exists('customer', $options) ? $options['customer'] : '';
     }
 
     /**
-     * {@inheritdoc}
+     * Commit a HTTP request.
+     *
+     * @param string   $method
+     * @param string   $url
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return mixed
      */
     protected function commit($method = 'post', $url, $params = [], $options = [])
     {
@@ -162,6 +257,7 @@ class Conekta extends AbstractGateway implements Charge, Store
         ];
 
         $success = false;
+
         $rawResponse = $this->getHttpClient()->{$method}($url, [
             'exceptions'      => false,
             'timeout'         => '80',
@@ -180,18 +276,23 @@ class Conekta extends AbstractGateway implements Charge, Store
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());
-            $success = ! ($this->array_get($response, 'object', 'error') == 'error');
+            $success = ! (Arr::get($response, 'object', 'error') == 'error');
         } else {
             $response = $this->responseError($rawResponse);
         }
 
-        return $this->mapResponseToTransaction($success, $response);
+        return $this->mapTransaction($success, $response);
     }
 
     /**
-     * {@inheritdoc}
+     * Map HTTP response to transaction object.
+     *
+     * @param bool  $success
+     * @param array $response
+     *
+     * @return \Dinkbit\PayMe\Transaction
      */
-    public function mapResponseToTransaction($success, $response)
+    public function mapTransaction($success, $response)
     {
         return (new Transaction())->setRaw($response)->map([
             'isRedirect'      => false,
@@ -199,34 +300,38 @@ class Conekta extends AbstractGateway implements Charge, Store
             'message'         => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
             'test'            => array_key_exists('livemode', $response) ? $response["livemode"] : false,
             'authorization'   => $success ? $response['id'] : $response['type'],
-            'status'          => $success ? $this->getStatus($this->array_get($response, 'status', 'paid')) : new Status('failed'),
+            'status'          => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'reference'       => $success ? $this->getReference($response) : false,
             'code'            => $success ? false : $response['code'],
         ]);
     }
 
     /**
+     * Map reference to response.
+     *
      * @param $response
      *
-     * @return null
+     * @return string|null
      */
     protected function getReference($response)
     {
-        $object = $this->array_get($response, 'object');
+        $object = Arr::get($response, 'object');
 
         if ($object == 'customer') {
-            return $this->array_get($response, 'default_card_id');
+            return Arr::get($response, 'default_card_id');
         } elseif ($object == 'card') {
-            return $this->array_get($response, 'customer_id');
+            return Arr::get($response, 'customer_id');
         }
 
         return $response['payment_method']['auth_code'];
     }
 
     /**
+     * Map Conekta response to status object.
+     *
      * @param $status
      *
-     * @return Status
+     * @return \Dinkbit\PayMe\Status
      */
     protected function getStatus($status)
     {
@@ -250,7 +355,9 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * @param $body
+     * Parse JSON response to array.
+     *
+     * @param  $body
      *
      * @return array
      */
@@ -260,28 +367,28 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * @param $rawResponse
+     * Get error response from server or fallback to general error.
+     *
+     * @param string $rawResponse
      *
      * @return array
      */
     protected function responseError($rawResponse)
     {
-        if (! $this->isJson($rawResponse->getBody())) {
-            return $this->jsonError($rawResponse);
-        }
-
-        return $this->parseResponse($rawResponse->getBody());
+        return $this->parseResponse($rawResponse->getBody()) ?: $this->jsonError($rawResponse);
     }
 
     /**
+     * Default JSON response.
+     *
      * @param $rawResponse
      *
      * @return array
      */
     public function jsonError($rawResponse)
     {
-        $msg = 'Respuesta no válida recibida de la API de Conekta. Por favor, póngase en contacto con contacto@conekta.com si sigues recibiendo este mensaje.';
-        $msg .= " (Respuesta en bruto devuelto por el API {$rawResponse->getBody()})";
+        $msg = 'API Response not valid.';
+        $msg .= " (Raw response API {$rawResponse->getBody()})";
 
         return [
             'message_to_purchaser' => $msg
@@ -289,22 +396,12 @@ class Conekta extends AbstractGateway implements Charge, Store
     }
 
     /**
-     * @param $string
+     * Get the request url.
      *
-     * @return bool
-     */
-    protected function isJson($string)
-    {
-        json_decode($string);
-
-        return (json_last_error() == JSON_ERROR_NONE);
-    }
-
-    /**
      * @return string
      */
     protected function getRequestUrl()
     {
-        return $this->liveEndpoint;
+        return $this->endpoint;
     }
 }

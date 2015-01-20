@@ -3,65 +3,52 @@
 namespace Dinkbit\PayMe\Gateways;
 
 use Dinkbit\PayMe\Currency;
+use InvalidArgumentException;
 
 abstract class AbstractGateway
 {
     /**
-     * @var
+     * Configuration options.
+     *
+     * @var string[]
      */
     protected $config;
 
     /**
+     * Inject the configuration for a Gateway.
+     *
      * @param $config
      */
     abstract public function __construct($config);
 
     /**
-     * @param string $method
-     * @param $url
-     * @param array  $params
-     * @param array  $options
+     * Commit a HTTP request.
+     *
+     * @param string   $method
+     * @param string   $url
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return mixed
      */
     abstract protected function commit($method = 'post', $url, $params = [], $options = []);
 
     /**
-     * @param $success
-     * @param $response
+     * Map HTTP response to transaction object.
+     *
+     * @param bool  $success
+     * @param array $response
+     *
+     * @return \Dinkbit\PayMe\Transaction
+     */
+    abstract public function mapTransaction($success, $response);
+
+    /**
+     * Get the gateway request url.
      *
      * @return mixed
      */
-    abstract public function mapResponseToTransaction($success, $response);
-
-    /**
-     * @return mixed
-     */
     abstract protected function getRequestUrl();
-
-    /**
-     * @return string
-     */
-    public function displayName()
-    {
-        return $this->displayName;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDefaultCurrency()
-    {
-        return $this->defaultCurrency;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getMoneyFormat()
-    {
-        return $this->moneyFormat;
-    }
 
     /**
      * Get a fresh instance of the Guzzle HTTP client.
@@ -74,7 +61,9 @@ abstract class AbstractGateway
     }
 
     /**
-     * @param $endpoint
+     * Build request url from string.
+     *
+     * @param string $endpoint
      *
      * @return string
      */
@@ -84,14 +73,42 @@ abstract class AbstractGateway
     }
 
     /**
-     * Accepts the anount of money in base unit and returns cants or base unit
+     * Get gateway display name.
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return property_exists($this, 'displayName') ? $this->displayName : '';
+    }
+
+    /**
+     * Get gateway default currency.
+     *
+     * @return string
+     */
+    protected function getDefaultCurrency()
+    {
+        return property_exists($this, 'defaultCurrency') ? $this->defaultCurrency : '';
+    }
+
+    /**
+     * Get gateway money format.
+     *
+     * @return string
+     */
+    protected function getMoneyFormat()
+    {
+        return property_exists($this, 'moneyFormat') ? $this->moneyFormat : '';
+    }
+
+    /**
+     * Accepts the amount of money in base unit and returns cants or base unit
      * amount according to the @see $money_format propery.
      *
-     *
-     * @param  $money The amount of money in base unit, not in cents.
+     * @param  $money
      *
      * @throws \InvalidArgumentException
-     * @access public
      *
      * @return integer|float
      */
@@ -102,7 +119,7 @@ abstract class AbstractGateway
         }
 
         if (is_string($money) or $money < 0) {
-            throw new \InvalidArgumentException('Money amount must be a positive number.');
+            throw new InvalidArgumentException('Money amount must be a positive number.');
         }
 
         if ($this->getMoneyFormat() == 'cents') {
@@ -196,53 +213,5 @@ abstract class AbstractGateway
             '.',
             ''
         );
-    }
-
-    /**
-     * Remove all accents from string.
-     *
-     * @var string
-     *
-     * @return mixed
-     */
-    protected function cleanAccents($string)
-    {
-        $notAllowed = ["á","é","í","ó","ú","Á","É","Í","Ó","Ú","ñ","À","Ã","Ì","Ò","Ù","Ã™","Ã ","Ã¨","Ã¬","Ã²","Ã¹","ç","Ç","Ã¢","ê","Ã®","Ã´","Ã»","Ã‚","ÃŠ","ÃŽ","Ã”","Ã›","ü","Ã¶","Ã–","Ã¯","Ã¤","«","Ò","Ã","Ã„","Ã‹"];
-        $allowed = ["a","e","i","o","u","A","E","I","O","U","n","N","A","E","I","O","U","a","e","i","o","u","c","C","a","e","i","o","u","A","E","I","O","U","u","o","O","i","a","e","U","I","A","E"];
-        $text = str_replace($notAllowed, $allowed, $string);
-
-        return $text;
-    }
-
-    /**
-     * @param $array
-     * @param $key
-     * @param null $default
-     *
-     * @return null
-     */
-    public function array_get($array, $key, $default = null)
-    {
-        return isset($array[$key]) ? $array[$key] : $default;
-    }
-
-    /**
-     * @param $options
-     * @param array $required
-     *
-     * @return bool
-     */
-    protected function requires($options, array $required = [])
-    {
-        foreach ($required as $key) {
-            if (! array_key_exists(trim($key), $options)) {
-                throw new \InvalidArgumentException("Missing required parameter: {$key}");
-                break;
-
-                return false;
-            }
-        }
-
-        return true;
     }
 }
