@@ -9,6 +9,7 @@ Supported Gateways:
 * Conekta
 * Conekta Oxxo
 * Conekta Bank
+* Stripe
 * Paypal Express (soon)
 
 ## Installation
