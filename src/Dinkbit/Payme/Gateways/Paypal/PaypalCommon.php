@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace Dinkbit\Payme\Gateways\Paypal;
 
-use Dinkbit\Payme\Gateways\AbstractGateway;
+use Dinkbit\PayMe\Gateways\AbstractGateway;
 
 class PaypalCommon extends AbstractGateway
 {

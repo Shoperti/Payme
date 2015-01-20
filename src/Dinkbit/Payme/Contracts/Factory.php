@@ -9,7 +9,7 @@ interface Factory
      *
      * @param string $driver
      *
-     * @return \Dinkbit\Payme\Contracts\Gateway
+     * @return \Dinkbit\PayMe\Contracts\Gateway
      */
     public function driver($driver = null);
 }

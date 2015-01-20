@@ -1,9 +1,11 @@
-<?php namespace Dinkbit\Payme\Gateways;
+<?php
 
-use Dinkbit\Payme\Contracts\Charge;
-use Dinkbit\Payme\Contracts\Store;
-use Dinkbit\Payme\Status;
-use Dinkbit\Payme\Transaction;
+namespace Dinkbit\Payme\Gateways;
+
+use Dinkbit\PayMe\Contracts\Charge;
+use Dinkbit\PayMe\Contracts\Store;
+use Dinkbit\PayMe\Status;
+use Dinkbit\PayMe\Transaction;
 
 class Conekta extends AbstractGateway implements Charge, Store
 {
@@ -36,7 +38,7 @@ class Conekta extends AbstractGateway implements Charge, Store
         $params = [];
 
         $params = $this->addOrder($params, $amount, $options);
-        $params = $this->addPaymentMethod($params, $payment, $options);
+        $params = $this->addPayMentMethod($params, $payment, $options);
 
         return $this->commit('post', $this->buildUrlFromString('charges'), $params);
     }
@@ -80,7 +82,7 @@ class Conekta extends AbstractGateway implements Charge, Store
      */
     protected function addOrder($params, $money, $options)
     {
-        $params['description'] = $this->array_get($options, 'description', "Payme Purchase");
+        $params['description'] = $this->array_get($options, 'description', "PayMe Purchase");
         $params['reference_id'] = $this->array_get($options, 'order_id');
         $params['currency'] = $this->array_get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
@@ -95,7 +97,7 @@ class Conekta extends AbstractGateway implements Charge, Store
      *
      * @return mixed
      */
-    protected function addPaymentMethod($params, $payment, $options)
+    protected function addPayMentMethod($params, $payment, $options)
     {
         if (is_string($payment)) {
             $params['card'] = $payment;
@@ -171,7 +173,7 @@ class Conekta extends AbstractGateway implements Charge, Store
                 'Content-Type'                => 'application/json',
                 'RaiseHtmlError'              => 'false',
                 'X-Conekta-Client-User-Agent' => json_encode($user_agent),
-                'User-Agent'                  => 'Conekta PaymeBindings/'.$this->config['version'],
+                'User-Agent'                  => 'Conekta PayMeBindings/'.$this->config['version'],
             ],
             'json' => $params
         ]);

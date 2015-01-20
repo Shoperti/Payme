@@ -27,7 +27,7 @@ class PaymeManager extends Manager implements Contracts\Factory
     {
         $config = $this->app['config']['services.banwire'];
 
-        return new \Dinkbit\Payme\Gateways\BanwireRecurrent($config);
+        return new \Dinkbit\PayMe\Gateways\BanwireRecurrent($config);
     }
 
     /**
@@ -39,7 +39,7 @@ class PaymeManager extends Manager implements Contracts\Factory
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\Payme\Gateways\Conekta($config);
+        return new \Dinkbit\PayMe\Gateways\Conekta($config);
     }
 
     /**
@@ -51,7 +51,7 @@ class PaymeManager extends Manager implements Contracts\Factory
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\Payme\Gateways\ConektaBank($config);
+        return new \Dinkbit\PayMe\Gateways\ConektaBank($config);
     }
 
     /**
@@ -63,7 +63,7 @@ class PaymeManager extends Manager implements Contracts\Factory
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\Payme\Gateways\ConektaOxxo($config);
+        return new \Dinkbit\PayMe\Gateways\ConektaOxxo($config);
     }
 
     /**
@@ -75,7 +75,7 @@ class PaymeManager extends Manager implements Contracts\Factory
     {
         $config = $this->app['config']['services.paypal'];
 
-        return new \Dinkbit\Payme\Gateways\PaypalExpress($config);
+        return new \Dinkbit\PayMe\Gateways\PaypalExpress($config);
     }
 
     /**
@@ -85,6 +85,6 @@ class PaymeManager extends Manager implements Contracts\Factory
      */
     public function getDefaultDriver()
     {
-        throw new \InvalidArgumentException("No Payme driver was specified.");
+        throw new \InvalidArgumentException("No PayMe driver was specified.");
     }
 }

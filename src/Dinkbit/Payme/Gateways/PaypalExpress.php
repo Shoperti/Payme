@@ -2,7 +2,7 @@
 
 namespace Dinkbit\Payme\Gateways;
 
-use Dinkbit\Payme\Gateways\Paypal\PaypalCommon;
+use Dinkbit\PayMe\Gateways\Paypal\PaypalCommon;
 
 class PaypalExpress extends PaypalCommon
 {
@@ -19,11 +19,11 @@ class PaypalExpress extends PaypalCommon
     }
 
     /**
-     * Map the raw transaction array to a Payme Transaction instance.
+     * Map the raw transaction array to a PayMe Transaction instance.
      *
      * @param array $transaction
      *
-     * @return \Dinkbit\Payme\Transaction
+     * @return \Dinkbit\PayMe\Transaction
      */
     protected function mapResponseToTransaction(array $transaction)
     {

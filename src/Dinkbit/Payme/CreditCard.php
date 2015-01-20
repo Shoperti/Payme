@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace Dinkbit\Payme;
 
-use Dinkbit\Payme\Exceptions\InvalidCreditCardException;
+use Dinkbit\PayMe\Exceptions\InvalidCreditCardException;
 
 class CreditCard
 {
