@@ -321,6 +321,10 @@ class Conekta extends AbstractGateway implements Charge, Store
             return Arr::get($response, 'default_card_id');
         } elseif ($object == 'card') {
             return Arr::get($response, 'customer_id');
+        } elseif ($object == 'payee') {
+            return Arr::get($response, 'id');
+        } elseif ($object == 'transfer') {
+            return Arr::get($response, 'id');
         }
 
         return $response['payment_method']['auth_code'];

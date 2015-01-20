@@ -7,6 +7,7 @@ use Dinkbit\PayMe\Gateways\Bogus;
 use Dinkbit\PayMe\Gateways\Conekta;
 use Dinkbit\PayMe\Gateways\ConektaBank;
 use Dinkbit\PayMe\Gateways\ConektaOxxo;
+use Dinkbit\PayMe\Gateways\ConektaPayouts;
 use Dinkbit\PayMe\Gateways\PaypalExpress;
 use Dinkbit\PayMe\Gateways\Stripe;
 use Illuminate\Support\Manager;
@@ -84,6 +85,18 @@ class PayMeManager extends Manager implements Contracts\Factory
         $config = $this->app['config']['services.conekta'];
 
         return new ConektaOxxo($config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return \Dinkbit\PayMe\Gateways\ConektaPayouts;
+     */
+    protected function createConektaPayoutsDriver()
+    {
+        $config = $this->app['config']['services.conekta'];
+
+        return new ConektaPayouts($config);
     }
 
     /**
