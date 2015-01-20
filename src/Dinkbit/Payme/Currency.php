@@ -5,17 +5,23 @@ namespace Dinkbit\Payme;
 class Currency
 {
     /**
-     * @var
+     * Letter code of currency.
+     *
+     * @var string
      */
     private $code;
 
     /**
-     * @var
+     * Numeric code of currency.
+     *
+     * @var int
      */
     private $numeric;
 
     /**
-     * @var
+     * Decimal positions of currency.
+     *
+     * @var int
      */
     private $decimals;
 
