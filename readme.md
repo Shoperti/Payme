@@ -43,5 +43,5 @@ $payme->driver('conekta')->unstore('cus_test');
 ### Todo
 
 - [ ] Add Gateways tests
-- [ ] Fix credit cards implementation
 - [ ] Add more gateways
+- [ ] Add Credit Card object
