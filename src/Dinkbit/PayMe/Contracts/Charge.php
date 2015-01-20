@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\Payme\Contracts;
+namespace Dinkbit\PayMe\Contracts;
 
 interface Charge
 {
@@ -9,9 +9,9 @@ interface Charge
      *
      * @param $amount
      * @param $payment
-     * @param array $options
+     * @param string[] $options
      *
-     * @return
+     * @return \Dinkbit\Payme\Transaction
      */
     public function charge($amount, $payment, $options = []);
 }

@@ -1,8 +1,14 @@
 <?php
 
-namespace Dinkbit\Payme;
+namespace Dinkbit\PayMe;
 
+use Dinkbit\PayMe\Gateways\BanwireRecurrent;
+use Dinkbit\PayMe\Gateways\Conekta;
+use Dinkbit\PayMe\Gateways\ConektaBank;
+use Dinkbit\PayMe\Gateways\ConektaOxxo;
+use Dinkbit\PayMe\Gateways\PaypalExpress;
 use Illuminate\Support\Manager;
+use InvalidArgumentException;
 
 class PaymeManager extends Manager implements Contracts\Factory
 {
@@ -11,7 +17,7 @@ class PaymeManager extends Manager implements Contracts\Factory
      *
      * @param string $driver
      *
-     * @return mixed
+     * @return \Dinkbit\PayMe\Contracts\Gateway
      */
     public function with($driver)
     {
@@ -21,70 +27,70 @@ class PaymeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return Gateways\Banwire
+     * @return \Dinkbit\PayMe\Gateways\BanwireRecurrent
      */
     protected function createBanwireRecurrentDriver()
     {
         $config = $this->app['config']['services.banwire'];
 
-        return new \Dinkbit\PayMe\Gateways\BanwireRecurrent($config);
+        return new BanwireRecurrent($config);
     }
 
     /**
      * Create an instance of the specified driver.
      *
-     * @return Gateways\Conekta
+     * @return \Dinkbit\PayMe\Gateways\Conekta
      */
     protected function createConektaDriver()
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\PayMe\Gateways\Conekta($config);
+        return new Conekta($config);
     }
 
     /**
      * Create an instance of the specified driver.
      *
-     * @return Gateways\ConektaBank
+     * @return \Dinkbit\PayMe\Gateways\ConektaBank
      */
     protected function createConektaBankDriver()
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\PayMe\Gateways\ConektaBank($config);
+        return new ConektaBank($config);
     }
 
     /**
      * Create an instance of the specified driver.
      *
-     * @return Gateways\ConektaOxxo
+     * @return \Dinkbit\PayMe\Gateways\ConektaOxxo
      */
     protected function createConektaOxxoDriver()
     {
         $config = $this->app['config']['services.conekta'];
 
-        return new \Dinkbit\PayMe\Gateways\ConektaOxxo($config);
+        return new ConektaOxxo($config);
     }
 
     /**
      * Create an instance of the specified driver.
      *
-     * @return Gateways\PaypalExpress
+     * @return \Dinkbit\PayMe\Gateways\PaypalExpress
      */
     protected function createPaypalExpressDriver()
     {
         $config = $this->app['config']['services.paypal'];
 
-        return new \Dinkbit\PayMe\Gateways\PaypalExpress($config);
+        return new PaypalExpress($config);
     }
 
     /**
      * Get the default driver name.
      *
-     * @return string
+     * @throws \InvalidArgumentException
      */
     public function getDefaultDriver()
     {
-        throw new \InvalidArgumentException("No PayMe driver was specified.");
+        throw new InvalidArgumentException("No PayMe driver was specified.");
     }
 }

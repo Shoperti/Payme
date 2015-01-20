@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\Payme;
+namespace Dinkbit\PayMe;
 
 use Illuminate\Support\ServiceProvider;
 

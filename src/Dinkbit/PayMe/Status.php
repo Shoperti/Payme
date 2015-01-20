@@ -1,16 +1,22 @@
 <?php
 
-namespace Dinkbit\Payme;
+namespace Dinkbit\PayMe;
+
+use InvalidArgumentException;
 
 class Status
 {
     /**
-     * @var
+     * Provided status.
+     *
+     * @var string
      */
-    public $status;
+    protected $status;
 
     /**
-     * @var array
+     * Available statuses.
+     *
+     * @var string[]
      */
     protected $statuses = [
         'pending',
@@ -28,19 +34,22 @@ class Status
     ];
 
     /**
+     * Create a new status instance.
+     *
      * @param $status
+     *
+     * @return void
      */
     public function __construct($status)
     {
         $this->disallowInvalidMethod($status);
-
         $this->status = $status;
     }
 
     /**
      * @param $status
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function disallowInvalidMethod($status)
     {
@@ -50,6 +59,8 @@ class Status
     }
 
     /**
+     * Return status to string.
+     *
      * @return string
      */
     public function __toString()

@@ -1,32 +1,32 @@
 <?php
 
-namespace Dinkbit\Payme\Contracts;
+namespace Dinkbit\PayMe\Contracts;
 
 interface Transaction
 {
     /**
      * Is the transaction successful?
      *
-     * @return boolean
+     * @return bool
      */
     public function success();
 
     /**
      * Does the transaction require a redirect?
      *
-     * @return boolean
+     * @return bool
      */
     public function isRedirect();
 
     /**
-     * Return transaction status.
+     * Return transaction gateway is in test mode.
      *
      * @return string
      */
     public function test();
 
     /**
-     * Return authorization status.
+     * Return authorization code.
      *
      * @return string
      */
@@ -40,23 +40,23 @@ interface Transaction
     public function status();
 
     /**
-     * Response Message.
+     * Response Message from the payment gateway.
      *
-     * @return string A response message from the payment gateway
+     * @return string
      */
     public function message();
 
     /**
-     * Transaction code.
+     * Transaction code from the payment gateway.
      *
-     * @return string A response code from the payment gateway
+     * @return string
      */
     public function code();
 
     /**
-     * Gateway Reference.
+     * Gateway reference to represent this transaction.
      *
-     * @return string A reference provided by the gateway to represent this transaction
+     * @return string
      */
     public function reference();
 

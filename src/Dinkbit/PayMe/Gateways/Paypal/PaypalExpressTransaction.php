@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\Payme\Gateways\Paypal;
+namespace Dinkbit\PayMe\Gateways\Paypal;
 
 use Dinkbit\PayMe\Transaction;
 

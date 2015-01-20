@@ -1,25 +1,78 @@
 <?php
 
-namespace Dinkbit\Payme;
+namespace Dinkbit\PayMe;
 
 use ArrayAccess;
 
 class Transaction implements ArrayAccess, Contracts\Transaction
 {
+    /**
+     * Has the transaction made by the Gateway?
+     *
+     * @var bool
+     */
     public $success;
+
+    /**
+     * Does the Gateway needs to redirect.
+     *
+     * @var bool
+     */
     public $isRedirect;
+
+    /**
+     * Is the Gateway in tests mode?
+     *
+     * @var bool
+     */
     public $test;
+
+    /**
+     * Has the message sent by the Gateway?
+     *
+     * @var bool
+     */
     public $status;
+
+    /**
+     * The authorization code for the transaction.
+     *
+     * @var string
+     */
     public $authorization;
+
+    /**
+     * The response message from the transaction.
+     *
+     * @var string
+     */
     public $message;
+
+    /**
+     * The code for the transaction.
+     *
+     * @var string
+     */
     public $code;
+
+    /**
+     * The reference code for the transaction.
+     *
+     * @var string
+     */
     public $reference;
+
+    /**
+     * The raw transaction information.
+     *
+     * @var array
+     */
     public $transaction;
 
     /**
      * Is the transaction successful?
      *
-     * @return boolean
+     * @return bool
      */
     public function success()
     {
@@ -29,7 +82,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     /**
      * Does the transaction require a redirect?
      *
-     * @return boolean
+     * @return bool
      */
     public function isRedirect()
     {
@@ -37,7 +90,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Return transaction status.
+     * Return transaction gateway is in test mode.
      *
      * @return string
      */
@@ -49,7 +102,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     /**
      * Return authorization code.
      *
-     * @return mixed
+     * @return string
      */
     public function authorization()
     {
@@ -57,19 +110,19 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Response Message.
+     * Response Message from the payment gateway.
      *
-     * @return string A response message from the payment gateway
+     * @return string
      */
     public function message()
     {
-        return $this->message;
+        return (string) $this->message;
     }
 
     /**
-     * Transaction code.
+     * Transaction code from the payment gateway.
      *
-     * @return string A response code from the payment gateway
+     * @return string
      */
     public function code()
     {
@@ -87,9 +140,9 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Gateway Reference.
+     * Gateway reference to represent this transaction.
      *
-     * @return string A reference provided by the gateway to represent this transaction
+     * @return string
      */
     public function reference()
     {
@@ -111,7 +164,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @param array $transaction
      *
-     * @return $this
+     * @return \Dinkbit\PayMe\Transaction
      */
     public function setRaw(array $transaction)
     {
@@ -125,7 +178,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @param array $attributes
      *
-     * @return $this
+     * @return \Dinkbit\PayMe\Transaction
      */
     public function map(array $attributes)
     {
