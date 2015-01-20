@@ -1,8 +1,10 @@
-<?php namespace Dinkbit\Payme\Gateways;
+<?php
 
-use Dinkbit\Payme\Contracts\Charge;
-use Dinkbit\Payme\Status;
-use Dinkbit\Payme\Transaction;
+namespace Dinkbit\Payme\Gateways;
+
+use Dinkbit\PayMe\Contracts\Charge;
+use Dinkbit\PayMe\Status;
+use Dinkbit\PayMe\Transaction;
 
 class BanwireRecurrent extends AbstractGateway implements Charge
 {
@@ -29,7 +31,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
         $params = [];
 
         $params = $this->addOrder($params, $amount);
-        $params = $this->addPayment($params, $payment, $options);
+        $params = $this->addPayMent($params, $payment, $options);
         $params = $this->addUser($params, $options);
 
         return $this->commit('post', $this->buildUrlFromString('ejecuta_pago_ondemand'), $params);
@@ -55,7 +57,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
      * @param $payment
      * @param array $options
      */
-    protected function addPayment($params, $payment, $options = [])
+    protected function addPayMent($params, $payment, $options = [])
     {
         $params['token'] = $payment;
         $params['id_tarjeta'] = $this->array_get($options, 'card_id');

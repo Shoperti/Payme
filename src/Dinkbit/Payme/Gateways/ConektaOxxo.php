@@ -1,7 +1,9 @@
-<?php namespace Dinkbit\Payme\Gateways;
+<?php
 
-use Dinkbit\Payme\Status;
-use Dinkbit\Payme\Transaction;
+namespace Dinkbit\Payme\Gateways;
+
+use Dinkbit\PayMe\Status;
+use Dinkbit\PayMe\Transaction;
 
 class ConektaOxxo extends Conekta
 {

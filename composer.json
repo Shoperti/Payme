@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Dinkbit\\Payme\\": "src/"
+            "Dinkbit\\PayMe\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dinkbit\\Payme\\Tests\\": "tests/"
+            "Dinkbit\\PayMe\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "dev",

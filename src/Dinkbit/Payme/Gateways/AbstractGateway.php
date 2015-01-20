@@ -1,6 +1,8 @@
-<?php namespace Dinkbit\Payme\Gateways;
+<?php
 
-use Dinkbit\Payme\Currency;
+namespace Dinkbit\Payme\Gateways;
+
+use Dinkbit\PayMe\Currency;
 
 abstract class AbstractGateway
 {

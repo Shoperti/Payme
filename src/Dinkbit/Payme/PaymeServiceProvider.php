@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Dinkbit\Payme;
 
@@ -20,8 +20,8 @@ class PaymeServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bindShared('Dinkbit\Payme\Contracts\Factory', function ($app) {
-            return new PaymeManager($app);
+        $this->app->bindShared('Dinkbit\PayMe\Contracts\Factory', function ($app) {
+            return new PayMeManager($app);
         });
     }
 
@@ -32,6 +32,6 @@ class PaymeServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['Dinkbit\Payme\Contracts\Factory'];
+        return ['Dinkbit\PayMe\Contracts\Factory'];
     }
 }

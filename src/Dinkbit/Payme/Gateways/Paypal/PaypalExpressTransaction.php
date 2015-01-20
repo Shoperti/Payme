@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace Dinkbit\Payme\Gateways\Paypal;
 
-use Dinkbit\Payme\Transaction;
+use Dinkbit\PayMe\Transaction;
 
 class PaypalExpressTransaction extends Transaction
 {
