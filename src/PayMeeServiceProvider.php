@@ -4,7 +4,7 @@ namespace Dinkbit\PayMe;
 
 use Illuminate\Support\ServiceProvider;
 
-class PaymeServiceProvider extends ServiceProvider
+class PayMeServiceProvider extends ServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.

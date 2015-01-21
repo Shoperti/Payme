@@ -12,7 +12,7 @@ use Dinkbit\PayMe\Gateways\Stripe;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
-class PaymeManager extends Manager implements Contracts\Factory
+class PayMeManager extends Manager implements Contracts\Factory
 {
     /**
      * Get a driver instance.
