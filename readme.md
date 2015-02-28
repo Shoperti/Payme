@@ -1,6 +1,7 @@
 # Dinkbit PayMe
 
 [![Build Status](https://img.shields.io/travis/dinkbit/payme.svg?style=flat-square)](https://travis-ci.org/dinkbit/payme)
+[![StyleCI](https://styleci.io/repos/24345061/shield)](https://styleci.io/repos/24345061)
 
 Based on [Active Merchant](http://github.com/Shopify/active_merchant) for Ruby.
 
