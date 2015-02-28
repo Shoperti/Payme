@@ -271,7 +271,7 @@ class Conekta extends AbstractGateway implements Charge, Store
                 'X-Conekta-Client-User-Agent' => json_encode($user_agent),
                 'User-Agent'                  => 'Conekta PayMeBindings/'.$this->config['version'],
             ],
-            'json' => $params
+            'json' => $params,
         ]);
 
         if ($rawResponse->getStatusCode() == 200) {
@@ -391,7 +391,7 @@ class Conekta extends AbstractGateway implements Charge, Store
         $msg .= " (Raw response API {$rawResponse->getBody()})";
 
         return [
-            'message_to_purchaser' => $msg
+            'message_to_purchaser' => $msg,
         ];
     }
 

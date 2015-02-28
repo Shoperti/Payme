@@ -184,7 +184,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
-            'body'            => $params
+            'body'            => $params,
         ]);
 
         $response = $this->parseResponse($rawResponse->getBody());
@@ -283,7 +283,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
         $msg .= " (Raw response API {$rawResponse->getBody()})";
 
         return [
-            'message' => $msg
+            'message' => $msg,
         ];
     }
 

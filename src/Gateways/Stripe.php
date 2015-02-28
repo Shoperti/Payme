@@ -239,7 +239,7 @@ class Stripe extends AbstractGateway implements Charge, Store
                 'User-Agent'                 => 'Stripe/v1 PayMeBindings/'.$this->config['version'],
                 'X-Stripe-Client-User-Agent' => json_encode($userAgent),
             ],
-            'body' => $params
+            'body' => $params,
         ]);
 
         if ($rawResponse->getStatusCode() == 200) {
