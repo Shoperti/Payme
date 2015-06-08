@@ -15,7 +15,7 @@ Supported Gateways:
 
 ## Installation
 
-### Laravel 4.1, 4.2, 5.0
+### Laravel 4.1, 4.2, 5.0, 5.1
 
 Begin by installing this package through Composer. Edit your project's `composer.json` file to require `dinkbit/payme`.
 
