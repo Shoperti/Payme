@@ -46,7 +46,7 @@ class ConektaOxxo extends Conekta
      */
     public function addExpiry($params, $options)
     {
-        $params['cash']['expires_at'] = Arr::get($options, 'expires', date("Y-m-d", time() + 172800));
+        $params['cash']['expires_at'] = Arr::get($options, 'expires', date('Y-m-d', time() + 172800));
 
         return $params;
     }
@@ -67,7 +67,7 @@ class ConektaOxxo extends Conekta
             'isRedirect'      => false,
             'success'         => $success,
             'message'         => $success ? $response['payment_method']['barcode_url'] : $response['message_to_purchaser'],
-            'test'            => array_key_exists('livemode', $response) ? $response["livemode"] : false,
+            'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
             'authorization'   => $success ? $response['id'] : $response['type'],
             'status'          => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'reference'       => $success ? $response['payment_method']['barcode_url'] : false,

@@ -14,7 +14,7 @@ class PaypalCommon extends AbstractGateway
 
     protected $SUCCESS_CODES = ['Success', 'SuccessWithWarning'];
 
-    const FRAUD_REVIEW_CODE = "11610";
+    const FRAUD_REVIEW_CODE = '11610';
 
     /**
      * Parse the raw data response from gateway.
@@ -80,7 +80,7 @@ class PaypalCommon extends AbstractGateway
      *
      * @param array $response
      *
-     * @return boolean
+     * @return bool
      */
     private function fraud_review_from($response)
     {
@@ -106,7 +106,7 @@ class PaypalCommon extends AbstractGateway
     /**
      * @param array $response
      *
-     * @return boolean
+     * @return bool
      */
     private function authorization_from($response)
     {

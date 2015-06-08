@@ -110,7 +110,7 @@ abstract class AbstractGateway
      *
      * @throws \InvalidArgumentException
      *
-     * @return integer|float
+     * @return int|float
      */
     public function amount($money)
     {
@@ -126,7 +126,7 @@ abstract class AbstractGateway
             return number_format($money, 0, '', '');
         }
 
-        return sprintf("%.2f", number_format($money, 2, '.', '') / 100);
+        return sprintf('%.2f', number_format($money, 2, '.', '') / 100);
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class AbstractGateway
      */
     public function getAmount($amount)
     {
-        if (! is_float($amount) &&
+        if (!is_float($amount) &&
             $this->getCurrencyDecimalPlaces() > 0 &&
             false === strpos((string) $amount, '.')) {
             throw new InvalidRequestException(

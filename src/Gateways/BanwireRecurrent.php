@@ -136,21 +136,21 @@ class BanwireRecurrent extends AbstractGateway implements Charge
         switch ($code) {
             case 'N/A':
             case '404':
-                $responseMessage = "Tarjeta denegada, por favor revisa tu información e intenta de nuevo.";
+                $responseMessage = 'Tarjeta denegada, por favor revisa tu información e intenta de nuevo.';
                 break;
             case '405':
-                $responseMessage = "Los datos de facturación de American Express no son los mismos que en el estado de cuenta.";
+                $responseMessage = 'Los datos de facturación de American Express no son los mismos que en el estado de cuenta.';
                 break;
             case '406':
-                $responseMessage = "Lo sentimos, esta tarjeta no puede ser procesada por seguridad.";
+                $responseMessage = 'Lo sentimos, esta tarjeta no puede ser procesada por seguridad.';
                 break;
             case '403':
             case '250':
             case '700':
-                $responseMessage = "Los datos de la tarjeta no son correctos, por favor revisa tu información e intenta de nuevo.";
+                $responseMessage = 'Los datos de la tarjeta no son correctos, por favor revisa tu información e intenta de nuevo.';
                 break;
             case '100':
-                $responseMessage = "La dirección y código postal de la tarjeta de crédito no coinciden.";
+                $responseMessage = 'La dirección y código postal de la tarjeta de crédito no coinciden.';
                 break;
             case '212':
             case '213':
@@ -158,7 +158,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
                 $responseMessage = $message;
                 break;
             default:
-                $responseMessage = "Por el momento no es posible procesar la transacción, favor de intentar mas tarde.";
+                $responseMessage = 'Por el momento no es posible procesar la transacción, favor de intentar mas tarde.';
                 break;
         }
 
@@ -191,7 +191,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
 
         $success = $this->getSuccess($response);
 
-        if (! $success) {
+        if (!$success) {
             $response = $this->responseError($rawResponse);
         }
 

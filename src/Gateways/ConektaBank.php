@@ -51,7 +51,7 @@ class ConektaBank extends Conekta
             'isRedirect'      => false,
             'success'         => $success,
             'message'         => $success ? $response['payment_method']['reference'] : $response['message_to_purchaser'],
-            'test'            => array_key_exists('livemode', $response) ? $response["livemode"] : false,
+            'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
             'authorization'   => $success ? $response['id'] : $response['type'],
             'status'          => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'reference'       => $success ? $response['payment_method']['reference'] : false,

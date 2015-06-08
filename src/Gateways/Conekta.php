@@ -44,7 +44,7 @@ class Conekta extends AbstractGateway implements Charge, Store
      *
      * @var string
      */
-    protected $apiVersion = "0.3.0";
+    protected $apiVersion = '0.3.0';
 
     /**
      * Conekta API locale.
@@ -139,7 +139,7 @@ class Conekta extends AbstractGateway implements Charge, Store
      */
     protected function addOrder(array $params, $money, array $options)
     {
-        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', "PayMe Purchase"));
+        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['reference_id'] = Arr::get($options, 'order_id');
         $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
@@ -276,7 +276,7 @@ class Conekta extends AbstractGateway implements Charge, Store
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());
-            $success = ! (Arr::get($response, 'object', 'error') == 'error');
+            $success = !(Arr::get($response, 'object', 'error') == 'error');
         } else {
             $response = $this->responseError($rawResponse);
         }
@@ -298,7 +298,7 @@ class Conekta extends AbstractGateway implements Charge, Store
             'isRedirect'      => false,
             'success'         => $success,
             'message'         => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
-            'test'            => array_key_exists('livemode', $response) ? $response["livemode"] : false,
+            'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
             'authorization'   => $success ? $response['id'] : $response['type'],
             'status'          => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'reference'       => $success ? $this->getReference($response) : false,

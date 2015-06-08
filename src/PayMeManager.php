@@ -117,6 +117,6 @@ class PayMeManager extends Manager implements Contracts\Factory
      */
     public function getDefaultDriver()
     {
-        throw new InvalidArgumentException("No PayMe driver was specified.");
+        throw new InvalidArgumentException('No PayMe driver was specified.');
     }
 }

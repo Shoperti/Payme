@@ -44,7 +44,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      *
      * @var string
      */
-    protected $apiVersion = "v1";
+    protected $apiVersion = 'v1';
 
     /**
      * Inject the configuration for a Gateway.
@@ -131,7 +131,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      */
     protected function addOrder(array $params, $money, array $options)
     {
-        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', "PayMe Purchase"));
+        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
 
@@ -244,7 +244,7 @@ class Stripe extends AbstractGateway implements Charge, Store
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());
-            $success = (! array_key_exists('error', $response));
+            $success = (!array_key_exists('error', $response));
         } else {
             $response = $this->responseError($rawResponse);
         }
@@ -266,7 +266,7 @@ class Stripe extends AbstractGateway implements Charge, Store
             'isRedirect'      => false,
             'success'         => $success,
             'message'         => $success ? 'Transaction approved' : $response['error']['message'],
-            'test'            => array_key_exists('livemode', $response) ? $response["livemode"] : false,
+            'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
             'authorization'   => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
             'reference'       => $success ? Arr::get($response, 'balance_transaction', '') : false,
