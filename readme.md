@@ -10,6 +10,7 @@ Supported Gateways:
 * Conekta
 * Conekta Oxxo
 * Conekta Bank
+* Conekta Payouts
 * Stripe
 * Paypal Express (soon)
 
@@ -105,6 +106,17 @@ $payme->driver('conekta')->unstore('cus_test');
 $payme->driver('conektaoxxo')->charge($amount, 'oxxo');
 
 $payme->driver('conektabank')->charge($amount, 'banorte');
+
+$payme->driver('conektapayouts')->storeRecipient([
+  "name"=> "Joe Co",
+  "email"=> "store.guy@example.com",
+  "phone"=> "55 5555 5555",
+  "account_number"=> "002123456789012345", // 18 digits CLABE
+  "account_holder"=> "Joe Co",
+  "tax_id"=> "RFC123456QUR" // RFC
+]);
+$payme->driver('conektapayouts')->charge($amount, 'payee_TOKEN');
+$payme->driver('conektapayouts')->unstoreRecipient('payee_TOKEN');
 
 $payme->driver('banwirerecurrent')->charge($amount, '8305ab68d4acf7dc650364d3f31a7318', [
   'card_id' => '1407',
