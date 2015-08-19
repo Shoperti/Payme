@@ -56,7 +56,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
      * @param $payment
      * @param string[] $options
      *
-     * @return \Shoperti\Payme\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
@@ -94,7 +94,7 @@ class BanwireRecurrent extends AbstractGateway implements Charge
      *
      * @return array
      */
-    protected function addPayment(array $params, $payment, array $options)
+    protected function addPayMent(array $params, $payment, array $options)
     {
         $params['token'] = $payment;
         $params['id_tarjeta'] = Arr::get($options, 'card_id');

@@ -22,14 +22,14 @@ class ConektaPayouts extends Conekta
      * @param $payment
      * @param string[] $options
      *
-     * @return \Shoperti\Payme\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
         $params = [];
 
         $params = $this->addOrder($params, $amount, $options);
-        $params = $this->addPaymentMethod($params, $payment, $options);
+        $params = $this->addPayMentMethod($params, $payment, $options);
 
         return $this->commit('post', $this->buildUrlFromString('payouts'), $params);
     }
@@ -88,7 +88,7 @@ class ConektaPayouts extends Conekta
      *
      * @return mixed
      */
-    protected function addPaymentMethod(array $params, $payment, array $options)
+    protected function addPayMentMethod(array $params, $payment, array $options)
     {
         if (is_string($payment)) {
             $params['payee_id'] = $payment;

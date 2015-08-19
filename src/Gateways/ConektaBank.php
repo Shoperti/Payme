@@ -22,7 +22,7 @@ class ConektaBank extends Conekta
      * @param $payment
      * @param string[] $options
      *
-     * @return \Shoperti\Payme\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
