@@ -29,7 +29,7 @@ class ConektaPayouts extends Conekta
         $params = [];
 
         $params = $this->addOrder($params, $amount, $options);
-        $params = $this->addPayMentMethod($params, $payment, $options);
+        $params = $this->addPaymentMethod($params, $payment, $options);
 
         return $this->commit('post', $this->buildUrlFromString('payouts'), $params);
     }
@@ -88,7 +88,7 @@ class ConektaPayouts extends Conekta
      *
      * @return mixed
      */
-    protected function addPayMentMethod(array $params, $payment, array $options)
+    protected function addPaymentMethod(array $params, $payment, array $options)
     {
         if (is_string($payment)) {
             $params['payee_id'] = $payment;
