@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe\Contracts;
+namespace Shoperti\PayMe\Contracts;
 
 interface Factory
 {
@@ -9,7 +9,7 @@ interface Factory
      *
      * @param string $driver
      *
-     * @return \Dinkbit\PayMe\Contracts\Gateway
+     * @return \Shoperti\PayMe\Contracts\Gateway
      */
     public function driver($driver = null);
 }

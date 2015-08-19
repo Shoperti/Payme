@@ -1,8 +1,10 @@
 <?php
 
-use Dinkbit\PayMe\Transaction;
+namespace Shoperti\Test\PayMe;
 
-class TransactionTest extends PHPUnit_Framework_TestCase
+use Shoperti\PayMe\Transaction;
+
+class TransactionTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_can_map_array_to_values()

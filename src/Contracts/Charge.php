@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe\Contracts;
+namespace Shoperti\PayMe\Contracts;
 
 interface Charge
 {
@@ -11,7 +11,7 @@ interface Charge
      * @param $payment
      * @param string[] $options
      *
-     * @return \Dinkbit\Payme\Transaction
+     * @return \Shoperti\Payme\Transaction
      */
     public function charge($amount, $payment, $options = []);
 }

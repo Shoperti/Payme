@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe;
+namespace Shoperti\PayMe;
 
 use InvalidArgumentException;
 

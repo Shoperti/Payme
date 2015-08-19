@@ -1,13 +1,13 @@
 <?php
 
-namespace Dinkbit\PayMe\Gateways;
+namespace Shoperti\PayMe\Gateways;
 
-use Dinkbit\PayMe\Contracts\Charge;
-use Dinkbit\PayMe\Contracts\Store;
-use Dinkbit\PayMe\Status;
-use Dinkbit\PayMe\Support\Arr;
-use Dinkbit\PayMe\Support\Helper;
-use Dinkbit\PayMe\Transaction;
+use Shoperti\PayMe\Contracts\Charge;
+use Shoperti\PayMe\Contracts\Store;
+use Shoperti\PayMe\Status;
+use Shoperti\PayMe\Support\Arr;
+use Shoperti\PayMe\Support\Helper;
+use Shoperti\PayMe\Transaction;
 
 class Stripe extends AbstractGateway implements Charge, Store
 {
@@ -67,7 +67,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      * @param $payment
      * @param string[] $options
      *
-     * @return \Dinkbit\Payme\Transaction
+     * @return \Shoperti\Payme\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {
@@ -258,7 +258,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      * @param bool  $success
      * @param array $response
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function mapTransaction($success, $response)
     {
@@ -279,7 +279,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      *
      * @param $status
      *
-     * @return \Dinkbit\PayMe\Status
+     * @return \Shoperti\PayMe\Status
      */
     protected function getStatus($status)
     {

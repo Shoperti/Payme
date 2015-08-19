@@ -1,15 +1,15 @@
 <?php
 
-namespace Dinkbit\PayMe;
+namespace Shoperti\PayMe;
 
-use Dinkbit\PayMe\Gateways\BanwireRecurrent;
-use Dinkbit\PayMe\Gateways\Bogus;
-use Dinkbit\PayMe\Gateways\Conekta;
-use Dinkbit\PayMe\Gateways\ConektaBank;
-use Dinkbit\PayMe\Gateways\ConektaOxxo;
-use Dinkbit\PayMe\Gateways\ConektaPayouts;
-use Dinkbit\PayMe\Gateways\PaypalExpress;
-use Dinkbit\PayMe\Gateways\Stripe;
+use Shoperti\PayMe\Gateways\BanwireRecurrent;
+use Shoperti\PayMe\Gateways\Bogus;
+use Shoperti\PayMe\Gateways\Conekta;
+use Shoperti\PayMe\Gateways\ConektaBank;
+use Shoperti\PayMe\Gateways\ConektaOxxo;
+use Shoperti\PayMe\Gateways\ConektaPayouts;
+use Shoperti\PayMe\Gateways\PaypalExpress;
+use Shoperti\PayMe\Gateways\Stripe;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -20,7 +20,7 @@ class PayMeManager extends Manager implements Contracts\Factory
      *
      * @param string $driver
      *
-     * @return \Dinkbit\PayMe\Contracts\Gateway
+     * @return \Shoperti\PayMe\Contracts\Gateway
      */
     public function with($driver)
     {
@@ -30,7 +30,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\Bogus
+     * @return \Shoperti\PayMe\Gateways\Bogus
      */
     protected function createBogusDriver()
     {
@@ -42,7 +42,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\BanwireRecurrent
+     * @return \Shoperti\PayMe\Gateways\BanwireRecurrent
      */
     protected function createBanwireRecurrentDriver()
     {
@@ -54,7 +54,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\Conekta
+     * @return \Shoperti\PayMe\Gateways\Conekta
      */
     protected function createConektaDriver()
     {
@@ -66,7 +66,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\ConektaBank
+     * @return \Shoperti\PayMe\Gateways\ConektaBank
      */
     protected function createConektaBankDriver()
     {
@@ -78,7 +78,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\ConektaOxxo
+     * @return \Shoperti\PayMe\Gateways\ConektaOxxo
      */
     protected function createConektaOxxoDriver()
     {
@@ -90,7 +90,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\ConektaPayouts;
+     * @return \Shoperti\PayMe\Gateways\ConektaPayouts;
      */
     protected function createConektaPayoutsDriver()
     {
@@ -102,7 +102,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\PaypalExpress
+     * @return \Shoperti\PayMe\Gateways\PaypalExpress
      */
     protected function createPaypalExpressDriver()
     {
@@ -114,7 +114,7 @@ class PayMeManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Dinkbit\PayMe\Gateways\Stripe
+     * @return \Shoperti\PayMe\Gateways\Stripe
      */
     protected function createStripeDriver()
     {

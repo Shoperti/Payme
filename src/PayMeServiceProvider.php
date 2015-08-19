@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe;
+namespace Shoperti\PayMe;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -20,7 +20,7 @@ class PayMeServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bindShared('Dinkbit\PayMe\Contracts\Factory', function ($app) {
+        $this->app->bindShared('Shoperti\PayMe\Contracts\Factory', function ($app) {
             return new PayMeManager($app);
         });
     }
@@ -32,6 +32,6 @@ class PayMeServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['Dinkbit\PayMe\Contracts\Factory'];
+        return ['Shoperti\PayMe\Contracts\Factory'];
     }
 }

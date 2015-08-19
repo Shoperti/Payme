@@ -1,10 +1,10 @@
 <?php
 
-namespace Dinkbit\PayMe\Gateways;
+namespace Shoperti\PayMe\Gateways;
 
-use Dinkbit\PayMe\Status;
-use Dinkbit\PayMe\Support\Arr;
-use Dinkbit\PayMe\Transaction;
+use Shoperti\PayMe\Status;
+use Shoperti\PayMe\Support\Arr;
+use Shoperti\PayMe\Transaction;
 
 class ConektaPayouts extends Conekta
 {
@@ -22,7 +22,7 @@ class ConektaPayouts extends Conekta
      * @param $payment
      * @param string[] $options
      *
-     * @return \Dinkbit\Payme\Transaction
+     * @return \Shoperti\Payme\Transaction
      */
     public function charge($amount, $payment, $options = [])
     {

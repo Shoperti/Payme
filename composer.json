@@ -1,35 +1,35 @@
 {
-    "name": "dinkbit/payme",
-    "description": "Multi-gateway payment processing library for Laravel",
+    "name": "shoperti/payme",
+    "description": "A multi-gateway payment platform for PHP",
     "license": "MIT",
     "keywords": [
         "payme",
         "payments",
         "laravel",
-        "dinkbit"
+        "gateway"
     ],
     "authors": [
         {
-            "name": "dinkbit",
-            "homepage": "https://github.com/dinkbit/payme"
+            "name": "Shoperti",
+            "homepage": "https://github.com/shoperti/payme"
         }
     ],
     "require": {
         "php": ">=5.4.0",
         "illuminate/support": "~4.1|~5.0|~5.1",
-        "guzzlehttp/guzzle": "~5.0"
+        "guzzlehttp/guzzle": "~5.3|~6.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
     },
     "autoload": {
         "psr-4": {
-            "Dinkbit\\PayMe\\": "src/"
+            "Shoperti\\PayMe\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dinkbit\\PayMe\\Tests\\": "tests/"
+            "Shoperti\\Tests\\PayMe\\": "tests/"
         }
     },
     "extra": {

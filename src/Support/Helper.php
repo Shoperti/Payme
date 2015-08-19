@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe\Support;
+namespace Shoperti\PayMe\Support;
 
 class Helper
 {

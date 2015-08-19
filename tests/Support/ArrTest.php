@@ -1,8 +1,10 @@
 <?php
 
-use Dinkbit\PayMe\Support\Arr;
+namespace Shoperti\Test\PayMe\Support;
 
-class ArrTest extends PHPUnit_Framework_TestCase
+use Shoperti\PayMe\Support\Arr;
+
+class ArrTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function testArrGet()

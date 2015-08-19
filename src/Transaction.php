@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe;
+namespace Shoperti\PayMe;
 
 use ArrayAccess;
 
@@ -164,7 +164,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @param array $transaction
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function setRaw(array $transaction)
     {
@@ -178,7 +178,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @param array $attributes
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function map(array $attributes)
     {

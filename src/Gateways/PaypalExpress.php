@@ -1,8 +1,8 @@
 <?php
 
-namespace Dinkbit\PayMe\Gateways;
+namespace Shoperti\PayMe\Gateways;
 
-use Dinkbit\PayMe\Gateways\Paypal\PaypalCommon;
+use Shoperti\PayMe\Gateways\Paypal\PaypalCommon;
 
 class PaypalExpress extends PaypalCommon
 {
@@ -23,7 +23,7 @@ class PaypalExpress extends PaypalCommon
      *
      * @param array $transaction
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     protected function mapResponseToTransaction(array $transaction)
     {

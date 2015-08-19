@@ -1,8 +1,8 @@
 <?php
 
-namespace Dinkbit\PayMe\Gateways\Paypal;
+namespace Shoperti\PayMe\Gateways\Paypal;
 
-use Dinkbit\PayMe\Transaction;
+use Shoperti\PayMe\Transaction;
 
 class PaypalExpressTransaction extends Transaction
 {

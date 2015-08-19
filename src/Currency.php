@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe;
+namespace Shoperti\PayMe;
 
 class Currency
 {
@@ -74,7 +74,7 @@ class Currency
      *
      * @param string $code The three letter currency code
      *
-     * @return null|\Dinkbit\PayMe\Currency
+     * @return null|\Shoperti\PayMe\Currency
      */
     public static function find($code)
     {

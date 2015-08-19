@@ -1,8 +1,10 @@
 <?php
 
-use Dinkbit\PayMe\Currency;
+namespace Shoperti\Test\PayMe;
 
-class CurrencyTest extends PHPUnit_Framework_TestCase
+use Shoperti\PayMe\Currency;
+
+class CurrencyTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_can_find_currency_by_code()

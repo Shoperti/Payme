@@ -1,6 +1,6 @@
 <?php
 
-namespace Dinkbit\PayMe\Contracts;
+namespace Shoperti\PayMe\Contracts;
 
 interface StoreRecipient
 {

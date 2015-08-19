@@ -1,8 +1,8 @@
 <?php
 
-namespace Dinkbit\PayMe\Gateways;
+namespace Shoperti\PayMe\Gateways;
 
-use Dinkbit\PayMe\Currency;
+use Shoperti\PayMe\Currency;
 use InvalidArgumentException;
 
 abstract class AbstractGateway
@@ -39,7 +39,7 @@ abstract class AbstractGateway
      * @param bool  $success
      * @param array $response
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     abstract public function mapTransaction($success, $response);
 

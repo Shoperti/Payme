@@ -1,8 +1,10 @@
 <?php
 
-use Dinkbit\PayMe\Status;
+namespace Shoperti\Test\PayMe;
 
-class StatusTest extends PHPUnit_Framework_TestCase
+use Shoperti\PayMe\Status;
+
+class StatusTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_returns_a_valid_status()

@@ -1,8 +1,10 @@
 <?php
 
-use Dinkbit\PayMe\Support\Helper;
+namespace Shoperti\Test\PayMe\Support;
 
-class HelperTest extends PHPUnit_Framework_TestCase
+use Shoperti\PayMe\Support\Helper;
+
+class HelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_cleans_accents_from_string()
