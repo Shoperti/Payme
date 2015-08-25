@@ -2,8 +2,8 @@
 
 namespace Shoperti\PayMe\Gateways;
 
-use Shoperti\PayMe\Currency;
 use InvalidArgumentException;
+use Shoperti\PayMe\Currency;
 
 abstract class AbstractGateway
 {
