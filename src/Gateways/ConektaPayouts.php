@@ -57,12 +57,12 @@ class ConektaPayouts extends Conekta
      * @param array $options
      *
      * @return mixed
-     * TODO: Check as there's an error from Conekta
      */
 
     /*
     public function update($reference, $options = [])
     {
+        TODO: Check as there's an error from Conekta
         $params = [];
 
         $params = $this->addPayout($params, $options);
