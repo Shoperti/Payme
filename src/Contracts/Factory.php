@@ -5,11 +5,11 @@ namespace Shoperti\PayMe\Contracts;
 interface Factory
 {
     /**
-     * Get a Gateway implementation.
+     * Create a new gateway instance..
      *
-     * @param string $driver
+     * @param string[] $driver
      *
      * @return \Shoperti\PayMe\Contracts\Gateway
      */
-    public function driver($driver = null);
+    public function make(array $config);
 }
