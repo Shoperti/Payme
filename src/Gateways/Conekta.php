@@ -373,13 +373,13 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Get error response from server or fallback to general error.
      *
-     * @param string $rawResponse
+     * @param string $parseResponse
      *
      * @return array
      */
-    protected function responseError($rawResponse)
+    protected function responseError($parseResponse)
     {
-        return $this->parseResponse($rawResponse) ?: $this->jsonError($rawResponse);
+        return $this->parseResponse($parseResponse) ?: $this->jsonError($parseResponse);
     }
 
     /**

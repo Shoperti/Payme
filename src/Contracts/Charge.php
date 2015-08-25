@@ -7,9 +7,9 @@ interface Charge
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
-     * @param string[] $options
+     * @param int|float $amount
+     * @param mixed     $payment
+     * @param string[]  $options
      *
      * @return \Shoperti\PayMe\Transaction
      */

@@ -7,7 +7,7 @@ interface Store
     /**
      * Stores a credit card.
      *
-     * @param $creditcard
+     * @param mixed    $creditcard
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -17,7 +17,7 @@ interface Store
     /**
      * Unstores a credit card.
      *
-     * @param $reference
+     * @param string   $reference
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction

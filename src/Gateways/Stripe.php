@@ -301,13 +301,13 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Get error response from server or fallback to general error.
      *
-     * @param string $rawResponse
+     * @param string $responseBody
      *
      * @return array
      */
-    protected function responseError($rawResponse)
+    protected function responseError($responseBody)
     {
-        return $this->parseResponse($rawResponse) ?: $this->jsonError($rawResponse);
+        return $this->parseResponse($responseBody) ?: $this->jsonError($responseBody);
     }
 
     /**
