@@ -56,7 +56,9 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Inject the configuration for a Gateway.
      *
-     * @param $config
+     * @param string[] $config
+     *
+     * @return void
      */
     public function __construct($config)
     {
@@ -71,8 +73,8 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
+     * @param int      $amount
+     * @param mixed    $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -91,10 +93,10 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Stores a credit card.
      *
-     * @param $creditcard
+     * @param string   $creditcard
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function store($creditcard, $options = [])
     {
@@ -114,10 +116,10 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Unstores a credit card.
      *
-     * @param $reference
+     * @param string   $reference
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstore($reference, $options = [])
     {
@@ -131,9 +133,9 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Add order params to request.
      *
-     * @param $params[]
-     * @param $money
-     * @param $options[]
+     * @param string[] $params
+     * @param int      $money
+     * @param string[] $options
      *
      * @return array
      */
@@ -150,10 +152,10 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Add order details params.
      *
-     * @param $params[]
-     * @param $options[]
+     * @param string[] $params
+     * @param string[] $options
      *
-     * @return mixed
+     * @return array
      */
     protected function addOrderDetails(array $params, array $options)
     {
@@ -175,9 +177,9 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Add payment method to request.
      *
-     * @param $params[]
-     * @param $payment
-     * @param $options[]
+     * @param string[] $params
+     * @param mixed    $payment
+     * @param string[] $options
      *
      * @return array
      */
@@ -201,8 +203,8 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Add address to request.
      *
-     * @param $params[]
-     * @param $options[]
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return array
      */
@@ -225,9 +227,9 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Add customer to request.
      *
-     * @param $params[]
-     * @param $creditcard
-     * @param $options[]
+     * @param string[] $params
+     * @param string   $creditcard
+     * @param string[] $options
      *
      * @return array
      */
@@ -278,7 +280,7 @@ class Conekta extends AbstractGateway implements Charge, Store
             $response = $this->parseResponse($rawResponse->getBody());
             $success = !(Arr::get($response, 'object', 'error') == 'error');
         } else {
-            $response = $this->responseError($rawResponse);
+            $response = $this->responseError($rawResponse->getBody());
         }
 
         return $this->mapTransaction($success, $response);
@@ -309,7 +311,7 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Map reference to response.
      *
-     * @param $response
+     * @param array $response
      *
      * @return string|null
      */
@@ -333,15 +335,14 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Map Conekta response to status object.
      *
-     * @param $status
+     * @param string $status
      *
      * @return \Shoperti\PayMe\Status
      */
     protected function getStatus($status)
     {
         switch ($status) {
-            case 'pending_payment';
-
+            case 'pending_payment':
                 return new Status('pending');
                 break;
             case 'paid':
@@ -351,8 +352,7 @@ class Conekta extends AbstractGateway implements Charge, Store
             case 'canceled':
                 return new Status($status);
                 break;
-            case 'in_trial';
-
+            case 'in_trial':
                 return new Status('trial');
                 break;
         }
@@ -361,7 +361,7 @@ class Conekta extends AbstractGateway implements Charge, Store
     /**
      * Parse JSON response to array.
      *
-     * @param  $body
+     * @param string $body
      *
      * @return array
      */
@@ -379,20 +379,20 @@ class Conekta extends AbstractGateway implements Charge, Store
      */
     protected function responseError($rawResponse)
     {
-        return $this->parseResponse($rawResponse->getBody()) ?: $this->jsonError($rawResponse);
+        return $this->parseResponse($rawResponse) ?: $this->jsonError($rawResponse);
     }
 
     /**
      * Default JSON response.
      *
-     * @param $rawResponse
+     * @param string $rawResponse
      *
      * @return array
      */
     public function jsonError($rawResponse)
     {
         $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse->getBody()})";
+        $msg .= " (Raw response API {$rawResponse})";
 
         return [
             'message_to_purchaser' => $msg,

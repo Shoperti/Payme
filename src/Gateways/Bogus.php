@@ -50,9 +50,9 @@ class Bogus extends AbstractGateway implements Charge, Store
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
-     * @param string[] $options
+     * @param int|float $amount
+     * @param mixed     $payment
+     * @param string[]  $options
      *
      * @return \Shoperti\PayMe\Transaction
      */
@@ -72,10 +72,10 @@ class Bogus extends AbstractGateway implements Charge, Store
     /**
      * Stores a credit card.
      *
-     * @param $creditcard
+     * @param mixed    $creditcard
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function store($creditcard, $options = [])
     {
@@ -93,10 +93,10 @@ class Bogus extends AbstractGateway implements Charge, Store
     /**
      * Unstores a credit card.
      *
-     * @param $reference
+     * @param string   $reference
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstore($reference, $options = [])
     {
@@ -117,7 +117,7 @@ class Bogus extends AbstractGateway implements Charge, Store
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     protected function commit($method = 'post', $url, $params = [], $options = [])
     {

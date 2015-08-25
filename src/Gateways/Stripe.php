@@ -63,8 +63,8 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
+     * @param int      $amount
+     * @param string   $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -83,10 +83,10 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Stores a credit card.
      *
-     * @param $creditcard
+     * @param mixed    $creditcard
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function store($creditcard, $options = [])
     {
@@ -106,10 +106,10 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Unstores a credit card.
      *
-     * @param $reference
+     * @param string   $reference
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstore($reference, $options = [])
     {
@@ -123,9 +123,9 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Add order params to request.
      *
-     * @param $params[]
-     * @param $money
-     * @param $options[]
+     * @param string[] $params
+     * @param int      $money
+     * @param string[] $options
      *
      * @return array
      */
@@ -141,9 +141,9 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Add payment method to request.
      *
-     * @param $params[]
-     * @param $payment
-     * @param $options[]
+     * @param string[] $params
+     * @param mixed    $payment
+     * @param string[] $options
      *
      * @return array
      */
@@ -167,8 +167,8 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Add address to request.
      *
-     * @param $params[]
-     * @param $options[]
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return array
      */
@@ -191,9 +191,9 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Add customer to request.
      *
-     * @param $params[]
-     * @param $creditcard
-     * @param $options[]
+     * @param string[] $params
+     * @param string   $creditcard
+     * @param string[] $options
      *
      * @return array
      */
@@ -214,7 +214,7 @@ class Stripe extends AbstractGateway implements Charge, Store
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     protected function commit($method = 'post', $url, $params = [], $options = [])
     {
@@ -246,7 +246,7 @@ class Stripe extends AbstractGateway implements Charge, Store
             $response = $this->parseResponse($rawResponse->getBody());
             $success = (!array_key_exists('error', $response));
         } else {
-            $response = $this->responseError($rawResponse);
+            $response = $this->responseError($rawResponse->getBody());
         }
 
         return $this->mapTransaction($success, $response);
@@ -277,7 +277,7 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Map Conekta response to status object.
      *
-     * @param $status
+     * @param string $status
      *
      * @return \Shoperti\PayMe\Status
      */
@@ -289,7 +289,7 @@ class Stripe extends AbstractGateway implements Charge, Store
     /**
      * Parse JSON response to array.
      *
-     * @param  $body
+     * @param string $body
      *
      * @return array
      */
@@ -307,20 +307,20 @@ class Stripe extends AbstractGateway implements Charge, Store
      */
     protected function responseError($rawResponse)
     {
-        return $this->parseResponse($rawResponse->getBody()) ?: $this->jsonError($rawResponse);
+        return $this->parseResponse($rawResponse) ?: $this->jsonError($rawResponse);
     }
 
     /**
      * Default JSON response.
      *
-     * @param $rawResponse
+     * @param string $rawResponse
      *
      * @return array
      */
     public function jsonError($rawResponse)
     {
         $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse->getBody()})";
+        $msg .= " (Raw response API {$rawResponse})";
 
         return [
             'error' => ['message' => $msg],

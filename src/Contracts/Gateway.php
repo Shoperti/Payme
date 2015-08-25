@@ -10,7 +10,7 @@ interface Gateway
      * @param bool  $success
      * @param array $response
      *
-     * @return \Dinkbit\PayMe\Transaction
+     * @return \Shoperti\PayMe\Transaction
      */
     public function mapTransaction($success, $response);
 
@@ -74,7 +74,7 @@ interface Gateway
 
     /**
      * Format amount to the current currency.
-     * 
+     *
      * @param $amount
      *
      * @return string

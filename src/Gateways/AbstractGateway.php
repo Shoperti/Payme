@@ -30,7 +30,7 @@ abstract class AbstractGateway implements Gateway
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     abstract protected function commit($method = 'post', $url, $params = [], $options = []);
 

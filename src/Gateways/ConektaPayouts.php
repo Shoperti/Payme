@@ -16,10 +16,10 @@ class ConektaPayouts extends Conekta
     protected $displayName = 'conektapayouts';
 
     /**
-     * Process Payout.
+     * Charge the payout.
      *
-     * @param $amount
-     * @param $payment
+     * @param int      $amount
+     * @param mixed    $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -35,11 +35,11 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * Create Recipient.
+     * Register a recipient.
      *
-     * @param array $options
+     * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function storeRecipient($options = [])
     {
@@ -52,29 +52,31 @@ class ConektaPayouts extends Conekta
         return $this->commit('post', $this->buildUrlFromString('payees'), $params);
     }
 
+    // /**
+    //  * @param $reference
+    //  * @param array $options
+    //  *
+    //  * @return mixed
+    //  */
+    // public function update($reference, $options = [])
+    // {
+    //     // TODO: Check as there's an error from Conekta
+    //     $params = [];
+    //
+    //     $params = $this->addPayout($params, $options);
+    //     $params = $this->addPayoutMethod($params, $options);
+    //     $params = $this->addPayoutBilling($params, $options);
+    //
+    //     return $this->commit('put', $this->buildUrlFromString('payees/'.$reference), $params);
+    // }
+
     /**
-     * @param $reference
-     * @param array $options
+     * Unstores an existing recipient.
      *
-     * @return mixed
-     */
-
-    /*
-    public function update($reference, $options = [])
-    {
-        TODO: Check as there's an error from Conekta
-        $params = [];
-
-        $params = $this->addPayout($params, $options);
-        $params = $this->addPayoutMethod($params, $options);
-        $params = $this->addPayoutBilling($params, $options);
-
-        return $this->commit('put', $this->buildUrlFromString('payees/'.$reference), $params);
-    }
-    */
-
-    /**
-     * {@inheritdoc}
+     * @param string   $reference
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstoreRecipient($reference, $options = [])
     {
@@ -82,11 +84,13 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * @param $params
-     * @param $payment
-     * @param $options
+     * Add payment method to request.
      *
-     * @return mixed
+     * @param string[] $params
+     * @param mixed    $payment
+     * @param string[] $options
+     *
+     * @return array
      */
     protected function addPaymentMethod(array $params, $payment, array $options)
     {
@@ -98,8 +102,10 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * @param $params
-     * @param $options
+     * Add payout to request.
+     *
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return mixed
      */
@@ -113,12 +119,14 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * @param $params
-     * @param $options
+     * Add payout method to request.
+     *
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return mixed
      */
-    protected function addPayoutMethod($params, $options)
+    protected function addPayoutMethod(array $params, array $options)
     {
         $params['payout_method'] = [];
         $params['payout_method']['type'] = 'bank_transfer_payout_method';
@@ -129,12 +137,14 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * @param $params
-     * @param $options
+     * Add payout billing to request.
+     *
+     * @param string[] $params
+     * @param string[] $options
      *
      * @return mixed
      */
-    protected function addPayoutBilling($params, $options)
+    protected function addPayoutBilling(array $params, array $options)
     {
         $params['billing_address'] = [];
         $params['billing_address']['tax_id'] = Arr::get($options, 'tax_id'); // RFC
@@ -143,9 +153,16 @@ class ConektaPayouts extends Conekta
     }
 
     /**
-     * {@inheritdoc}
+     * Commit a HTTP request.
+     *
+     * @param string   $method
+     * @param string   $url
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Transaction
      */
-    public function mapResponseToTransaction($success, $response)
+    public function mapTransaction($success, $response)
     {
         return (new Transaction())->setRaw($response)->map([
             'isRedirect'    => false,

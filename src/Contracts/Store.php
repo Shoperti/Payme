@@ -10,7 +10,7 @@ interface Store
      * @param $creditcard
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function store($creditcard, $options = []);
 
@@ -20,7 +20,7 @@ interface Store
      * @param $reference
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstore($reference, $options = []);
 }
