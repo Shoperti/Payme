@@ -3,9 +3,10 @@
 namespace Shoperti\PayMe\Gateways;
 
 use InvalidArgumentException;
+use Shoperti\PayMe\Contracts\Gateway;
 use Shoperti\PayMe\Currency;
 
-abstract class AbstractGateway
+abstract class AbstractGateway implements Gateway
 {
     /**
      * Configuration options.
@@ -130,9 +131,11 @@ abstract class AbstractGateway
     }
 
     /**
+     * Parse the amout to pay to the currency format.
+     *
      * @param $amount
      *
-     * @throws InvalidRequestException
+     * @throws \InvalidArgumentException
      *
      * @return string
      */
@@ -141,7 +144,7 @@ abstract class AbstractGateway
         if (!is_float($amount) &&
             $this->getCurrencyDecimalPlaces() > 0 &&
             false === strpos((string) $amount, '.')) {
-            throw new InvalidRequestException(
+            throw new InvalidArgumentException(
                 'Please specify amount as a string or float, '.
                 'with decimal places (e.g. \'10.00\' to represent $10.00).'
             );
@@ -151,9 +154,9 @@ abstract class AbstractGateway
     }
 
     /**
-     * @param $amount
+     * Get the amount converted to integer.
      *
-     * @throws InvalidRequestException
+     * @param $amount
      *
      * @return int
      */
@@ -163,7 +166,9 @@ abstract class AbstractGateway
     }
 
     /**
-     * @return mixed
+     * Get the gateway currency.
+     *
+     * @return string
      */
     public function getCurrency()
     {
@@ -171,7 +176,9 @@ abstract class AbstractGateway
     }
 
     /**
-     * @return mixed
+     * Get the gateway currency numeric representation.
+     *
+     * @return int
      */
     public function getCurrencyNumeric()
     {
@@ -181,6 +188,8 @@ abstract class AbstractGateway
     }
 
     /**
+     * Get the currency decimal places.
+     *
      * @return int
      */
     public function getCurrencyDecimalPlaces()
@@ -193,6 +202,8 @@ abstract class AbstractGateway
     }
 
     /**
+     * Get the currency decimal factor.
+     *
      * @return number
      */
     private function getCurrencyDecimalFactor()
@@ -201,6 +212,8 @@ abstract class AbstractGateway
     }
 
     /**
+     * Format amount to the current currency.
+     *
      * @param $amount
      *
      * @return string

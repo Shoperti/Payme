@@ -57,7 +57,7 @@ class ConektaPayouts extends Conekta
      * @param array $options
      *
      * @return mixed
-     *               Revisar ya que existe un error por parte de Conekta
+     * TODO: Check as there's an error from Conekta
      */
 
     /*
