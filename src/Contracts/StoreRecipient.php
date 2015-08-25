@@ -5,21 +5,21 @@ namespace Shoperti\PayMe\Contracts;
 interface StoreRecipient
 {
     /**
-     * Stores a Recipient.
+     * Stores a new recipient.
      *
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function storeRecipient($options = []);
 
     /**
-     * Unstores a Recipient.
+     * Unstores an existing recipient.
      *
-     * @param $reference
+     * @param string   $reference
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function unstoreRecipient($reference, $options = []);
 }

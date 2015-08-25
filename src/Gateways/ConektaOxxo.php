@@ -18,8 +18,8 @@ class ConektaOxxo extends Conekta
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
+     * @param int      $amount
+     * @param mixed    $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -39,12 +39,12 @@ class ConektaOxxo extends Conekta
     /**
      * Add payment expire at time.
      *
-     * @param $params[]
-     * @param $options[]
+     * @param string[] $params
+     * @param string[] $options
      *
-     * @return mixed
+     * @return array
      */
-    public function addExpiry($params, $options)
+    protected function addExpiry(array $params, array $options)
     {
         $params['cash']['expires_at'] = Arr::get($options, 'expires', date('Y-m-d', time() + 172800));
 
@@ -59,7 +59,7 @@ class ConektaOxxo extends Conekta
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function mapTransaction($success, $response)
     {

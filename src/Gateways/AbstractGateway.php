@@ -30,7 +30,7 @@ abstract class AbstractGateway implements Gateway
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     abstract protected function commit($method = 'post', $url, $params = [], $options = []);
 
@@ -104,10 +104,9 @@ abstract class AbstractGateway implements Gateway
     }
 
     /**
-     * Accepts the amount of money in base unit and returns cants or base unit
-     * amount according to the @see $money_format propery.
+     * Accepts the amount of money in base unit and returns cants or base unit.
      *
-     * @param  $money
+     * @param int|float $money
      *
      * @throws \InvalidArgumentException
      *

@@ -18,8 +18,8 @@ class ConektaBank extends Conekta
     /**
      * Charge the credit card.
      *
-     * @param $amount
-     * @param $payment
+     * @param int      $amount
+     * @param mixed    $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Transaction
@@ -43,7 +43,7 @@ class ConektaBank extends Conekta
      * @param string[] $params
      * @param string[] $options
      *
-     * @return mixed
+     * @return \Shoperti\PayMe\Transaction
      */
     public function mapTransaction($success, $response)
     {
