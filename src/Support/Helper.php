@@ -28,7 +28,7 @@ class Helper
     public static function className($value)
     {
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
-        
+
         return ucfirst(str_replace(' ', '', $value));
     }
 }
