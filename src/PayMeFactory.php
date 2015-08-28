@@ -4,6 +4,7 @@ namespace Shoperti\PayMe;
 
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\Factory;
+use Shoperti\PayMe\Support\Helper;
 
 class PayMeFactory implements Factory
 {
@@ -46,8 +47,7 @@ class PayMeFactory implements Factory
         }
 
         $name = $config['gateway'];
-
-        $gateway = ucfirst($name);
+        $gateway = Helper::camelCase($name);
         $class = "Shoperti\PayMe\Gateways\\{$gateway}";
 
         if (class_exists($class)) {
