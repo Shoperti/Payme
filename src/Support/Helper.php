@@ -20,10 +20,15 @@ class Helper
         return $text;
     }
 
-    public static function camelCase($value)
+    /**
+     * Resolves a camel case class name.
+     *
+     * @return string
+     */
+    public static function className($value)
     {
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
-    
-        return lcfirst(str_replace(' ', '', $value));
+        
+        return ucfirst(str_replace(' ', '', $value));
     }
 }

@@ -19,9 +19,9 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_converts_string_to_camelcase()
     {
-        $this->assertEquals('paymePHPPay', Helper::camelCase('payme_p_h_p_pay'));
-        $this->assertEquals('paymePhpPay', Helper::camelCase('payme_php_pay'));
-        $this->assertEquals('paymePhPPay', Helper::camelCase('payme-phP-pay'));
-        $this->assertEquals('paymePhpPay', Helper::camelCase('payme  -_-  php   -_-   pay   '));
+        $this->assertEquals('PaymePHPPay', Helper::className('payme_p_h_p_pay'));
+        $this->assertEquals('PaymePhpPay', Helper::className('payme_php_pay'));
+        $this->assertEquals('PaymePhPPay', Helper::className('payme-phP-pay'));
+        $this->assertEquals('PaymePhpPay', Helper::className('payme  -_-  php   -_-   pay   '));
     }
 }

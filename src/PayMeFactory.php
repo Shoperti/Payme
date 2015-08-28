@@ -47,7 +47,7 @@ class PayMeFactory implements Factory
         }
 
         $name = $config['gateway'];
-        $gateway = Helper::camelCase($name);
+        $gateway = Helper::className($name);
         $class = "Shoperti\PayMe\Gateways\\{$gateway}";
 
         if (class_exists($class)) {
