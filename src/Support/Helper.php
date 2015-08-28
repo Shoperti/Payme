@@ -23,7 +23,7 @@ class Helper
     public static function camelCase($value)
     {
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
-    
+
         return lcfirst(str_replace(' ', '', $value));
     }
 }
