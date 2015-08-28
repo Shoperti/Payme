@@ -29,6 +29,6 @@ class Helper
     {
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
 
-        return ucfirst(str_replace(' ', '', $value));
+        return str_replace(' ', '', $value);
     }
 }
