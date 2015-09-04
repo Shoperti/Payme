@@ -13,7 +13,7 @@ class ConektaOxxo extends Conekta
      *
      * @var string
      */
-    protected $displayName = 'conektaoxxo';
+    protected $displayName = 'conekta_oxxo';
 
     /**
      * Charge the credit card.

@@ -13,7 +13,7 @@ class ConektaBank extends Conekta
      *
      * @var string
      */
-    protected $displayName = 'conektabank';
+    protected $displayName = 'conekta_bank';
 
     /**
      * Charge the credit card.

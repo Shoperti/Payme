@@ -13,7 +13,7 @@ class ConektaPayouts extends Conekta
      *
      * @var string
      */
-    protected $displayName = 'conektapayouts';
+    protected $displayName = 'conekta_payouts';
 
     /**
      * Charge the payout.
