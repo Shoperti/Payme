@@ -21,6 +21,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->make([]);
     }
+
     /**
      * @test
      * @expectedException InvalidArgumentException
@@ -30,6 +31,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->make(['driver' => 'foo']);
     }
+
     /**
      * @test
      * @expectedException InvalidArgumentException
