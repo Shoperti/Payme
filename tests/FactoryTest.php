@@ -28,7 +28,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function it_thorws_on_not_gateway_supported()
     {
-        $this->factory->make(['gateway' => 'foo']);
+        $this->factory->make(['driver' => 'foo']);
     }
     /**
      * @test
@@ -37,13 +37,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function it_thorws_on_not_factory_specified()
     {
-        $this->factory->factory(['gateway' => 'bar']);
+        $this->factory->factory(['driver' => 'bar']);
     }
 
     /** @test */
     public function it_can_create_a_new_factory_instance()
     {
-        $gateway = $this->factory->make(['gateway' => 'bogus']);
+        $gateway = $this->factory->make(['driver' => 'bogus']);
 
         $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus', $gateway);
     }
@@ -51,7 +51,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_can_create_a_new_camelcase_instance()
     {
-        $gateway = $this->factory->make(['gateway' => 'conekta_oxxo', 'private_key' => 'foo']);
+        $gateway = $this->factory->make(['driver' => 'conekta_oxxo', 'private_key' => 'foo']);
 
         $this->assertInstanceOf('Shoperti\PayMe\Gateways\ConektaOxxo', $gateway);
     }

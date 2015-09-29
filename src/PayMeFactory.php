@@ -26,7 +26,7 @@ class PayMeFactory implements Factory
      */
     public function make(array $config)
     {
-        if (!isset($config['gateway'])) {
+        if (!isset($config['driver'])) {
             throw new InvalidArgumentException('A gateway must be specified.');
         }
 
@@ -46,7 +46,7 @@ class PayMeFactory implements Factory
             return $this->factories['name'];
         }
 
-        $name = $config['gateway'];
+        $name = $config['driver'];
         $gateway = Helper::className($name);
         $class = "Shoperti\PayMe\Gateways\\{$gateway}";
 

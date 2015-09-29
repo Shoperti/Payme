@@ -33,9 +33,9 @@ $payme = new Shoperti\PayMe\PayMeFactory();
 
 // Get a specific gateway.
 $gateway = $payme->make([
-	'gateway'      => 'stripe',
-	'private_key'  => 'secret_key',
-	'public_key'   => 'public_key',
+	'driver'      => 'stripe',
+	'private_key' => 'secret_key',
+	'public_key'  => 'public_key',
 ]);
 
 // Make transaction
