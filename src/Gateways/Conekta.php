@@ -171,6 +171,10 @@ class Conekta extends AbstractGateway implements Charge, Store
             $params['details']['phone'] = Arr::get($options, 'phone', '');
         }
 
+        $params = $this->addCustomer($params, $options);
+        $params = $this->addLineItems($params, $options);
+        $params = $this->addBillingAddress($params, $options);
+
         return $params;
     }
 
@@ -233,9 +237,75 @@ class Conekta extends AbstractGateway implements Charge, Store
      *
      * @return array
      */
-    protected function addCustomer(array $params, $creditcard, array $options)
+    protected function addCustomer(array $params, array $options)
     {
-        return $params['customer'] = array_key_exists('customer', $options) ? $options['customer'] : '';
+        if ($customer = Arr::get($options, 'customer')) {
+            $params['details']['customer'] = [];
+            $params['details']['customer']['logged_in'] = Arr::get($customer, 'logged_in');
+            $params['details']['customer']['successful_purchases'] = Arr::get($customer, 'successful_purchases');
+            $params['details']['customer']['created_at'] = Arr::get($customer, 'created_at');
+            $params['details']['customer']['updated_at'] = Arr::get($customer, 'updated_at');
+            $params['details']['customer']['offline_payments'] = Arr::get($customer, 'offline_payments');
+            $params['details']['customer']['score'] = Arr::get($customer, 'score');
+        }
+
+        return $params;
+    }
+
+    /**
+     * Add order line items param.
+     *
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return array
+     */
+    protected function addLineItems(array $params, array $options)
+    {
+        $params['details']['line_items'] = [];
+
+        if (isset($options['line_items']) and is_array($options['line_items'])) {
+            foreach ($options['line_items'] as $line_item) {
+                $params['details']['line_items'][] = [
+                    'name'        => Arr::get($line_item, 'name'),
+                    'description' => Arr::get($line_item, 'description'),
+                    'unit_price'  => $this->amount(Arr::get($line_item, 'unit_price')),
+                    'quantity'    => Arr::get($line_item, 'quantity', 1),
+                    'sku'         => Arr::get($line_item, 'sku'),
+                    'category'    => Arr::get($line_item, 'category'),
+                ];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Add Billing address to request.
+     *
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return array
+     */
+    protected function addBillingAddress(array $params, array $options)
+    {
+        if ($address = Arr::get($options, 'billing_address')) {
+            $params['details']['billing_address'] = [];
+            $params['details']['billing_address']['street1'] = Arr::get($address, 'address1');
+            $params['details']['billing_address']['street2'] = Arr::get($address, 'address2');
+            $params['details']['billing_address']['street3'] = Arr::get($address, 'address3');
+            $params['details']['billing_address']['city'] = Arr::get($address, 'city');
+            $params['details']['billing_address']['country'] = Arr::get($address, 'country');
+            $params['details']['billing_address']['state'] = Arr::get($address, 'state');
+            $params['details']['billing_address']['zip'] = Arr::get($address, 'zip');
+            $params['details']['billing_address']['tax_id'] = Arr::get($address, 'tax_id');
+            $params['details']['billing_address']['company_name'] = Arr::get($address, 'company_name');
+            $params['details']['billing_address']['phone'] = Arr::get($address, 'phone');
+            $params['details']['billing_address']['email'] = Arr::get($address, 'email');
+        }
+
+        return $params;
     }
 
     /**
@@ -297,14 +367,14 @@ class Conekta extends AbstractGateway implements Charge, Store
     public function mapTransaction($success, $response)
     {
         return (new Transaction())->setRaw($response)->map([
-            'isRedirect'      => false,
-            'success'         => $success,
-            'message'         => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
-            'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
-            'authorization'   => $success ? $response['id'] : $response['type'],
-            'status'          => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
-            'reference'       => $success ? $this->getReference($response) : false,
-            'code'            => $success ? false : $response['code'],
+            'isRedirect'    => false,
+            'success'       => $success,
+            'message'       => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
+            'test'          => array_key_exists('livemode', $response) ? $response['livemode'] : false,
+            'authorization' => $success ? $response['id'] : $response['type'],
+            'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
+            'reference'     => $success ? $this->getReference($response) : false,
+            'code'          => $success ? false : $response['code'],
         ]);
     }
 
