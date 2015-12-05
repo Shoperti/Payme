@@ -331,7 +331,6 @@ class Conekta extends AbstractGateway implements Charge, Store
             $params['details']['shipment']['address']['state'] = Arr::get($address, 'state');
             $params['details']['shipment']['address']['zip'] = Arr::get($address, 'zip');
             $params['details']['shipment']['address']['country'] = Arr::get($address, 'country');
-
         }
 
         return $params;
