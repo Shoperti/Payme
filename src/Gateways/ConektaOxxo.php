@@ -32,6 +32,7 @@ class ConektaOxxo extends Conekta
 
         $params = $this->addExpiry($params, $options);
         $params = $this->addOrder($params, $amount, $options);
+        $params = $this->addOrderDetails($params, $options);
 
         return $this->commit('post', $this->buildUrlFromString('charges'), $params);
     }

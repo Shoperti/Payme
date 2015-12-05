@@ -31,6 +31,7 @@ class ConektaBank extends Conekta
         $params['bank']['type'] = $payment;
 
         $params = $this->addOrder($params, $amount, $options);
+        $params = $this->addOrderDetails($params, $options);
 
         return $this->commit('post', $this->buildUrlFromString('charges'), $params);
     }

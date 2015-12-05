@@ -174,6 +174,7 @@ class Conekta extends AbstractGateway implements Charge, Store
         $params = $this->addCustomer($params, $options);
         $params = $this->addLineItems($params, $options);
         $params = $this->addBillingAddress($params, $options);
+        $params = $this->addShippingAddress($params, $options);
 
         return $params;
     }
@@ -214,7 +215,7 @@ class Conekta extends AbstractGateway implements Charge, Store
      */
     protected function addAddress(array $params, array $options)
     {
-        if ($address = Arr::get($options, 'address') or Arr::get($options, 'billing_address')) {
+        if ($address = Arr::get($options, 'address') || Arr::get($options, 'billing_address')) {
             $params['address'] = [];
             $params['address']['street1'] = Arr::get($address, 'address1');
             $params['address']['street2'] = Arr::get($address, 'address2');
@@ -264,7 +265,7 @@ class Conekta extends AbstractGateway implements Charge, Store
     {
         $params['details']['line_items'] = [];
 
-        if (isset($options['line_items']) and is_array($options['line_items'])) {
+        if (isset($options['line_items']) && is_array($options['line_items'])) {
             foreach ($options['line_items'] as $line_item) {
                 $params['details']['line_items'][] = [
                     'name'        => Arr::get($line_item, 'name'),
@@ -303,6 +304,34 @@ class Conekta extends AbstractGateway implements Charge, Store
             $params['details']['billing_address']['company_name'] = Arr::get($address, 'company_name');
             $params['details']['billing_address']['phone'] = Arr::get($address, 'phone');
             $params['details']['billing_address']['email'] = Arr::get($address, 'email');
+        }
+
+        return $params;
+    }
+
+    /**
+     * Add Shipping address to request.
+     *
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return array
+     */
+    protected function addShippingAddress(array $params, array $options)
+    {
+        if ($address = Arr::get($options, 'shipping_address')) {
+            $params['details']['shipment'] = [];
+            $params['details']['shipment']['carrier'] = Arr::get($address, 'carrier');
+            $params['details']['shipment']['service'] = Arr::get($address, 'service');
+            $params['details']['shipment']['price'] = Arr::get($address, 'price');
+            $params['details']['shipment']['address']['street1'] = Arr::get($address, 'address1');
+            $params['details']['shipment']['address']['street2'] = Arr::get($address, 'address2');
+            $params['details']['shipment']['address']['street3'] = Arr::get($address, 'address3');
+            $params['details']['shipment']['address']['city'] = Arr::get($address, 'city');
+            $params['details']['shipment']['address']['state'] = Arr::get($address, 'state');
+            $params['details']['shipment']['address']['zip'] = Arr::get($address, 'zip');
+            $params['details']['shipment']['address']['country'] = Arr::get($address, 'country');
+
         }
 
         return $params;
