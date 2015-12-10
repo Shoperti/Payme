@@ -142,7 +142,7 @@ class Conekta extends AbstractGateway implements Charge, Store
     protected function addOrder(array $params, $money, array $options)
     {
         $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
-        $params['reference_id'] = Arr::get($options, 'order_id');
+        $params['reference_id'] = Arr::get($options, 'reference');
         $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
 

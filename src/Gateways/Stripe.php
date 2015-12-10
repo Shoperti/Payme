@@ -132,6 +132,7 @@ class Stripe extends AbstractGateway implements Charge, Store
     protected function addOrder(array $params, $money, array $options)
     {
         $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
+        $params['receipt_number'] = Arr::get($options, 'reference');
         $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
         $params['amount'] = $this->amount($money);
 
