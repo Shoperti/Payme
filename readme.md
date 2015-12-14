@@ -5,9 +5,6 @@
 
 Supported Gateways:
 * Conekta
-* Conekta Oxxo
-* Conekta Bank
-* Conekta Payouts
 * Stripe
 * Paypal Express (soon)
 
@@ -17,7 +14,7 @@ Begin by installing this package through Composer. Edit your project's `composer
 
 ```json
 "require": {
-  "shoperti/payme": "dev-master"
+  "shoperti/payme": "1.0.0"
 }
 ```
 
@@ -28,20 +25,22 @@ Next, update Composer from the Terminal:
 ### Examples
 
 ```php
-// Create a new PayMeFactory
-$payme = new Shoperti\PayMe\PayMeFactory();
-
-// Get a specific gateway.
-$gateway = $payme->make([
+// Create a new PayMe instance choosing the driver
+$config = [
 	'driver'      => 'stripe',
 	'private_key' => 'secret_key',
 	'public_key'  => 'public_key',
-]);
+];
 
-// Make transaction
-$transaction = $gateway->charge('100', 'tok_test');
 
-if (! $transaction->success()) {
+$payme = (new Shoperti\PayMe\PayMe($config);
+or
+$payme = PayMe::make($config);
+
+// Make charge
+$response = $gateway->charges()->create('100', 'tok_test', []);
+
+if (!$response->success()) {
 	return ':(';
 }
 
@@ -51,9 +50,9 @@ return 'Hurray!';
 ### Todo
 
 - [ ] Add Gateways tests
-- [ ] Add more gateways
 - [ ] Add Credit Card object
 - [ ] Create a Laravel Bridge
+- [ ] Add more gateways
 
 ## License
 
