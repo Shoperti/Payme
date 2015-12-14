@@ -2,7 +2,8 @@
 
 namespace Shoperti\PayMe\Gateways\Conekta;
 
-use Shoperti\PayMe\Gateways\RecipientInterface;
+use Shoperti\PayMe\Contracts\RecipientInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
  * This is the conekta recipients class.
