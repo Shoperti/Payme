@@ -9,7 +9,7 @@ use Shoperti\PayMe\Gateways\RecipientInterface;
  *
  * @author joseph.cohen@dinkbit.com
  */
-class Recipients extends ConektaGateway implements RecipientInterface
+class Recipients extends AbstractApi implements RecipientInterface
 {
     /**
      * Charge the payout.
