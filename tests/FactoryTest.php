@@ -47,14 +47,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         $gateway = $this->factory->make(['driver' => 'bogus']);
 
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus', $gateway);
-    }
-
-    /** @test */
-    public function it_can_create_a_new_camelcase_instance()
-    {
-        $gateway = $this->factory->make(['driver' => 'conekta_oxxo', 'private_key' => 'foo']);
-
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ConektaOxxo', $gateway);
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus\BogusGateway', $gateway);
     }
 }

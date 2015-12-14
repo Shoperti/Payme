@@ -3,11 +3,12 @@
 namespace Shoperti\PayMe;
 
 use ArrayAccess;
+use Shoperti\PayMe\Contracts\ResponseInterface;
 
-class Transaction implements ArrayAccess, Contracts\Transaction
+class Response implements ArrayAccess, ResponseInterface
 {
     /**
-     * Has the transaction made by the Gateway?
+     * Has the response made by the Gateway?
      *
      * @var bool
      */
@@ -35,42 +36,42 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     public $status;
 
     /**
-     * The authorization code for the transaction.
+     * The authorization code for the response.
      *
      * @var string
      */
     public $authorization;
 
     /**
-     * The response message from the transaction.
+     * The response message from the response.
      *
      * @var string
      */
     public $message;
 
     /**
-     * The code for the transaction.
+     * The code for the response.
      *
      * @var string
      */
     public $code;
 
     /**
-     * The reference code for the transaction.
+     * The reference code for the response.
      *
      * @var string
      */
     public $reference;
 
     /**
-     * The raw transaction information.
+     * The raw response information.
      *
      * @var array
      */
-    public $transaction;
+    public $response;
 
     /**
-     * Is the transaction successful?
+     * Is the response successful?
      *
      * @return bool
      */
@@ -80,7 +81,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Does the transaction require a redirect?
+     * Does the response require a redirect?
      *
      * @return bool
      */
@@ -90,7 +91,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Return transaction gateway is in test mode.
+     * Return response gateway is in test mode.
      *
      * @return string
      */
@@ -130,7 +131,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Return transaction status.
+     * Return response status.
      *
      * @return string
      */
@@ -140,7 +141,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
     }
 
     /**
-     * Gateway reference to represent this transaction.
+     * Gateway reference to represent this response.
      *
      * @return string
      */
@@ -154,21 +155,21 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @return array
      */
-    public function raw()
+    public function data()
     {
-        return $this->transaction;
+        return $this->response;
     }
 
     /**
-     * Set the raw transaction array from the gateway.
+     * Set the raw response array from the gateway.
      *
-     * @param array $transaction
+     * @param array $response
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Response
      */
-    public function setRaw(array $transaction)
+    public function setRaw(array $response)
     {
-        $this->transaction = $transaction;
+        $this->response = $response;
 
         return $this;
     }
@@ -178,7 +179,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      *
      * @param array $attributes
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Response
      */
     public function map(array $attributes)
     {
@@ -198,7 +199,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      */
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->transaction);
+        return array_key_exists($offset, $this->response);
     }
 
     /**
@@ -210,7 +211,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      */
     public function offsetGet($offset)
     {
-        return $this->transaction[$offset];
+        return $this->response[$offset];
     }
 
     /**
@@ -223,7 +224,7 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      */
     public function offsetSet($offset, $value)
     {
-        $this->transaction[$offset] = $value;
+        $this->response[$offset] = $value;
     }
 
     /**
@@ -235,6 +236,6 @@ class Transaction implements ArrayAccess, Contracts\Transaction
      */
     public function offsetUnset($offset)
     {
-        unset($this->transaction[$offset]);
+        unset($this->response[$offset]);
     }
 }
