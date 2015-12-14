@@ -1,20 +1,17 @@
 <?php
 
-namespace Shoperti\PayMe\Gateways;
+namespace Shoperti\PayMe\Gateways\Conekta;
 
-use Shoperti\PayMe\Status;
-use Shoperti\PayMe\Support\Arr;
-use Shoperti\PayMe\Transaction;
+use Shoperti\PayMe\Contracts\RecipientInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
-class ConektaPayouts extends Conekta
+/**
+ * This is the conekta recipients class.
+ *
+ * @author joseph.cohen@dinkbit.com
+ */
+class Recipients extends AbstractApi implements RecipientInterface
 {
-    /**
-     * Gateway display name.
-     *
-     * @var string
-     */
-    protected $displayName = 'conekta_payouts';
-
     /**
      * Charge the payout.
      *
@@ -22,7 +19,7 @@ class ConektaPayouts extends Conekta
      * @param mixed    $payment
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function charge($amount, $payment, $options = [])
     {
@@ -39,9 +36,9 @@ class ConektaPayouts extends Conekta
      *
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function storeRecipient($options = [])
+    public function create($options = [])
     {
         $params = [];
 
@@ -73,12 +70,12 @@ class ConektaPayouts extends Conekta
     /**
      * Unstores an existing recipient.
      *
-     * @param string   $reference
+     * @param string   $id
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function unstoreRecipient($reference, $options = [])
+    public function delete($id, $options = [])
     {
         return $this->commit('delete', $this->buildUrlFromString('payees/'.$reference));
     }
@@ -150,29 +147,5 @@ class ConektaPayouts extends Conekta
         $params['billing_address']['tax_id'] = Arr::get($options, 'tax_id'); // RFC
 
         return $params;
-    }
-
-    /**
-     * Commit a HTTP request.
-     *
-     * @param string   $method
-     * @param string   $url
-     * @param string[] $params
-     * @param string[] $options
-     *
-     * @return \Shoperti\PayMe\Transaction
-     */
-    public function mapTransaction($success, $response)
-    {
-        return (new Transaction())->setRaw($response)->map([
-            'isRedirect'    => false,
-            'success'       => $success,
-            'message'       => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
-            'test'          => array_key_exists('livemode', $response) ? $response['livemode'] : false,
-            'authorization' => $success ? $response['id'] : $response['type'],
-            'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
-            'reference'     => $success ? $this->getReference($response) : false,
-            'code'          => $success ? false : $response['code'],
-        ]);
     }
 }

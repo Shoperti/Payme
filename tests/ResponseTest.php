@@ -2,9 +2,9 @@
 
 namespace Shoperti\Test\PayMe;
 
-use Shoperti\PayMe\Transaction;
+use Shoperti\PayMe\Response;
 
-class TransactionTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_can_map_array_to_values()
@@ -13,7 +13,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
             'foo' => 'bar',
         ];
 
-        $transaction = new Transaction();
+        $transaction = new Response();
 
         $transaction->map($raw);
 
@@ -23,7 +23,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_can_response_success()
     {
-        $transaction = new Transaction();
+        $transaction = new Response();
 
         $transaction->map([
             'success' => true,
@@ -41,9 +41,9 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_returns_a_valid_response()
     {
-        $transaction = new Transaction();
+        $transaction = new Response();
 
-        $transaction->map([
+        $data = [
             'isRedirect'      => false,
             'success'         => true,
             'message'         => 'foo',
@@ -52,7 +52,9 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
             'status'          => 'paid',
             'reference'       => '123',
             'code'            => '123',
-        ]);
+        ];
+
+        $transaction->setRaw($data)->map($data);
 
         $this->assertFalse($transaction->isRedirect());
         $this->assertTrue($transaction->success());
@@ -62,5 +64,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($transaction->status(), 'paid');
         $this->assertEquals($transaction->reference(), '123');
         $this->assertEquals($transaction->code(), '123');
+        $this->assertEquals($transaction->data(), $data);
     }
 }

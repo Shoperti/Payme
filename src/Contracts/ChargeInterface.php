@@ -2,16 +2,16 @@
 
 namespace Shoperti\PayMe\Contracts;
 
-interface Charge
+interface ChargeInterface
 {
     /**
-     * Charge the credit card.
+     * Create a charge.
      *
      * @param int|float $amount
      * @param mixed     $payment
      * @param string[]  $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function charge($amount, $payment, $options = []);
+    public function create($amount, $payment, $options = []);
 }

@@ -2,7 +2,7 @@
 
 namespace Shoperti\PayMe\Contracts;
 
-interface Factory
+interface FactoryInterface
 {
     /**
      * Create a new gateway instance..
