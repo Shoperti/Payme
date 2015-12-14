@@ -10,7 +10,7 @@ Supported Gateways:
 
 ## Installation
 
-Begin by installing this package through Composer. Edit your project's `composer.json` file to require `Shoperti/payme`.
+Begin by installing this package through Composer. Edit your project's `composer.json` file to require `shoperti/payme`.
 
 ```json
 "require": {
@@ -20,24 +20,23 @@ Begin by installing this package through Composer. Edit your project's `composer
 
 Next, update Composer from the Terminal:
 
-    composer update
+	composer update
 
 ### Examples
 
 ```php
 // Create a new PayMe instance choosing the driver
 $config = [
-	'driver'      => 'stripe',
+	'driver'	  => 'stripe',
 	'private_key' => 'secret_key',
 	'public_key'  => 'public_key',
 ];
 
-
-$payme = (new Shoperti\PayMe\PayMe($config);
+$payme = (new Shoperti\PayMe\PayMe($config));
 or
 $payme = PayMe::make($config);
 
-// Make charge
+// Make a charge
 $response = $gateway->charges()->create('100', 'tok_test', []);
 
 if (!$response->success()) {
@@ -46,6 +45,8 @@ if (!$response->success()) {
 
 return 'Hurray!';
 ```
+
+If you are looking for the old API we still have branch [1.0](https://github.com/Shoperti/Payme/tree/1.0)
 
 ### Todo
 
