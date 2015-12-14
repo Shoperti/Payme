@@ -3,17 +3,17 @@
 namespace Shoperti\PayMe\Gateways\Conekta;
 
 use InvalidArgumentException;
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Contracts\EventInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
- * This is the conekta events class.
- *
- * @author joseph.cohen@dinkbit.com
- */
+  * This is the conekta events class.
+  *
+  * @author joseph.cohen@dinkbit.com
+  */
  class Events extends AbstractApi implements EventInterface
-{
-    /**
+ {
+     /**
      * Find all events.
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
@@ -38,4 +38,4 @@ use Shoperti\PayMe\Contracts\EventInterface;
 
         return $this->commit('get', $this->buildUrlFromString("events/{$id}"));
     }
-}
+ }

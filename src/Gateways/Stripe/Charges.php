@@ -3,16 +3,15 @@
 namespace Shoperti\PayMe\Gateways\Stripe;
 
 use Shoperti\PayMe\Gateways\AbstractApi;
-use Shoperti\PayMe\Contracts\CardInterface;
 
 /**
- * This is the stripe charges class.
- *
- * @author joseph.cohen@dinkbit.com
- */
+  * This is the stripe charges class.
+  *
+  * @author joseph.cohen@dinkbit.com
+  */
  class Charges extends AbstractApi implements ChargeInterface
-{
-    /**
+ {
+     /**
      * Charge the credit card.
      *
      * @param int      $amount
@@ -118,4 +117,4 @@ use Shoperti\PayMe\Contracts\CardInterface;
 
         return $params;
     }
-}
+ }

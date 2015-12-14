@@ -3,8 +3,8 @@
 namespace Shoperti\PayMe\Gateways\Bogus;
 
 use InvalidArgumentException;
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Contracts\EventInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
  * This is the conekta charges class.

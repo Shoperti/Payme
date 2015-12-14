@@ -2,8 +2,8 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Contracts\ChargeInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
  * This is the bogus charges class.

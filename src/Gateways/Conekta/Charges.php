@@ -3,16 +3,15 @@
 namespace Shoperti\PayMe\Gateways\Conekta;
 
 use Shoperti\PayMe\Gateways\AbstractApi;
-use Shoperti\PayMe\Contracts\CardInterface;
 
 /**
- * This is the conekta charges class.
- *
- * @author joseph.cohen@dinkbit.com
- */
+  * This is the conekta charges class.
+  *
+  * @author joseph.cohen@dinkbit.com
+  */
  class Charges extends AbstractApi implements ChargeInterface
-{
-    /**
+ {
+     /**
      * Charge the credit card.
      *
      * @param int      $amount
@@ -66,10 +65,10 @@ use Shoperti\PayMe\Contracts\CardInterface;
             if ($payment == 'spei') {
                 $params['bank']['type'] = 'spei';
                 $params['bank']['expires_at'] = Arr::get($options, 'expires', date('Y-m-d', time() + 172800));
-            } else if ($payment == 'oxxo') {
+            } elseif ($payment == 'oxxo') {
                 $params['cash']['type'] = 'oxxo';
                 $params['cash']['expires_at'] = Arr::get($options, 'expires', date('Y-m-d', time() + 172800));
-            } else if ($payment == 'payee_id') {
+            } elseif ($payment == 'payee_id') {
                 $params['payee_id'] = $payment;
             } else {
                 $params['card'] = $payment;
@@ -247,4 +246,4 @@ use Shoperti\PayMe\Contracts\CardInterface;
 
         return $params;
     }
-}
+ }
