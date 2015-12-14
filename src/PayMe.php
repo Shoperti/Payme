@@ -80,8 +80,8 @@ class PayMe
     /**
      * Dynamically handle missing methods.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
      *
      * @return \Shoperti\PayMe\Contracts\ApiInterface
      */
@@ -93,11 +93,11 @@ class PayMe
     /**
      * Returns the Api class instance for the given method.
      *
-     * @param  string  $method
-     *
-     * @return \Shoperti\PayMe\Contracts\ApiInterface
+     * @param string $method
      *
      * @throws \BadMethodCallException
+     *
+     * @return \Shoperti\PayMe\Contracts\ApiInterface
      */
     protected function getApiInstance($method)
     {

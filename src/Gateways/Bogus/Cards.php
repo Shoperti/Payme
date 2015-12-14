@@ -2,8 +2,8 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Contracts\CardInterface;
+use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
  * This is the bogus cards class.
@@ -44,7 +44,7 @@ class Cards extends AbstractApi implements CardInterface
     public function delete($id, $options = [])
     {
         $params = [];
-        
+
         $params['transaction'] = 'fail';
 
         if ($creditcard === 'success') {

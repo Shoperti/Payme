@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Gateways\RecipientInterface;
 
 /**

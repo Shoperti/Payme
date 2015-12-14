@@ -2,10 +2,9 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
-use Shoperti\PayMe\Contracts\Store;
-use Shoperti\PayMe\Status;
-use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Gateways\AbstractGateway;
+use Shoperti\PayMe\Response;
+use Shoperti\PayMe\Status;
 
 class BogusGateway extends AbstractGateway
 {

@@ -3,10 +3,9 @@
 namespace Shoperti\PayMe\Gateways\Conekta;
 
 use Shoperti\PayMe\Gateway\AbstractGateway;
-use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
-use Shoperti\PayMe\Support\Helper;
 
 class ConektaGateway extends AbstractGateway
 {

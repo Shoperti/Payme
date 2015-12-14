@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\Conekta;
 
-use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Gateways\RecipientInterface;
 
 /**
