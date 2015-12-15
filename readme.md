@@ -27,7 +27,7 @@ Next, update Composer from the Terminal:
 ```php
 // Create a new PayMe instance choosing the driver
 $config = [
-	'driver'	  => 'stripe',
+	'driver'      => 'stripe',
 	'private_key' => 'secret_key',
 	'public_key'  => 'public_key',
 ];
@@ -40,7 +40,7 @@ $payme = PayMe::make($config);
 $response = $payme->charges()->create('100', 'tok_test', []);
 
 if (!$response->success()) {
-	return ':(';
+    return ':(';
 }
 
 return 'Hurray!';
