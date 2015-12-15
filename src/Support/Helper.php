@@ -35,8 +35,8 @@ class Helper
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param string       $haystack
+     * @param string|array $needles
      *
      * @return bool
      */
