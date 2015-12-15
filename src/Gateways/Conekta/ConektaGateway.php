@@ -127,7 +127,7 @@ class ConektaGateway extends AbstractGateway
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool $success
+     * @param bool  $success
      * @param array $response
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
@@ -186,13 +186,13 @@ class ConektaGateway extends AbstractGateway
 
         if ($object == 'customer') {
             return Arr::get($response, 'default_card_id');
-        } else if ($object == 'card') {
+        } elseif ($object == 'card') {
             return Arr::get($response, 'customer_id');
-        } else if ($object == 'payee') {
+        } elseif ($object == 'payee') {
             return Arr::get($response, 'id');
-        } else if ($object == 'transfer') {
+        } elseif ($object == 'transfer') {
             return Arr::get($response, 'id');
-        } else if ($object == 'event') {
+        } elseif ($object == 'event') {
             return Arr::get($response, 'id');
         }
 
