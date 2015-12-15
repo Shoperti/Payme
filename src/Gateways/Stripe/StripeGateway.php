@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\Stripe;
 
+use GuzzleHttp\ClientInterface;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
@@ -80,7 +81,7 @@ class StripeGateway extends AbstractGateway
 
         $success = false;
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, [
+        $request = [
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
@@ -91,8 +92,15 @@ class StripeGateway extends AbstractGateway
                 'User-Agent'                 => 'Stripe/v1 PayMeBindings/'.$this->config['version'],
                 'X-Stripe-Client-User-Agent' => json_encode($userAgent),
             ],
-            'form_params'     => $params,
-        ]);
+        ];
+
+        if (version_compare(ClientInterface::VERSION, '6') === 1) {
+            $request['form_params'] = $params;
+        } else {
+            $request['body'] = $params;
+        }
+        
+        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());

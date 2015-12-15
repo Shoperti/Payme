@@ -40,7 +40,7 @@ class Helper
      *
      * @return bool
      */
-    public function startsWith($haystack, $needles)
+    public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
             if ($needle != '' && strpos($haystack, $needle) === 0) {
