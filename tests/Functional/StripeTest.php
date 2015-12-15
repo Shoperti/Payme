@@ -69,7 +69,7 @@ class StripeTest extends AbstractFunctionalTestCase
     {
         $customer = $this->gateway->customers()->create(array_merge([
             'email' => 'john@doe.com',
-            'card' => [
+            'card'  => [
                 'exp_month' => 10,
                 'cvc'       => 314,
                 'exp_year'  => 2020,

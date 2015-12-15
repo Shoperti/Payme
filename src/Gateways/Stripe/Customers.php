@@ -13,7 +13,7 @@ use Shoperti\PayMe\Support\Arr;
   */
  class Customers extends AbstractApi implements CustomerInterface
  {
-    /**
+     /**
      * Create a customer.
      *
      * @param string[] $attributes

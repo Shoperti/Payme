@@ -7,7 +7,7 @@ interface CustomerInterface
     /**
      * Create a customer.
      *
-     * @param string[]  $attributes
+     * @param string[] $attributes
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
