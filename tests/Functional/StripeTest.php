@@ -65,6 +65,17 @@ class StripeTest extends AbstractFunctionalTestCase
         $this->assertSame($charge->message(), 'Invalid API Key provided: invalid_key');
     }
 
+    /** @test */
+    public function it_can_retrieve_a_single_and_all_events()
+    {
+        $events = $this->gateway->events()->all();
+
+        $this->assertNotEmpty($events[0]->data()['data']);
+        $this->assertInternalType('array', $events[0]->data()['data']);
+
+        $event = $this->gateway->events()->find($events[0]->reference());
+    }
+
     protected function createToken(array $parameters = [])
     {
         $customer = $this->gateway->customers()->create(array_merge([

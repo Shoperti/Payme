@@ -80,7 +80,7 @@ class ConektaGateway extends AbstractGateway
      */
     public function commit($method = 'post', $url, $params = [], $options = [])
     {
-        $user_agent = [
+        $userAgent = [
             'bindings_version' => $this->config['version'],
             'lang'             => 'php',
             'lang_version'     => phpversion(),
@@ -90,7 +90,7 @@ class ConektaGateway extends AbstractGateway
 
         $success = false;
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, [
+        $request = [
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
@@ -100,20 +100,55 @@ class ConektaGateway extends AbstractGateway
                 'Authorization'               => 'Basic '.base64_encode($this->config['private_key'].':'),
                 'Content-Type'                => 'application/json',
                 'RaiseHtmlError'              => 'false',
-                'X-Conekta-Client-User-Agent' => json_encode($user_agent),
+                'X-Conekta-Client-User-Agent' => json_encode($userAgent),
                 'User-Agent'                  => 'Conekta PayMeBindings/'.$this->config['version'],
             ],
-            'json' => $params,
-        ]);
+        ];
+
+        if (!empty($params) && $method !== 'get') {
+            $request['json'] = $params;
+        }
+
+        if (!empty($params) && $method === 'get') {
+            $request['query'] = $params;
+        }
+
+        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());
-            $success = !(Arr::get($response, 'object', 'error') == 'error');
         } else {
             $response = $this->responseError($rawResponse->getBody());
         }
 
-        return $this->mapResponse($success, $response);
+        return $this->respond($success, $response);
+    }
+
+    /**
+     * Respond with an array of responses or a single response.
+     *
+     * @param bool $success
+     * @param array $response
+     *
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    protected function respond($success, $response)
+    {
+        if (!isset($response[0])) {
+            $success = !(Arr::get($response, 'object', 'error') == 'error');
+
+            return $this->mapResponse($success, $response);
+        }
+
+        $responses = [];
+
+        foreach ($response as $responds) {
+            $success = !(Arr::get($responds, 'object', 'error') == 'error');
+
+            $responses[] = $this->mapResponse($success, $responds);
+        }
+
+        return $responses;
     }
 
     /**
@@ -151,11 +186,13 @@ class ConektaGateway extends AbstractGateway
 
         if ($object == 'customer') {
             return Arr::get($response, 'default_card_id');
-        } elseif ($object == 'card') {
+        } else if ($object == 'card') {
             return Arr::get($response, 'customer_id');
-        } elseif ($object == 'payee') {
+        } else if ($object == 'payee') {
             return Arr::get($response, 'id');
-        } elseif ($object == 'transfer') {
+        } else if ($object == 'transfer') {
+            return Arr::get($response, 'id');
+        } else if ($object == 'event') {
             return Arr::get($response, 'id');
         }
 

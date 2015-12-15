@@ -37,7 +37,7 @@ or
 $payme = PayMe::make($config);
 
 // Make a charge
-$response = $gateway->charges()->create('100', 'tok_test', []);
+$response = $payme->charges()->create('100', 'tok_test', []);
 
 if (!$response->success()) {
 	return ':(';
@@ -50,7 +50,7 @@ If you are looking for the old API we still have branch [1.0](https://github.com
 
 ### Todo
 
-- [ ] Add Gateways tests
+- [ ] Add Missing Gateways tests
 - [ ] Add Credit Card object
 - [ ] Create a Laravel Bridge
 - [ ] Add more gateways

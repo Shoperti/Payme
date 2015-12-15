@@ -20,7 +20,7 @@ class Events extends AbstractApi implements EventInterface
      */
     public function all()
     {
-        return $this->commit('get', $this->buildUrlFromString('events'));
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('events'));
     }
 
     /**
@@ -36,6 +36,6 @@ class Events extends AbstractApi implements EventInterface
             throw new InvalidArgumentException('We need an id');
         }
 
-        return $this->commit('get', $this->buildUrlFromString("events/{$id}"));
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString("events/{$id}"));
     }
 }

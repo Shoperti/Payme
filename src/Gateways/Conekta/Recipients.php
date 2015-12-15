@@ -13,40 +13,21 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 class Recipients extends AbstractApi implements RecipientInterface
 {
     /**
-     * Charge the payout.
-     *
-     * @param int      $amount
-     * @param mixed    $payment
-     * @param string[] $options
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    public function charge($amount, $payment, $options = [])
-    {
-        $params = [];
-
-        $params = $this->addOrder($params, $amount, $options);
-        $params = $this->addPaymentMethod($params, $payment, $options);
-
-        return $this->commit('post', $this->buildUrlFromString('payouts'), $params);
-    }
-
-    /**
      * Register a recipient.
      *
-     * @param string[] $options
+     * @param string[] $attributes
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($options = [])
+    public function create($attributes = [])
     {
         $params = [];
 
-        $params = $this->addPayout($params, $options);
-        $params = $this->addPayoutMethod($params, $options);
-        $params = $this->addPayoutBilling($params, $options);
+        $params = $this->addPayout($params, $attributes);
+        $params = $this->addPayoutMethod($params, $attributes);
+        $params = $this->addPayoutBilling($params, $attributes);
 
-        return $this->commit('post', $this->buildUrlFromString('payees'), $params);
+        return $this->commit('post', $this->gateway->buildUrlFromString('payees'), $params);
     }
 
     // /**
@@ -64,7 +45,7 @@ class Recipients extends AbstractApi implements RecipientInterface
     //     $params = $this->addPayoutMethod($params, $options);
     //     $params = $this->addPayoutBilling($params, $options);
     //
-    //     return $this->commit('put', $this->buildUrlFromString('payees/'.$reference), $params);
+    //     return $this->commit('put', $this->gateway->buildUrlFromString('payees/'.$reference), $params);
     // }
 
     /**
@@ -77,7 +58,7 @@ class Recipients extends AbstractApi implements RecipientInterface
      */
     public function delete($id, $options = [])
     {
-        return $this->commit('delete', $this->buildUrlFromString('payees/'.$reference));
+        return $this->commit('delete', $this->gateway->buildUrlFromString('payees/'.$id));
     }
 
     /**

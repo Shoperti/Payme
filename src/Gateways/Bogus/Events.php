@@ -22,13 +22,9 @@ class Events extends AbstractApi implements EventInterface
     {
         $params = [];
 
-        $params['transaction'] = 'fail';
+        $params['transaction'] = 'success';
 
-        if ($creditcard === 'success') {
-            $params['transaction'] = 'success';
-        }
-
-        return $this->commit('get', 'events', $params);
+        return $this->gateway->commit('get', 'events', $params);
     }
 
     /**
@@ -46,12 +42,8 @@ class Events extends AbstractApi implements EventInterface
 
         $params = [];
 
-        $params['transaction'] = 'fail';
+        $params['transaction'] = 'success';
 
-        if ($creditcard === 'success') {
-            $params['transaction'] = 'success';
-        }
-
-        return $this->commit('get', "events/{$id}", $params);
+        return $this->gateway->commit('get', "events/{$id}", $params);
     }
 }

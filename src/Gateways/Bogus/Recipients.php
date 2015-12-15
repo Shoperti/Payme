@@ -15,11 +15,11 @@ class Recipients extends AbstractApi implements RecipientInterface
     /**
      * Stores a new recipient.
      *
-     * @param string[] $options
+     * @param string[] $attributes
      *
      * @return \Shoperti\PayMe\ResponseInterface
      */
-    public function create($options = [])
+    public function create($attributes = [])
     {
         $params = [];
 

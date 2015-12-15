@@ -104,12 +104,38 @@ class StripeGateway extends AbstractGateway
 
         if ($rawResponse->getStatusCode() == 200) {
             $response = $this->parseResponse($rawResponse->getBody());
-            $success = (!array_key_exists('error', $response));
         } else {
             $response = $this->responseError($rawResponse->getBody());
         }
 
-        return $this->mapResponse($success, $response);
+        return $this->respond($success, $response);
+    }
+
+    /**
+     * Respond with an array of responses or a single response.
+     *
+     * @param bool $success
+     * @param array $response
+     *
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    protected function respond($success, $response)
+    {
+        if (Arr::get($response, 'object') !== 'list') {
+            $success = (!array_key_exists('error', $response));
+
+            return $this->mapResponse($success, $response);
+        }
+
+        $responses = [];
+
+        foreach ($response['data'] as $responds) {
+            $success = (!array_key_exists('error', $responds));
+
+            $responses[] = $this->mapResponse($success, $responds);
+        }
+
+        return $responses;
     }
 
     /**
@@ -127,9 +153,9 @@ class StripeGateway extends AbstractGateway
             'success'         => $success,
             'message'         => $success ? 'Transaction approved' : $response['error']['message'],
             'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
-            'authorization'   => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
+            'authorization'   => $success ? Arr::get($response, 'balance_transaction', '') : false,
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
-            'reference'       => $success ? Arr::get($response, 'balance_transaction', '') : false,
+            'reference'       => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
             'code'            => $success ? false : $response['error']['type'],
         ]);
     }

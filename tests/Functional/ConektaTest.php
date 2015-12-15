@@ -99,4 +99,17 @@ class ConektaTest extends AbstractFunctionalTestCase
 
         $this->assertSame($charge->message(), 'Acceso no autorizado.');
     }
+
+    /** @test */
+    public function it_can_retrieve_a_single_and_all_events()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $events = $gateway->events()->all();
+
+        $this->assertNotEmpty($events[0]->data()['data']);
+        $this->assertInternalType('array', $events[0]->data()['data']);
+
+        $event = $gateway->events()->find($events[0]->reference());
+    }
 }

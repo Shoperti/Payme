@@ -25,13 +25,13 @@ use Shoperti\PayMe\Gateways\AbstractApi;
         if (isset($options['customer'])) {
             $params['card'] = $creditcard;
 
-            return $this->commit('post', $this->buildUrlFromString('customers/'.$options['customer'].'/cards'), $params);
+            return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers/'.$options['customer'].'/cards'), $params);
         } else {
             $params['email'] = Arr::get($options, 'email');
             $params['description'] = Arr::get($options, 'name');
             $params['card'] = $creditcard;
 
-            return $this->commit('post', $this->buildUrlFromString('customers'), $params);
+            return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers'), $params);
         }
     }
 
@@ -46,9 +46,9 @@ use Shoperti\PayMe\Gateways\AbstractApi;
     public function delete($id, $options = [])
     {
         if (isset($options['card_id'])) {
-            return $this->commit('delete', $this->buildUrlFromString('customers/'.$id.'/cards/'.$options['card_id']));
+            return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id.'/cards/'.$options['card_id']));
         } else {
-            return $this->commit('delete', $this->buildUrlFromString('customers/'.$id));
+            return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id));
         }
     }
  }

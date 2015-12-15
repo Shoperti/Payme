@@ -71,7 +71,7 @@ class Charges extends AbstractApi implements ChargeInterface
             } elseif ($payment == 'oxxo') {
                 $params['cash']['type'] = 'oxxo';
                 $params['cash']['expires_at'] = Arr::get($options, 'expires', date('Y-m-d', time() + 172800));
-            } elseif ($payment == 'payee_id') {
+            } elseif (Helper::startsWith($payment, 'payee_')) {
                 $params['payee_id'] = $payment;
             } else {
                 $params['card'] = $payment;
