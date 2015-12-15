@@ -114,7 +114,7 @@ class StripeGateway extends AbstractGateway
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool $success
+     * @param bool  $success
      * @param array $response
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
