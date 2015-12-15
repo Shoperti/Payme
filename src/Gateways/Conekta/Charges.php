@@ -4,6 +4,8 @@ namespace Shoperti\PayMe\Gateways\Conekta;
 
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
+use Shoperti\PayMe\Support\Helper;
 
 /**
  * This is the conekta charges class.
@@ -29,7 +31,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addPaymentMethod($params, $payment, $options);
         $params = $this->addOrderDetails($params, $options);
 
-        return $this->commit('post', $this->buildUrlFromString('charges'), $params);
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('charges'), $params);
     }
 
     /**
@@ -45,8 +47,8 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['reference_id'] = Arr::get($options, 'reference');
-        $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
-        $params['amount'] = $this->amount($money);
+        $params['currency'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
+        $params['amount'] = $this->gateway->amount($money);
 
         return $params;
     }
@@ -182,7 +184,7 @@ class Charges extends AbstractApi implements ChargeInterface
                 $params['details']['line_items'][] = [
                     'name'        => Arr::get($line_item, 'name'),
                     'description' => Arr::get($line_item, 'description'),
-                    'unit_price'  => $this->amount(Arr::get($line_item, 'unit_price')),
+                    'unit_price'  => $this->gateway->amount(Arr::get($line_item, 'unit_price')),
                     'quantity'    => Arr::get($line_item, 'quantity', 1),
                     'sku'         => Arr::get($line_item, 'sku'),
                     'category'    => Arr::get($line_item, 'category'),

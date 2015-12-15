@@ -68,7 +68,7 @@ abstract class AbstractGateway implements GatewayInterface
      *
      * @return string
      */
-    protected function buildUrlFromString($endpoint)
+    public function buildUrlFromString($endpoint)
     {
         return $this->getRequestUrl().'/'.$endpoint;
     }

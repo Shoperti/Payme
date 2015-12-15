@@ -4,6 +4,8 @@ namespace Shoperti\PayMe\Gateways\Stripe;
 
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
+use Shoperti\PayMe\Support\Helper;
 
 /**
  * This is the stripe charges class.
@@ -29,7 +31,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addCard($params, $payment, $options);
         $params = $this->addCustomer($params, $payment, $options);
 
-        return $this->commit('post', $this->buildUrlFromString('charges'), $params);
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('charges'), $params);
     }
 
     /**
@@ -44,9 +46,12 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addOrder(array $params, $money, array $options)
     {
         $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
-        $params['receipt_number'] = Arr::get($options, 'reference');
-        $params['currency'] = Arr::get($options, 'currency', $this->getCurrency());
-        $params['amount'] = $this->amount($money);
+        $params['currency'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
+        $params['amount'] = $this->gateway->amount($money);
+
+        if (isset($options['reference'])) {
+            $params['metadata']['reference'] = Arr::get($options, 'reference');
+        }
 
         return $params;
     }
@@ -63,42 +68,14 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addCard(array $params, $payment, array $options)
     {
         if (is_string($payment)) {
-            $params['card'] = $payment;
-        } elseif ($payment instanceof CreditCard) {
-            $params['card'] = [];
-            $params['card']['name'] = $payment->getName();
-            $params['card']['cvc'] = $payment->getCvv();
-            $params['card']['number'] = $payment->getNumber();
-            $params['card']['exp_month'] = $payment->getExpiryMonth();
-            $params['card']['exp_year'] = $payment->getExpiryYear();
-            $params['card'] = $this->addAddress($params['card'], $options);
+            if (Helper::startsWith($payment, 'cus')) {
+                $params['customer'] = $payment;
+            } else {
+                $params['source'] = $payment;
+            }
         }
 
         return $params;
-    }
-
-    /**
-     * Add address to request.
-     *
-     * @param string[] $params
-     * @param string[] $options
-     *
-     * @return array
-     */
-    protected function addAddress(array $params, array $options)
-    {
-        if ($address = Arr::get($options, 'address') or Arr::get($options, 'billing_address')) {
-            $params['address'] = [];
-            $params['address']['street1'] = Arr::get($address, 'address1');
-            $params['address']['street2'] = Arr::get($address, 'address2');
-            $params['address']['street3'] = Arr::get($address, 'address3');
-            $params['address']['city'] = Arr::get($address, 'city');
-            $params['address']['country'] = Arr::get($address, 'country');
-            $params['address']['state'] = Arr::get($address, 'state');
-            $params['address']['zip'] = Arr::get($address, 'zip');
-
-            return $params;
-        }
     }
 
     /**

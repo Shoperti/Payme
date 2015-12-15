@@ -66,6 +66,16 @@ class PayMe
     }
 
     /**
+     * Get the current gateway.
+     *
+     * @return \Shoperti\PayMe\Contracts\Gateway
+     */
+    public function getGateway()
+    {
+        return $this->gateway;
+    }
+
+    /**
      * Create a new PayMe instance.
      *
      * @param string[] $config

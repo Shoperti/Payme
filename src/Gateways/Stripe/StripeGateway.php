@@ -51,7 +51,7 @@ class StripeGateway extends AbstractGateway
      */
     public function __construct($config)
     {
-        Arr::requires($config, ['secret']);
+        Arr::requires($config, ['private_key']);
 
         $config['version'] = $this->apiVersion;
 
@@ -85,13 +85,13 @@ class StripeGateway extends AbstractGateway
             'timeout'         => '80',
             'connect_timeout' => '30',
             'headers'         => [
-                'Authorization'              => 'Basic '.base64_encode($this->config['secret'].':'),
+                'Authorization'              => 'Basic '.base64_encode($this->config['private_key'].':'),
                 'Content-Type'               => 'application/x-www-form-urlencoded',
                 'RaiseHtmlError'             => 'false',
                 'User-Agent'                 => 'Stripe/v1 PayMeBindings/'.$this->config['version'],
                 'X-Stripe-Client-User-Agent' => json_encode($userAgent),
             ],
-            'body' => $params,
+            'form_params'     => $params,
         ]);
 
         if ($rawResponse->getStatusCode() == 200) {

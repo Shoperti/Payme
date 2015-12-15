@@ -1,6 +1,6 @@
 <?php
 
-namespace Shoperti\Test\PayMe;
+namespace Shoperti\Tests\PayMe;
 
 use Shoperti\PayMe\PayMe;
 
@@ -60,6 +60,14 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Shoperti\PayMe\PayMe', $gatewayA);
         $this->assertInstanceOf('Shoperti\PayMe\PayMe', $gatewayB);
+    }
+
+    /** @test */
+    public function it_can_create_a_new_gateway_instance()
+    {
+        $gateway = PayMe::make(['driver' => 'bogus']);
+
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus\BogusGateway', $gateway->getGateway());
     }
 
     /** @test */
