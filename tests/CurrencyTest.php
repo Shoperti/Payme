@@ -1,6 +1,6 @@
 <?php
 
-namespace Shoperti\Test\PayMe;
+namespace Shoperti\Tests\PayMe;
 
 use Shoperti\PayMe\Currency;
 

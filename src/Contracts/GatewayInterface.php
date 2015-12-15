@@ -2,7 +2,7 @@
 
 namespace Shoperti\PayMe\Contracts;
 
-interface Gateway
+interface GatewayInterface
 {
     /**
      * Map HTTP response to transaction object.
@@ -10,9 +10,9 @@ interface Gateway
      * @param bool  $success
      * @param array $response
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapTransaction($success, $response);
+    public function mapResponse($success, $response);
 
     /**
      * Get gateway display name.

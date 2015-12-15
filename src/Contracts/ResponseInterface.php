@@ -2,7 +2,7 @@
 
 namespace Shoperti\PayMe\Contracts;
 
-interface Transaction
+interface ResponseInterface
 {
     /**
      * Is the transaction successful?
@@ -65,5 +65,5 @@ interface Transaction
      *
      * @return array
      */
-    public function raw();
+    public function data();
 }

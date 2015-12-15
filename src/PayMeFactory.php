@@ -3,10 +3,10 @@
 namespace Shoperti\PayMe;
 
 use InvalidArgumentException;
-use Shoperti\PayMe\Contracts\Factory;
+use Shoperti\PayMe\Contracts\FactoryInterface;
 use Shoperti\PayMe\Support\Helper;
 
-class PayMeFactory implements Factory
+class PayMeFactory implements FactoryInterface
 {
     /**
      * The current factory instances.
@@ -42,16 +42,17 @@ class PayMeFactory implements Factory
      */
     public function factory($config)
     {
-        if (isset($this->factories['name'])) {
-            return $this->factories['name'];
+        $name = $config['driver'];
+
+        if (isset($this->factories[$name])) {
+            return $this->factories[$name];
         }
 
-        $name = $config['driver'];
         $gateway = Helper::className($name);
-        $class = "Shoperti\PayMe\Gateways\\{$gateway}";
+        $class = "Shoperti\\PayMe\\Gateways\\{$gateway}\\{$gateway}Gateway";
 
         if (class_exists($class)) {
-            return $this->factories['name'] = new $class($config);
+            return $this->factories[$name] = new $class($config);
         }
 
         throw new InvalidArgumentException("Unsupported factory [$name].");

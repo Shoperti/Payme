@@ -3,10 +3,10 @@
 namespace Shoperti\PayMe\Gateways;
 
 use InvalidArgumentException;
-use Shoperti\PayMe\Contracts\Gateway;
+use Shoperti\PayMe\Contracts\GatewayInterface;
 use Shoperti\PayMe\Currency;
 
-abstract class AbstractGateway implements Gateway
+abstract class AbstractGateway implements GatewayInterface
 {
     /**
      * Configuration options.
@@ -30,19 +30,19 @@ abstract class AbstractGateway implements Gateway
      * @param string[] $params
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    abstract protected function commit($method = 'post', $url, $params = [], $options = []);
+    abstract public function commit($method = 'post', $url, $params = [], $options = []);
 
     /**
-     * Map HTTP response to transaction object.
+     * Map HTTP response to response object.
      *
      * @param bool  $success
      * @param array $response
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    abstract public function mapTransaction($success, $response);
+    abstract public function mapResponse($success, $response);
 
     /**
      * Get the gateway request url.
@@ -68,7 +68,7 @@ abstract class AbstractGateway implements Gateway
      *
      * @return string
      */
-    protected function buildUrlFromString($endpoint)
+    public function buildUrlFromString($endpoint)
     {
         return $this->getRequestUrl().'/'.$endpoint;
     }

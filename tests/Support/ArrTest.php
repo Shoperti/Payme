@@ -1,6 +1,6 @@
 <?php
 
-namespace Shoperti\Test\PayMe\Support;
+namespace Shoperti\Tests\PayMe\Support;
 
 use Shoperti\PayMe\Support\Arr;
 
