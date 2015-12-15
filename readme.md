@@ -1,7 +1,7 @@
 # Shoperti PayMe
 
 [![Build Status](https://travis-ci.org/Shoperti/Payme.svg)](https://travis-ci.org/Shoperti/Payme)
-[![StyleCI](https://styleci.io/repos/24345061/shield)](https://styleci.io/repos/24345061)
+[![StyleCI](https://styleci.io/repos/24345061/shield?style=flat)](https://styleci.io/repos/24345061)
 
 Supported Gateways:
 * Conekta
