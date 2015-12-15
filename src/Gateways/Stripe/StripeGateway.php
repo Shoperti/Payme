@@ -99,7 +99,7 @@ class StripeGateway extends AbstractGateway
         } else {
             $request['body'] = $params;
         }
-        
+
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
         if ($rawResponse->getStatusCode() == 200) {
