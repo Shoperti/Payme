@@ -32,8 +32,8 @@ $config = [
 	'public_key'  => 'public_key',
 ];
 
-$payme = (new Shoperti\PayMe\PayMe($config));
-or
+$payme = new Shoperti\PayMe\PayMe($config);
+// or
 $payme = PayMe::make($config);
 
 // Make a charge
