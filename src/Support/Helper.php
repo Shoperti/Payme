@@ -122,7 +122,7 @@ class Helper
     /**
      * Transliterate a UTF-8 value to ASCII.
      *
-     * @param  string  $value
+     * @param string $value
      * 
      * @return string
      */
