@@ -7,6 +7,11 @@ use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
+/**
+ * This is the conekta gateway class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class ConektaGateway extends AbstractGateway
 {
     /**

@@ -9,7 +9,7 @@ use Shoperti\PayMe\Support\Arr;
 /**
   * This is the stripe customers class.
   *
-  * @author joseph.cohen@dinkbit.com
+  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
   */
  class Customers extends AbstractApi implements CustomerInterface
  {

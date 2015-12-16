@@ -6,6 +6,11 @@ use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\GatewayInterface;
 use Shoperti\PayMe\Currency;
 
+/**
+ * This is the abstract gateway class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 abstract class AbstractGateway implements GatewayInterface
 {
     /**
@@ -18,7 +23,9 @@ abstract class AbstractGateway implements GatewayInterface
     /**
      * Inject the configuration for a Gateway.
      *
-     * @param $config
+     * @param string[] $config
+     *
+     * @return void
      */
     abstract public function __construct($config);
 
@@ -132,7 +139,7 @@ abstract class AbstractGateway implements GatewayInterface
     /**
      * Parse the amout to pay to the currency format.
      *
-     * @param $amount
+     * @param int|string $amount
      *
      * @throws \InvalidArgumentException
      *
@@ -155,7 +162,7 @@ abstract class AbstractGateway implements GatewayInterface
     /**
      * Get the amount converted to integer.
      *
-     * @param $amount
+     * @param int|string $amount
      *
      * @return int
      */
@@ -213,7 +220,7 @@ abstract class AbstractGateway implements GatewayInterface
     /**
      * Format amount to the current currency.
      *
-     * @param $amount
+     * @param int|string $amount
      *
      * @return string
      */

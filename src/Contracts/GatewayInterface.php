@@ -2,6 +2,11 @@
 
 namespace Shoperti\PayMe\Contracts;
 
+/**
+ * This is the gateway interface.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 interface GatewayInterface
 {
     /**
@@ -33,7 +38,9 @@ interface GatewayInterface
     public function amount($money);
 
     /**
-     * @param $amount
+     * Get the amount.
+     *
+     * @param int|string $amount
      *
      * @throws \InvalidArgumentException
      *
@@ -44,7 +51,7 @@ interface GatewayInterface
     /**
      * Get the amount converted to integer.
      *
-     * @param $amount
+     * @param int|string $amount
      *
      * @return int
      */
@@ -74,7 +81,7 @@ interface GatewayInterface
     /**
      * Format amount to the current currency.
      *
-     * @param $amount
+     * @param int|string $amount
      *
      * @return string
      */

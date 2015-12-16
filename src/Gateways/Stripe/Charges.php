@@ -10,7 +10,7 @@ use Shoperti\PayMe\Support\Helper;
 /**
  * This is the stripe charges class.
  *
- * @author joseph.cohen@dinkbit.com
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class Charges extends AbstractApi implements ChargeInterface
 {
@@ -45,7 +45,7 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addOrder(array $params, $money, array $options)
     {
-        $params['description'] = Helper::cleanAccents(Arr::get($options, 'description', 'PayMe Purchase'));
+        $params['description'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['currency'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
         $params['amount'] = $this->gateway->amount($money);
 

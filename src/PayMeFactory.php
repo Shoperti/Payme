@@ -6,6 +6,11 @@ use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\FactoryInterface;
 use Shoperti\PayMe\Support\Helper;
 
+/**
+ * This is the payme factory class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class PayMeFactory implements FactoryInterface
 {
     /**

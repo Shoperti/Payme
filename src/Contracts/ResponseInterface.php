@@ -2,6 +2,11 @@
 
 namespace Shoperti\PayMe\Contracts;
 
+/**
+ * This is the response interface.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 interface ResponseInterface
 {
     /**

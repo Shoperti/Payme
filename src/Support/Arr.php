@@ -4,6 +4,11 @@ namespace Shoperti\PayMe\Support;
 
 use InvalidArgumentException;
 
+/**
+ * This is the arr class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class Arr
 {
     /**

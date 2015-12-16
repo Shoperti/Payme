@@ -8,7 +8,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 /**
  * This is the conekta recipients class.
  *
- * @author joseph.cohen@dinkbit.com
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class Recipients extends AbstractApi implements RecipientInterface
 {
@@ -31,7 +31,9 @@ class Recipients extends AbstractApi implements RecipientInterface
     }
 
     // /**
-    //  * @param $reference
+    //  * Update a recipient.
+    //  *
+    //  * @param int|string $reference
     //  * @param array $options
     //  *
     //  * @return mixed

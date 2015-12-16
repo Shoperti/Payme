@@ -8,6 +8,11 @@ use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
+/**
+ * This is the stripe gateway class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class StripeGateway extends AbstractGateway
 {
     /**
@@ -48,7 +53,9 @@ class StripeGateway extends AbstractGateway
     /**
      * Inject the configuration for a Gateway.
      *
-     * @param $config
+     * @param string[] $config
+     *
+     * @return void
      */
     public function __construct($config)
     {

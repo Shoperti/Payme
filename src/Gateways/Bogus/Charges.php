@@ -8,7 +8,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 /**
  * This is the bogus charges class.
  *
- * @author joseph.cohen@dinkbit.com
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class Charges extends AbstractApi implements ChargeInterface
 {
