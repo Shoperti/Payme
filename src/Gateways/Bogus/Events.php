@@ -9,7 +9,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 /**
  * This is the conekta charges class.
  *
- * @author joseph.cohen@dinkbit.com
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class Events extends AbstractApi implements EventInterface
 {

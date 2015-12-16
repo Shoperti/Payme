@@ -4,6 +4,11 @@ namespace Shoperti\PayMe;
 
 use InvalidArgumentException;
 
+/**
+ * This is the status class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class Status
 {
     /**
@@ -36,7 +41,7 @@ class Status
     /**
      * Create a new status instance.
      *
-     * @param $status
+     * @param string $status
      *
      * @return void
      */
@@ -49,7 +54,7 @@ class Status
     /**
      * Validate status provided.
      *
-     * @param $status
+     * @param string $status
      *
      * @throws \InvalidArgumentException
      */

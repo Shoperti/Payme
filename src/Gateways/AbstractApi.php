@@ -4,6 +4,11 @@ namespace Shoperti\PayMe\Gateways;
 
 use Shoperti\PayMe\Contracts\ApiInterface;
 
+/**
+ * This is the abstract api class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 abstract class AbstractApi implements ApiInterface
 {
     /**

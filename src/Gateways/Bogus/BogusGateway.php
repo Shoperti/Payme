@@ -6,6 +6,11 @@ use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 
+/**
+ * This is the bogus gateway class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class BogusGateway extends AbstractGateway
 {
     /**
@@ -39,7 +44,9 @@ class BogusGateway extends AbstractGateway
     /**
      * Inject the configuration for a Gateway.
      *
-     * @param $config
+     * @param string[] $config
+     *
+     * @return void
      */
     public function __construct($config)
     {

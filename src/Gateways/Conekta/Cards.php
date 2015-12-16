@@ -8,7 +8,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 /**
   * This is the conekta cards class.
   *
-  * @author joseph.cohen@dinkbit.com
+  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
   */
  class Cards extends AbstractApi implements CardInterface
  {

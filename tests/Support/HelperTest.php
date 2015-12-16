@@ -11,9 +11,9 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     {
         $string = 'Cómo tü te vá';
 
-        $str = Helper::cleanAccents($string);
+        $str = Helper::ascii($string);
 
-        $this->assertEquals('Como tu te va', $str);
+        $this->assertEquals('Como tue te va', $str);
     }
 
     /** @test */

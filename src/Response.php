@@ -5,6 +5,11 @@ namespace Shoperti\PayMe;
 use ArrayAccess;
 use Shoperti\PayMe\Contracts\ResponseInterface;
 
+/**
+ * This is the response class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class Response implements ArrayAccess, ResponseInterface
 {
     /**

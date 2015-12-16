@@ -2,6 +2,11 @@
 
 namespace Shoperti\PayMe;
 
+/**
+ * This is the currency class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class Currency
 {
     /**
@@ -26,11 +31,13 @@ class Currency
     private $decimals;
 
     /**
-     * Create a new Currency object.
+     * Create a new currency instance.
      *
-     * @param $code
-     * @param $numeric
-     * @param $decimals
+     * @param string $code
+     * @param int    $numeric
+     * @param int    $decimals
+     *
+     * @return void
      */
     private function __construct($code, $numeric, $decimals)
     {
@@ -52,7 +59,7 @@ class Currency
     /**
      * Get the numeric code for this currency.
      *
-     * @return string
+     * @return int
      */
     public function getNumeric()
     {

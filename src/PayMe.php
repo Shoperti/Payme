@@ -6,6 +6,11 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Shoperti\PayMe\Support\Helper;
 
+/**
+ * This is the payme class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
 class PayMe
 {
     /**
@@ -13,7 +18,7 @@ class PayMe
      *
      * @var string
      */
-    const VERSION = '0.1.0';
+    const VERSION = '2.0.0';
 
     /**
      * The current factories instances.
