@@ -3,8 +3,8 @@
 namespace Shoperti\PayMe\Gateways\Stripe;
 
 use GuzzleHttp\ClientInterface;
-use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\ErrorCode;
+use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;

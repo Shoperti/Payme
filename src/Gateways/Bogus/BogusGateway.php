@@ -2,8 +2,8 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
-use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\ErrorCode;
+use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 
