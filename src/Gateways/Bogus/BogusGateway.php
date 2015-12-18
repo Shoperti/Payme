@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
+use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
@@ -86,14 +87,15 @@ class BogusGateway extends AbstractGateway
     public function mapResponse($success, $response)
     {
         return (new Response())->setRaw($response)->map([
-            'isRedirect'      => false,
-            'success'         => $success,
-            'message'         => $success ? 'Approved' : 'Error',
-            'test'            => false,
-            'authorization'   => $success ? '123' : '',
-            'status'          => $success ? new Status('paid') : new Status('failed'),
-            'reference'       => $success ? '123' : false,
-            'code'            => $success ? false : '1',
+            'isRedirect'    => false,
+            'success'       => $success,
+            'reference'     => $success ? '12345' : null,
+            'message'       => $success ? 'Approved' : 'Error',
+            'test'          => false,
+            'authorization' => $success ? '123' : '',
+            'status'        => $success ? new Status('paid') : new Status('failed'),
+            'errorCode'     => $success ? false : new ErrorCode('card_declined'),
+            'type'          => 'charge',
         ]);
     }
 

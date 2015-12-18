@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\Conekta;
 
+use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
@@ -169,12 +170,13 @@ class ConektaGateway extends AbstractGateway
         return (new Response())->setRaw($response)->map([
             'isRedirect'    => false,
             'success'       => $success,
-            'message'       => $success ? 'Transacción aprobada' : $response['message_to_purchaser'],
+            'reference'     => $success ? $response['id'] : null,
+            'message'       => $success ? 'Transaction approved' : $response['message_to_purchaser'],
             'test'          => array_key_exists('livemode', $response) ? $response['livemode'] : false,
-            'authorization' => $success ? $response['id'] : $response['type'],
+            'authorization' => $success ? $this->getAuthorization($response) : false,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
-            'reference'     => $success ? $this->getReference($response) : false,
-            'code'          => $success ? false : $response['code'],
+            'errorCode'     => $success ? null : $this->getErrorCode($response['code']),
+            'type'          => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
         ]);
     }
 
@@ -185,7 +187,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @return string|null
      */
-    protected function getReference($response)
+    protected function getAuthorization($response)
     {
         $object = Arr::get($response, 'object');
 
@@ -226,6 +228,38 @@ class ConektaGateway extends AbstractGateway
                 break;
             case 'in_trial':
                 return new Status('trial');
+                break;
+        }
+    }
+
+    /**
+     * Map Conekta response to error code object.
+     *
+     * @param string $code
+     *
+     * @return \Shoperti\PayMe\ErrorCode
+     */
+    protected function getErrorCode($code)
+    {
+        switch ($code) {
+            case 'invalid_expiry_month':
+            case 'invalid_expiry_year':
+                return new ErrorCode('invalid_expiry_date');
+                break;
+            case 'invalid_number':
+            case 'invalid_cvc':
+            case 'card_declined':
+            case 'processing_error':
+            case 'expired_card':
+            case 'insufficient_funds':
+            case 'suspected_fraud':
+                return new ErrorCode($code);
+                break;
+            case 'invalid_amount':
+            case 'invalid_payment_type':
+            case 'unsupported_currency':
+            case 'missing_description':
+                return new ErrorCode('config_error');
                 break;
         }
     }
