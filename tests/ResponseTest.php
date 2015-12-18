@@ -51,7 +51,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             'authorization'   => '1',
             'status'          => 'paid',
             'reference'       => '123',
-            'code'            => '123',
+            'errorCode'       => 'card_declined',
         ];
 
         $transaction->setRaw($data)->map($data);
@@ -63,7 +63,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($transaction->authorization(), '1');
         $this->assertEquals($transaction->status(), 'paid');
         $this->assertEquals($transaction->reference(), '123');
-        $this->assertEquals($transaction->code(), '123');
+        $this->assertEquals($transaction->errorCode(), 'card_declined');
         $this->assertEquals($transaction->data(), $data);
     }
 }

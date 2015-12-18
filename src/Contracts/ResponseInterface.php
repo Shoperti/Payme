@@ -10,63 +10,63 @@ namespace Shoperti\PayMe\Contracts;
 interface ResponseInterface
 {
     /**
-     * Is the transaction successful?
+     * Get if the response is successful.
      *
      * @return bool
      */
     public function success();
 
     /**
-     * Does the transaction require a redirect?
+     * Get if the response require a redirect.
      *
      * @return bool
      */
     public function isRedirect();
 
     /**
-     * Return transaction gateway is in test mode.
-     *
-     * @return string
-     */
-    public function test();
-
-    /**
-     * Return authorization code.
-     *
-     * @return string
-     */
-    public function authorization();
-
-    /**
-     * Return transaction status.
-     *
-     * @return string
-     */
-    public function status();
-
-    /**
-     * Response Message from the payment gateway.
-     *
-     * @return string
-     */
-    public function message();
-
-    /**
-     * Transaction code from the payment gateway.
-     *
-     * @return string
-     */
-    public function code();
-
-    /**
-     * Gateway reference to represent this transaction.
+     * Get the reference id to represent this response.
      *
      * @return string
      */
     public function reference();
 
     /**
-     * Gateway raw data.
+     * Get if gateway is in test mode.
+     *
+     * @return string
+     */
+    public function test();
+
+    /**
+     * Get the authorization code.
+     *
+     * @return string
+     */
+    public function authorization();
+
+    /**
+     * Get the response message.
+     *
+     * @return string
+     */
+    public function message();
+
+    /**
+     * Get the error code from the response.
+     *
+     * @return string
+     */
+    public function errorCode();
+
+    /**
+     * Get the response status.
+     *
+     * @return string
+     */
+    public function status();
+
+    /**
+     * Get the gateway raw response.
      *
      * @return array
      */

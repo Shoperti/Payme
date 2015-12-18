@@ -27,25 +27,11 @@ class Response implements ArrayAccess, ResponseInterface
     public $isRedirect;
 
     /**
-     * Is the Gateway in tests mode?
-     *
-     * @var bool
-     */
-    public $test;
-
-    /**
-     * Has the message sent by the Gateway?
-     *
-     * @var bool
-     */
-    public $status;
-
-    /**
-     * The authorization code for the response.
+     * The reference id for the response.
      *
      * @var string
      */
-    public $authorization;
+    public $reference;
 
     /**
      * The response message from the response.
@@ -55,18 +41,32 @@ class Response implements ArrayAccess, ResponseInterface
     public $message;
 
     /**
-     * The code for the response.
+     * The authorization code for the response.
      *
      * @var string
      */
-    public $code;
+    public $authorization;
 
     /**
-     * The reference code for the response.
+     * Has the status sent by the Gateway?
+     *
+     * @var bool
+     */
+    public $status;
+
+    /**
+     * The error code for the response.
      *
      * @var string
      */
-    public $reference;
+    public $errorCode;
+
+    /**
+     * Is the Gateway in tests mode?
+     *
+     * @var bool
+     */
+    public $test;
 
     /**
      * The raw response information.
@@ -76,7 +76,7 @@ class Response implements ArrayAccess, ResponseInterface
     public $response;
 
     /**
-     * Is the response successful?
+     * Get if the response is successful.
      *
      * @return bool
      */
@@ -86,7 +86,7 @@ class Response implements ArrayAccess, ResponseInterface
     }
 
     /**
-     * Does the response require a redirect?
+     * Get if the response require a redirect.
      *
      * @return bool
      */
@@ -96,57 +96,7 @@ class Response implements ArrayAccess, ResponseInterface
     }
 
     /**
-     * Return response gateway is in test mode.
-     *
-     * @return string
-     */
-    public function test()
-    {
-        return (bool) $this->test;
-    }
-
-    /**
-     * Return authorization code.
-     *
-     * @return string
-     */
-    public function authorization()
-    {
-        return $this->authorization;
-    }
-
-    /**
-     * Response Message from the payment gateway.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return (string) $this->message;
-    }
-
-    /**
-     * Transaction code from the payment gateway.
-     *
-     * @return string
-     */
-    public function code()
-    {
-        return $this->code;
-    }
-
-    /**
-     * Return response status.
-     *
-     * @return string
-     */
-    public function status()
-    {
-        return (string) $this->status;
-    }
-
-    /**
-     * Gateway reference to represent this response.
+     * Get the reference id to represent this response.
      *
      * @return string
      */
@@ -156,7 +106,57 @@ class Response implements ArrayAccess, ResponseInterface
     }
 
     /**
-     * Gateway raw data.
+     * Get if gateway is in test mode.
+     *
+     * @return string
+     */
+    public function test()
+    {
+        return (bool) $this->test;
+    }
+
+    /**
+     * Get the authorization code.
+     *
+     * @return string
+     */
+    public function authorization()
+    {
+        return $this->authorization;
+    }
+
+    /**
+     * Get the response message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return (string) $this->message;
+    }
+
+    /**
+     * Get the error code from the response.
+     *
+     * @return string
+     */
+    public function errorCode()
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * Get the response status.
+     *
+     * @return string
+     */
+    public function status()
+    {
+        return (string) $this->status;
+    }
+
+    /**
+     * Get the gateway raw response.
      *
      * @return array
      */

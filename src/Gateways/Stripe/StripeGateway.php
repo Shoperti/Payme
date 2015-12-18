@@ -4,6 +4,7 @@ namespace Shoperti\PayMe\Gateways\Stripe;
 
 use GuzzleHttp\ClientInterface;
 use Shoperti\PayMe\Gateways\AbstractGateway;
+use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
@@ -158,12 +159,12 @@ class StripeGateway extends AbstractGateway
         return (new Response())->setRaw($response)->map([
             'isRedirect'      => false,
             'success'         => $success,
+            'reference'       => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
             'message'         => $success ? 'Transaction approved' : $response['error']['message'],
             'test'            => array_key_exists('livemode', $response) ? $response['livemode'] : false,
             'authorization'   => $success ? Arr::get($response, 'balance_transaction', '') : false,
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
-            'reference'       => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
-            'code'            => $success ? false : $response['error']['type'],
+            'errorCode'       => $success ? null : $this->getErrorCode($response['error']),
         ]);
     }
 
@@ -177,6 +178,37 @@ class StripeGateway extends AbstractGateway
     protected function getStatus($status)
     {
         return $status ? new Status('paid') : new Status('pending');
+    }
+
+    /**
+     * Map Stripe response to error code object.
+     *
+     * @param array $error
+     *
+     * @return \Shoperti\PayMe\ErrorCode
+     */
+    protected function getErrorCode($error)
+    {
+        $code = Arr::get($error, 'code', $error['type']);
+
+        switch ($code) {
+            case 'invalid_expiry_month':
+            case 'invalid_expiry_year':
+                return new ErrorCode('invalid_expiry_date');
+                break;
+            case 'invalid_number':
+            case 'incorrect_number':
+            case 'invalid_cvc':
+            case 'incorrect_zip':
+            case 'card_declined':
+            case 'expired_card':
+            case 'processing_error':
+                return new ErrorCode($code);
+                break;
+            case 'missing':
+                return new ErrorCode('config_error');
+                break;
+        }
     }
 
     /**
