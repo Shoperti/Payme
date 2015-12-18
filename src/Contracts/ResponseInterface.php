@@ -66,6 +66,13 @@ interface ResponseInterface
     public function status();
 
     /**
+     * Get the gateway response type.
+     *
+     * @return string
+     */
+    public function type();
+
+    /**
      * Get the gateway raw response.
      *
      * @return array

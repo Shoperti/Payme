@@ -95,6 +95,7 @@ class BogusGateway extends AbstractGateway
             'authorization' => $success ? '123' : '',
             'status'        => $success ? new Status('paid') : new Status('failed'),
             'errorCode'     => $success ? false : new ErrorCode('card_declined'),
+            'type'          => 'charge',
         ]);
     }
 

@@ -41,6 +41,13 @@ class Response implements ArrayAccess, ResponseInterface
     public $message;
 
     /**
+     * Is the Gateway in tests mode?
+     *
+     * @var bool
+     */
+    public $test;
+
+    /**
      * The authorization code for the response.
      *
      * @var string
@@ -62,11 +69,11 @@ class Response implements ArrayAccess, ResponseInterface
     public $errorCode;
 
     /**
-     * Is the Gateway in tests mode?
+     * The type of the gateway response.
      *
-     * @var bool
+     * @var string
      */
-    public $test;
+    public $type;
 
     /**
      * The raw response information.
@@ -153,6 +160,16 @@ class Response implements ArrayAccess, ResponseInterface
     public function status()
     {
         return (string) $this->status;
+    }
+
+    /**
+     * Get the gateway response type.
+     *
+     * @return string
+     */
+    public function type()
+    {
+        return $this->type;
     }
 
     /**

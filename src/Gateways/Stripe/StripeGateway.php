@@ -165,6 +165,7 @@ class StripeGateway extends AbstractGateway
             'authorization'   => $success ? Arr::get($response, 'balance_transaction', '') : false,
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response['error']),
+            'type'            => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
         ]);
     }
 

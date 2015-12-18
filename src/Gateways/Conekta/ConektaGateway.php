@@ -176,6 +176,7 @@ class ConektaGateway extends AbstractGateway
             'authorization' => $success ? $this->getAuthorization($response) : false,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode($response['code']),
+            'type'          => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
         ]);
     }
 

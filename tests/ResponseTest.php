@@ -46,12 +46,13 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $data = [
             'isRedirect'      => false,
             'success'         => true,
+            'reference'       => '123',
             'message'         => 'foo',
             'test'            => false,
-            'authorization'   => '1',
+            'authorization'   => '00000',
             'status'          => 'paid',
-            'reference'       => '123',
             'errorCode'       => 'card_declined',
+            'type'            => 'charge',
         ];
 
         $transaction->setRaw($data)->map($data);
@@ -60,10 +61,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($transaction->success());
         $this->assertEquals($transaction->message(), 'foo');
         $this->assertFalse($transaction->test());
-        $this->assertEquals($transaction->authorization(), '1');
+        $this->assertEquals($transaction->authorization(), '00000');
         $this->assertEquals($transaction->status(), 'paid');
         $this->assertEquals($transaction->reference(), '123');
         $this->assertEquals($transaction->errorCode(), 'card_declined');
+        $this->assertEquals($transaction->type(), 'charge');
         $this->assertEquals($transaction->data(), $data);
     }
 }
