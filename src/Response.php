@@ -149,7 +149,7 @@ class Response implements ArrayAccess, ResponseInterface
      */
     public function errorCode()
     {
-        return $this->errorCode;
+        return (string) $this->errorCode;
     }
 
     /**
