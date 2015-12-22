@@ -4,7 +4,6 @@ namespace Shoperti\PayMe;
 
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\FactoryInterface;
-use Shoperti\PayMe\Support\Helper;
 
 /**
  * This is the payme factory class.
@@ -55,12 +54,12 @@ class PayMeFactory implements FactoryInterface
     /**
      * Attempt to get the gateway from the local cache.
      *
-     * @param  string   $name
-     * @param  string[] $config
-     *
-     * @return \Shoperti\PayMe\Contracts\Gateway
+     * @param string   $name
+     * @param string[] $config
      *
      * @throws \InvalidArgumentException
+     *
+     * @return \Shoperti\PayMe\Contracts\Gateway
      */
     protected function get($name, $config)
     {
