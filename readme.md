@@ -46,6 +46,21 @@ if (!$response->success()) {
 return 'Hurray!';
 ```
 
+You can also use our factory.
+
+```php
+$payme = new Shoperti\PayMe\PayMeFactory();
+
+// Make a charge
+$response = $payme->make($config)->charges()->create('100', 'tok_test', []);
+
+if (!$response->success()) {
+    return ':(';
+}
+
+return 'Hurray!';
+```
+
 If you are looking for the old API we still have branch [1.0](https://github.com/Shoperti/Payme/tree/1.0)
 
 ### Todo
