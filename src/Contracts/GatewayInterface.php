@@ -10,6 +10,24 @@ namespace Shoperti\PayMe\Contracts;
 interface GatewayInterface
 {
     /**
+     * Sets the current config array.
+     *
+     * @param string[]
+     *
+     * @return $this
+     */
+    public function getConfig();
+
+    /**
+     * Sets the current config array.
+     *
+     * @param string[]
+     *
+     * @return $this
+     */
+    public function setConfig($config);
+
+    /**
      * Map HTTP response to transaction object.
      *
      * @param bool  $success

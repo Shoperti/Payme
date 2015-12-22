@@ -49,17 +49,25 @@ class PayMeFactory implements FactoryInterface
     {
         $name = $config['driver'];
 
-        if (isset($this->factories[$name])) {
+        return $this->factories[$name] = $this->get($name, $config);
+    }
+
+    /**
+     * Attempt to get the gateway from the local cache.
+     *
+     * @param  string   $name
+     * @param  string[] $config
+     *
+     * @return \Shoperti\PayMe\Contracts\Gateway
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function get($name, $config)
+    {
+        if (isset($this->factories[$name]) && $this->factories[$name]->getConfig() === $config) {
             return $this->factories[$name];
         }
 
-        $gateway = Helper::className($name);
-        $class = "Shoperti\\PayMe\\Gateways\\{$gateway}\\{$gateway}Gateway";
-
-        if (class_exists($class)) {
-            return $this->factories[$name] = new $class($config);
-        }
-
-        throw new InvalidArgumentException("Unsupported factory [$name].");
+        return PayMe::make($config);
     }
 }

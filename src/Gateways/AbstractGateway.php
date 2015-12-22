@@ -59,6 +59,30 @@ abstract class AbstractGateway implements GatewayInterface
     abstract protected function getRequestUrl();
 
     /**
+     * Returns the current config array.
+     *
+     * @return string[]
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Sets the current config array.
+     *
+     * @param string[]
+     *
+     * @return $this
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
      * Get a fresh instance of the Guzzle HTTP client.
      *
      * @return \GuzzleHttp\Client
