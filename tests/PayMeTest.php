@@ -6,11 +6,20 @@ use Shoperti\PayMe\PayMe;
 
 class PayMeTest extends \PHPUnit_Framework_TestCase
 {
+    /** @test */
+    public function it_gets_the_verson()
+    {
+        $gateway = PayMe::make(['driver' => 'bogus']);
+
+        $this->assertSame(PayMe::VERSION, $gateway->getVersion());
+    }
+
     /**
+     * @test
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage A gateway must be specified.
      */
-    public function testNoDriverSpecified()
+    public function it_throws_if_no_driver_specified()
     {
         (new PayMe([]));
     }
@@ -19,7 +28,7 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage A gateway must be specified.
      */
-    public function testNoDriverSpecifiedOnMake()
+    public function it_throws_if_no_driver_specified_on_make()
     {
         PayMe::make([]);
     }
@@ -58,8 +67,17 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
         $gatewayA = PayMe::make(['driver' => 'bogus']);
         $gatewayB = PayMe::make(['driver' => 'bogus']);
 
-        $this->assertInstanceOf('Shoperti\PayMe\PayMe', $gatewayA);
-        $this->assertInstanceOf('Shoperti\PayMe\PayMe', $gatewayB);
+        $this->assertNotSame('Shoperti\PayMe\PayMe', $gatewayA);
+        $this->assertNotSame('Shoperti\PayMe\PayMe', $gatewayB);
+    }
+
+    /** @test */
+    public function it_can_create_a_multiple_payme_instances_with_different_config()
+    {
+        $gatewayA = PayMe::make(['driver' => 'bogus', 'foo' => 'bar']);
+        $gatewayB = PayMe::make(['driver' => 'bogus', 'bar' => 'foo']);
+
+        $this->assertNotSame($gatewayA->getConfig(), $gatewayB->getConfig());
     }
 
     /** @test */

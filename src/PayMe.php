@@ -21,18 +21,18 @@ class PayMe
     const VERSION = '2.0.0';
 
     /**
-     * The current factories instances.
-     *
-     * @return array
-     */
-    protected $factories = [];
-
-    /**
      * The current driver name.
      *
      * @return string
      */
     protected $driver;
+
+    /**
+     * The current driver config.
+     *
+     * @return string[]
+     */
+    protected $config;
 
     /**
      * The current instatiated gateway.
@@ -54,20 +54,39 @@ class PayMe
             throw new InvalidArgumentException('A gateway must be specified.');
         }
 
-        $this->driver = $config['driver'];
+        $this->config = $config;
 
-        if (isset($this->factories[$this->driver])) {
-            return $this->gateway = $this->factories[$this->driver];
-        }
+        $gateway = Helper::className($this->getDriver());
 
-        $gateway = Helper::className($this->driver);
         $class = "\\Shoperti\\PayMe\\Gateways\\{$gateway}\\{$gateway}Gateway";
 
         if (class_exists($class)) {
-            return $this->gateway = $this->factories[$this->driver] = new $class($config);
+            return $this->gateway = new $class($config);
         }
 
-        throw new InvalidArgumentException("Unsupported gateway [$this->driver].");
+        throw new InvalidArgumentException('Unsupported gateway ['.$this->getDriver().'].');
+    }
+
+    /**
+     * Create a new PayMe instance.
+     *
+     * @param string[] $config
+     *
+     * @return \Shoperti\PayMe\Payme
+     */
+    public static function make($config)
+    {
+        return new static($config);
+    }
+
+    /**
+     * Return the current package version.
+     *
+     * @return string
+     */
+    public static function getVersion()
+    {
+        return self::VERSION;
     }
 
     /**
@@ -81,15 +100,37 @@ class PayMe
     }
 
     /**
-     * Create a new PayMe instance.
+     * Return the current config array.
      *
-     * @param string[] $config
-     *
-     * @return \Shoperti\PayMe\Payme
+     * @return string[]
      */
-    public static function make($config)
+    public function getConfig()
     {
-        return new static($config);
+        return $this->config;
+    }
+
+    /**
+     * Set the current config array.
+     *
+     * @param string[]
+     *
+     * @return $this
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * Get the driver name.
+     *
+     * @return string
+     */
+    public function getDriver()
+    {
+        return isset($this->config['driver']) ? $this->config['driver'] : null;
     }
 
     /**
@@ -116,7 +157,7 @@ class PayMe
      */
     protected function getApiInstance($method)
     {
-        $gateway = Helper::className($this->driver);
+        $gateway = Helper::className($this->getDriver());
 
         $class = "\\Shoperti\\PayMe\\Gateways\\{$gateway}\\".Helper::className($method);
 
