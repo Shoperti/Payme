@@ -77,4 +77,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus\Charges', $gateway->charges());
     }
+
+    /** @test */
+    public function it_can_call_an_api_class_on_multiple_gateways()
+    {
+        $gatewayA = $this->factory->make(['driver' => 'bogus', 'foo' => 'bar']);
+        $gatewayB = $this->factory->make(['driver' => 'bogus', 'bar' => 'foo']);
+
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus\Charges', $gatewayA->charges());
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Bogus\Charges', $gatewayB->charges());
+        $this->assertNotSame($gatewayA->charges(), $gatewayB->charges());
+    }
 }
