@@ -6,6 +6,7 @@
 Supported Gateways:
 * Conekta
 * Stripe
+* ComproPago
 * Paypal Express (soon)
 
 ## Installation
