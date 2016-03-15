@@ -84,7 +84,7 @@ class ComproPagoGateway extends AbstractGateway
      *
      * @return mixed
      */
-    public function commit($method = 'post', $url, $params = [], $options = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $success = false;
 
