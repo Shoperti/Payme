@@ -112,9 +112,11 @@ class PaypalExpressGateway extends AbstractGateway
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
-            'verify'          => false,
             'headers'         => [
                 'User-Agent' => 'PaypalExpress/v1 PayMeBindings/'.$this->config['version'],
+            ],
+            'curl.options' => [
+                'CURLOPT_SSLVERSION' => 6,
             ],
         ];
 
