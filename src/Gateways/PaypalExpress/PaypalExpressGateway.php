@@ -149,6 +149,8 @@ class PaypalExpressGateway extends AbstractGateway
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
 
+        var_dump($response);
+
         return $this->mapResponse($success, $response);
     }
 
@@ -164,7 +166,7 @@ class PaypalExpressGateway extends AbstractGateway
     {
         return (new Response())->setRaw($response)->map([
             'isRedirect'      => $response['isRedirect'],
-            'success'         => !$response['isRedirect'],
+            'success'         => $response['isRedirect'] ? false : $success,
             'reference'       => $this->getReference($response, $success, $response['isRedirect']),
             'message'         => $success ? 'Transaction approved' : $response['L_LONGMESSAGE0'],
             'test'            => $this->config['test'],

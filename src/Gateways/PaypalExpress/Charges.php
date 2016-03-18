@@ -42,6 +42,26 @@ class Charges extends AbstractApi implements ChargeInterface
     }
 
     /**
+     * Complete a charge.
+     *
+     * @param mixed     $payment
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function complete($options = [])
+    {
+        $params = [];
+
+        $params['METHOD'] = 'DoExpressCheckoutPayment';
+        $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Arr::get($options, 'ACTION', 'Sale');
+        $params['TOKEN'] = Arr::get($options, 'TOKEN');
+        $params['PAYERID'] = Arr::get($options, 'PAYERID');
+
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params);
+    }
+
+    /**
      * Add order params to request.
      *
      * @param string[] $params

@@ -23,7 +23,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succed_to_create_a_charge()
+    public function is_should_succeed_to_create_a_charge()
     {
         $charge = $this->gateway->charges()->create(11000, 'SetExpressCheckout', [
             'return_url' => 'http://localhost/return',
