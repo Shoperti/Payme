@@ -39,7 +39,7 @@ abstract class AbstractGateway implements GatewayInterface
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    abstract public function commit($method = 'post', $url, $params = [], $options = []);
+    abstract public function commit($method, $url, $params = [], $options = []);
 
     /**
      * Map HTTP response to response object.

@@ -44,8 +44,8 @@ class Charges extends AbstractApi implements ChargeInterface
     /**
      * Complete a charge.
      *
-     * @param mixed     $payment
-     * @param string[]  $options
+     * @param mixed    $payment
+     * @param string[] $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
@@ -94,17 +94,17 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addLineItems(array $params, array $options)
     {
         if (isset($options['line_items']) && is_array($options['line_items'])) {
-            $params["PAYMENTREQUEST_0_ITEMAMT"] = 0;
+            $params['PAYMENTREQUEST_0_ITEMAMT'] = 0;
 
             foreach ($options['line_items'] as $n => $lineItem) {
                 $params["L_PAYMENTREQUEST_0_NAME$n"] = Arr::get($lineItem, 'name');
                 $params["L_PAYMENTREQUEST_0_DESC$n"] = Arr::get($lineItem, 'description');
                 $params["L_PAYMENTREQUEST_0_QTY$n"] = Arr::get($lineItem, 'quantity', 1);
                 $params["L_PAYMENTREQUEST_0_AMT$n"] = $this->gateway->amount(Arr::get($lineItem, 'unit_price'));
-                $params["PAYMENTREQUEST_0_ITEMAMT"] += Arr::get($lineItem, 'quantity', 1) * Arr::get($lineItem, 'unit_price');
+                $params['PAYMENTREQUEST_0_ITEMAMT'] += Arr::get($lineItem, 'quantity', 1) * Arr::get($lineItem, 'unit_price');
             }
 
-            $params["PAYMENTREQUEST_0_ITEMAMT"] = $this->gateway->amount($params["PAYMENTREQUEST_0_ITEMAMT"]);
+            $params['PAYMENTREQUEST_0_ITEMAMT'] = $this->gateway->amount($params['PAYMENTREQUEST_0_ITEMAMT']);
         }
 
         return $params;
