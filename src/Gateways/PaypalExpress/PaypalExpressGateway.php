@@ -149,8 +149,6 @@ class PaypalExpressGateway extends AbstractGateway
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
 
-        var_dump($response);
-
         return $this->mapResponse($success, $response);
     }
 
