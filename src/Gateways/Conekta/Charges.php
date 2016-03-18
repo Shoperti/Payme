@@ -180,14 +180,14 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['details']['line_items'] = [];
 
         if (isset($options['line_items']) && is_array($options['line_items'])) {
-            foreach ($options['line_items'] as $line_item) {
+            foreach ($options['line_items'] as $lineItem) {
                 $params['details']['line_items'][] = [
-                    'name'        => Arr::get($line_item, 'name'),
-                    'description' => Arr::get($line_item, 'description'),
-                    'unit_price'  => $this->gateway->amount(Arr::get($line_item, 'unit_price')),
-                    'quantity'    => Arr::get($line_item, 'quantity', 1),
-                    'sku'         => Arr::get($line_item, 'sku'),
-                    'category'    => Arr::get($line_item, 'category'),
+                    'name'        => Arr::get($lineItem, 'name'),
+                    'description' => Arr::get($lineItem, 'description'),
+                    'unit_price'  => $this->gateway->amount(Arr::get($lineItem, 'unit_price')),
+                    'quantity'    => Arr::get($lineItem, 'quantity', 1),
+                    'sku'         => Arr::get($lineItem, 'sku'),
+                    'category'    => Arr::get($lineItem, 'category'),
                 ];
             }
         }

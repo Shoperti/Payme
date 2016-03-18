@@ -16,16 +16,6 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token()
-    {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $charge = $gateway->charges()->create(1000, 'tok_test_visa_4242');
-
-        $this->assertTrue($charge->success());
-    }
-
-    /** @test */
     public function is_should_fail_to_charge_a_token()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
