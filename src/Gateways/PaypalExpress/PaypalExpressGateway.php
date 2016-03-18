@@ -115,8 +115,8 @@ class PaypalExpressGateway extends AbstractGateway
             'headers'         => [
                 'User-Agent' => 'PaypalExpress/v1 PayMeBindings/'.$this->config['version'],
             ],
-            'curl.options' => [
-                'CURLOPT_SSLVERSION' => 6,
+            'curl' => [
+                CURLOPT_SSLVERSION => 6,
             ],
         ];
 
