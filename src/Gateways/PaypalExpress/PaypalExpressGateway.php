@@ -99,7 +99,7 @@ class PaypalExpressGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method = 'post', $url, $params = [], $options = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $params['VERSION'] = $this->config['version'];
         $params['USER'] = $this->config['username'];
@@ -180,9 +180,9 @@ class PaypalExpressGateway extends AbstractGateway
     /**
      * Map paypal response to status object.
      *
-     * @param  array $response
-     * @param  bool  $success
-     * @param  bool  $isRedirect
+     * @param array $response
+     * @param bool  $success
+     * @param bool  $isRedirect
      *
      * @return string
      */
@@ -197,7 +197,7 @@ class PaypalExpressGateway extends AbstractGateway
         }
 
         return $this->getCheckoutUrl().'?'.http_build_query([
-            'cmd' => '_express-checkout',
+            'cmd'   => '_express-checkout',
             'token' => $response['TOKEN'],
         ], '', '&');
     }
