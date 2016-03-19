@@ -73,6 +73,23 @@ class PaypalExpressGateway extends AbstractGateway
     protected $apiVersion = '119.0';
 
     /**
+     * Some default options for curl.
+     *
+     * @var array
+     */
+    public static $defaultCurlOptions = [
+        CURLOPT_SSLVERSION => 6,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_TIMEOUT => 60,    // maximum number of seconds to allow cURL functions to execute
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_SSL_VERIFYPEER => 1,
+        CURLOPT_SSL_CIPHER_LIST => 'TLSv1'
+        //Allowing TLSv1 cipher list.
+        //Adding it like this for backward compatibility with older versions of curl
+    ];
+
+    /**
      * Inject the configuration for a Gateway.
      *
      * @param string[] $config
@@ -118,18 +135,10 @@ class PaypalExpressGateway extends AbstractGateway
         ];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $request['curl'] = [
-                CURLOPT_SSLVERSION     => 3,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
-            ];
+            $request['curl'] = static::$defaultCurlOptions;
             $request['form_params'] = $params;
         } else {
-            $request['config']['curl'] = [
-                CURLOPT_SSLVERSION     => 3,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
-            ];
+            $request['config']['curl'] = static::$defaultCurlOptions;
             $request['body'] = $params;
         }
 
