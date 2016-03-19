@@ -126,7 +126,7 @@ class PaypalExpressGateway extends AbstractGateway
         $success = false;
 
         $request = [
-            'verify' => false,
+            'verify'          => false,
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
