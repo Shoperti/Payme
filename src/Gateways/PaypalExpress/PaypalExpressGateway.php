@@ -126,12 +126,14 @@ class PaypalExpressGateway extends AbstractGateway
         $success = false;
 
         $request = [
+            'verify' => false,
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
             'headers'         => [
                 'User-Agent' => 'PaypalExpress/v1 PayMeBindings/'.$this->config['version'],
             ],
+            'debug' => true,
         ];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
