@@ -119,12 +119,14 @@ class PaypalExpressGateway extends AbstractGateway
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $request['curl'] = [
+                CURLOPT_SSLVERSION     => 3,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ];
             $request['form_params'] = $params;
         } else {
             $request['config']['curl'] = [
+                CURLOPT_SSLVERSION     => 3,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ];
