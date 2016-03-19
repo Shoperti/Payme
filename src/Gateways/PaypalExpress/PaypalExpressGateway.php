@@ -115,14 +115,19 @@ class PaypalExpressGateway extends AbstractGateway
             'headers'         => [
                 'User-Agent' => 'PaypalExpress/v1 PayMeBindings/'.$this->config['version'],
             ],
-            'curl' => [
-                CURLOPT_SSLVERSION => 6,
-            ],
         ];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
+            $request['curl'] = [
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+            ];
             $request['form_params'] = $params;
         } else {
+            $request['config']['curl'] = [
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+            ];
             $request['body'] = $params;
         }
 
