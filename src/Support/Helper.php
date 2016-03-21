@@ -123,7 +123,7 @@ class Helper
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param string $value
-     * 
+     *
      * @return string
      */
     public static function ascii($value)
