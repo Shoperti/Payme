@@ -70,7 +70,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
-        $this->assertContains('https://www.sandbox.paypal.com/cgi-bin/webscr', $charge->reference());
+        $this->assertContains('https://www.sandbox.paypal.com/cgi-bin/webscr', $charge->authorization());
     }
 
     /** @test */
