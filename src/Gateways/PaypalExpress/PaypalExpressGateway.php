@@ -174,7 +174,11 @@ class PaypalExpressGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        return (new Response())->setRaw($response)->map([
+        $rawResponse = $response;
+
+        unset($rawResponse['isRedirect']);
+
+        return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,
             'reference'       => $success ? $this->getReference($response, $response['isRedirect']) : false,
@@ -252,7 +256,7 @@ class PaypalExpressGateway extends AbstractGateway
 
         if (isset($response['PAYMENTINFO_0_PAYMENTSTATUS'])
             && $response['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Pending') {
-                return new Status('pending');
+            return new Status('pending');
         }
 
         return new Status('paid');
