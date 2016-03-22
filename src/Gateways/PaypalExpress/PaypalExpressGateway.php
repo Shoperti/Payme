@@ -94,7 +94,7 @@ class PaypalExpressGateway extends AbstractGateway
         Arr::requires($config, ['username', 'password', 'signature']);
 
         $config['version'] = $this->apiVersion;
-        $config['test'] = Arr::get($config, 'test', false);
+        $config['test'] = (bool) Arr::get($config, 'test', false);
 
         $this->config = $config;
     }
@@ -177,10 +177,10 @@ class PaypalExpressGateway extends AbstractGateway
         return (new Response())->setRaw($response)->map([
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,
-            'reference'       => $this->getReference($response, $success, $response['isRedirect']),
+            'reference'       => $success ? $this->getReference($response, $response['isRedirect']) : false,
             'message'         => $success ? 'Transaction approved' : $response['L_LONGMESSAGE0'],
             'test'            => $this->config['test'],
-            'authorization'   => $success ? Arr::get($response, 'CORRELATIONID', '') : false,
+            'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', false)) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response['L_ERRORCODE0']),
             'type'            => false,
@@ -188,7 +188,31 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Map paypal response to status object.
+     * Map paypal response to reference.
+     *
+     * @param array $response
+     * @param bool  $isRedirect
+     *
+     * @return string
+     */
+    public function getReference($response, $isRedirect)
+    {
+        if ($isRedirect) {
+            return Arr::get($response, 'TOKEN', '');
+        }
+
+        foreach (['REFUNDTRANSACTIONID',
+            'TRANSACTIONID',
+            'PAYMENTINFO_0_TRANSACTIONID',
+            'AUTHORIZATIONID'] as $key) {
+            if (isset($response[$key])) {
+                return $response[$key];
+            }
+        }
+    }
+
+    /**
+     * Map paypal response to authorization.
      *
      * @param array $response
      * @param bool  $success
@@ -196,14 +220,14 @@ class PaypalExpressGateway extends AbstractGateway
      *
      * @return string
      */
-    protected function getReference($response, $success, $isRedirect)
+    protected function getAuthorization($response, $success, $isRedirect)
     {
         if (!$success) {
             return '';
         }
 
         if (!$isRedirect) {
-            return $response['TOKEN'];
+            return $response['CORRELATIONID'];
         }
 
         return $this->getCheckoutUrl().'?'.http_build_query([

@@ -54,9 +54,11 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = [];
 
         $params['METHOD'] = 'DoExpressCheckoutPayment';
-        $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Arr::get($options, 'ACTION', 'Sale');
-        $params['TOKEN'] = Arr::get($options, 'TOKEN');
-        $params['PAYERID'] = Arr::get($options, 'PAYERID');
+        $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Arr::get($options, 'action', 'Sale');
+        $params['TOKEN'] = Arr::get($options, 'token');
+        $params['PAYERID'] = Arr::get($options, 'payerid');
+        $params['PAYMENTREQUEST_0_CURRENCYCODE'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
+        $params['PAYMENTREQUEST_0_AMT'] = $this->gateway->amount(Arr::get($options, 'amount'));
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params);
     }
