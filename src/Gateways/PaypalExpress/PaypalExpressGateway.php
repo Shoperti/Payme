@@ -204,7 +204,7 @@ class PaypalExpressGateway extends AbstractGateway
         foreach (['REFUNDTRANSACTIONID',
             'TRANSACTIONID',
             'PAYMENTINFO_0_TRANSACTIONID',
-            'AUTHORIZATIONID'] as $key) {
+            'AUTHORIZATIONID', ] as $key) {
             if (isset($response[$key])) {
                 return $response[$key];
             }
