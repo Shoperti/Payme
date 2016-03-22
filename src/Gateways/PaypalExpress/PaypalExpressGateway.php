@@ -181,7 +181,7 @@ class PaypalExpressGateway extends AbstractGateway
             'message'         => $success ? 'Transaction approved' : $response['L_LONGMESSAGE0'],
             'test'            => $this->config['test'],
             'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
-            'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', false)) : new Status('failed'),
+            'status'          => $success ? $this->getStatus($response, $response['isRedirect']) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response['L_ERRORCODE0']),
             'type'            => false,
         ]);
@@ -239,13 +239,23 @@ class PaypalExpressGateway extends AbstractGateway
     /**
      * Map paypal response to status object.
      *
-     * @param string $status
+     * @param array $response
+     * @param bool  $isRedirect
      *
      * @return \Shoperti\PayMe\Status
      */
-    protected function getStatus($status)
+    protected function getStatus($response, $isRedirect)
     {
-        return $status ? new Status('paid') : new Status('pending');
+        if ($isRedirect) {
+            return new Status('pending');
+        }
+
+        if (isset($response['PAYMENTINFO_0_PAYMENTSTATUS'])
+            && $response['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Pending') {
+                return new Status('pending');
+        }
+
+        return new Status('paid');
     }
 
     /**
