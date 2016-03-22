@@ -171,7 +171,7 @@ class ConektaGateway extends AbstractGateway
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $success ? $response['id'] : null,
-            'message'       => $success ? 'Transaction approved' : $response['message_to_purchaser'],
+            'message'       => $success ? 'Transaction approved' : Arr::get($response, 'message_to_purchaser', ''),
             'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
             'authorization' => $success ? $this->getAuthorization($response) : false,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
