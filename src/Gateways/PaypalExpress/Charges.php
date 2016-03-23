@@ -57,8 +57,18 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Arr::get($options, 'action', 'Sale');
         $params['TOKEN'] = Arr::get($options, 'token');
         $params['PAYERID'] = Arr::get($options, 'payerid');
+
+        $params['PAYMENTREQUEST_0_DESC'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
+        $params['PAYMENTREQUEST_0_INVNUM'] = Arr::get($options, 'reference');
         $params['PAYMENTREQUEST_0_CURRENCYCODE'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
         $params['PAYMENTREQUEST_0_AMT'] = $this->gateway->amount(Arr::get($options, 'amount'));
+
+        if (isset($options['shipping_address']['price'])) {
+            $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount($options['shipping_address']['price']);
+        }
+
+        $params = $this->addLineItems($params, $options);
+        $params = $this->addBN($params, $options);
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params);
     }
@@ -140,6 +150,7 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addShippingAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'shipping_address')) {
+            $params['ADDROVERRIDE'] = 1;
             $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount(Arr::get($address, 'price', 0));
             $params['PAYMENTREQUEST_0_SHIPTOSTREET'] = Arr::get($address, 'address1');
             $params['PAYMENTREQUEST_0_SHIPTOSTREET2'] = Arr::get($address, 'address2');
