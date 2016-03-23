@@ -156,7 +156,13 @@ class StripeGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        return (new Response())->setRaw($response)->map([
+        $rawResponse = $response;
+
+        if (array_key_exists('type', $response) && isset($response['data']['object'])) {
+            $response = $response['data']['object'];
+        }
+
+        return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => false,
             'success'         => $success,
             'reference'       => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
@@ -165,7 +171,7 @@ class StripeGateway extends AbstractGateway
             'authorization'   => $success ? Arr::get($response, 'balance_transaction', '') : false,
             'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response['error']),
-            'type'            => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
+            'type'            => array_key_exists('type', $rawResponse) ? $rawResponse['type'] : Arr::get($rawResponse, 'object'),
         ]);
     }
 

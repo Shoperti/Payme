@@ -167,7 +167,13 @@ class ConektaGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        return (new Response())->setRaw($response)->map([
+        $rawResponse = $response;
+
+        if (array_key_exists('type', $response) && isset($response['data']['object'])) {
+            $response = $response['data']['object'];
+        }
+
+        return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $success ? $response['id'] : null,
@@ -175,8 +181,8 @@ class ConektaGateway extends AbstractGateway
             'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
             'authorization' => $success ? $this->getAuthorization($response) : false,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
-            'errorCode'     => $success ? null : $this->getErrorCode($response['code']),
-            'type'          => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
+            'errorCode'     => $success ? null : $this->getErrorCode(Arr::get($response, 'code', 'invalid_payment_type')),
+            'type'          => array_key_exists('type', $rawResponse) ? $rawResponse['type'] : Arr::get($rawResponse, 'object'),
         ]);
     }
 
