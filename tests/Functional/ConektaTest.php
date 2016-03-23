@@ -100,6 +100,6 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertNotEmpty($events[0]->data()['data']);
         $this->assertInternalType('array', $events[0]->data()['data']);
 
-        $event = $gateway->events()->find($events[0]->reference());
+        $event = $gateway->events()->find($events[0]->data()['id']);
     }
 }

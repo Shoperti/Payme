@@ -73,7 +73,7 @@ class StripeTest extends AbstractFunctionalTestCase
         $this->assertNotEmpty($events[0]->data()['data']);
         $this->assertInternalType('array', $events[0]->data()['data']);
 
-        $event = $this->gateway->events()->find($events[0]->reference());
+        $event = $this->gateway->events()->find($events[0]->data()['id']);
     }
 
     protected function createToken(array $parameters = [])
