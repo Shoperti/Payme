@@ -213,8 +213,8 @@ class ConektaGateway extends AbstractGateway
             return $response['payment_method']['auth_code'];
         } elseif (isset($response['payment_method']['barcode_url'])) {
             return $response['payment_method']['barcode_url'];
-        } elseif (isset($response['payment_method']['reference'])) {
-            return $response['payment_method']['reference'];
+        } elseif (isset($response['payment_method']['clabe'])) {
+            return $response['payment_method']['clabe'];
         }
     }
 
