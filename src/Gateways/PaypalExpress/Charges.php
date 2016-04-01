@@ -31,7 +31,6 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale';
         $params['RETURNURL'] = Arr::get($options, 'return_url');
         $params['CANCELURL'] = Arr::get($options, 'cancel_url');
-        $params['PAYMENTREQUEST_0_NOTIFYURL'] = Arr::get($options, 'notify_url');
 
         $params = $this->addOrder($params, $amount, $options);
         $params = $this->addBN($params, $options);
@@ -62,6 +61,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['PAYMENTREQUEST_0_INVNUM'] = Arr::get($options, 'reference');
         $params['PAYMENTREQUEST_0_CURRENCYCODE'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
         $params['PAYMENTREQUEST_0_AMT'] = $this->gateway->amount(Arr::get($options, 'amount'));
+        $params['PAYMENTREQUEST_0_NOTIFYURL'] = Arr::get($options, 'notify_url');
 
         if (isset($options['shipping_address']['price'])) {
             $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount($options['shipping_address']['price']);
