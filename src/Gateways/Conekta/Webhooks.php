@@ -60,7 +60,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
      */
     public function update($params = [])
     {
-        $id = Arr::get($params ,'id', null);
+        $id = Arr::get($params, 'id', null);
 
         if (!$id) {
             throw new InvalidArgumentException('We need an id');
