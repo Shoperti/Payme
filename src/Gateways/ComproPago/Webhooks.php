@@ -5,6 +5,7 @@ namespace Shoperti\PayMe\Gateways\ComproPago;
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\WebhookInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the compro pago events class.
@@ -66,7 +67,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
             throw new InvalidArgumentException('We need an id');
         }
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('webhooks/stores/'.$id), $params);
+        return $this->gateway->commit('put', $this->gateway->buildUrlFromString('webhooks/stores/'.$id), $params);
     }
 
     /**

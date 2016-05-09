@@ -66,7 +66,7 @@ class ComproPagoGateway extends AbstractGateway
      */
     public function __construct($config)
     {
-        Arr::requires($config, ['private_key']);
+        Arr::requires($config, ['private_key', 'public_key']);
 
         $config['version'] = $this->apiVersion;
         $config['locale'] = $this->locale;
@@ -94,7 +94,7 @@ class ComproPagoGateway extends AbstractGateway
             'connect_timeout' => '30',
             'headers'         => [
                 'Accept'        => 'application/compropago',
-                'Authorization' => 'Basic '.base64_encode($this->config['private_key'].':'),
+                'Authorization' => 'Basic '.base64_encode($this->config['private_key'].':'.$this->config['public_key']),
                 'Content-Type'  => 'application/json',
                 'User-Agent'    => 'ComproPago PayMeBindings/'.$this->config['version'].' (PHP '.phpversion().';)',
             ],
@@ -125,9 +125,21 @@ class ComproPagoGateway extends AbstractGateway
      */
     protected function respond($success, $response)
     {
-        $success = !(Arr::get($response, 'object', 'error') == 'error');
+        if (!isset($response[0])) {
+            $success = !(array_key_exists('type', $response) && $response['type'] == 'error');
 
-        return $this->mapResponse($success, $response);
+            return $this->mapResponse($success, $response);
+        }
+
+        $responses = [];
+
+        foreach ($response as $responds) {
+            $success = !(array_key_exists('type', $response) && $response['type'] == 'error');
+
+            $responses[] = $this->mapResponse($success, $responds);
+        }
+
+        return $responses;
     }
 
     /**
@@ -144,13 +156,37 @@ class ComproPagoGateway extends AbstractGateway
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $success ? $response['id'] : null,
-            'message'       => $success ? 'Transaction approved' : $response['message'],
-            'test'          => array_key_exists('livemode', $response) ? $response['livemode'] : false,
+            'message'       => $success ? 'Transaction approved' : Arr::get($response, 'message'),
+            'test'          => $this->getTest($response),
             'authorization' => $success ? $this->getAuthorization($response) : false,
             'status'        => $success ? $this->getStatus($response) : new Status('failed'),
-            'errorCode'     => $success ? null : $this->getErrorCode($response['code']),
-            'type'          => array_key_exists('type', $response) ? $response['type'] : Arr::get($response, 'object'),
+            'errorCode'     => $success ? null : $this->getErrorCode(Arr::get($response, 'code')),
+            'type'          => array_key_exists('type', $response) ? Arr::get($response, 'type') : Arr::get($response, 'object'),
         ]);
+    }
+
+    /**
+     * Map test mode to response.
+     *
+     * @param array $response
+     *
+     * @return string|null
+     */
+    protected function getTest($response)
+    {
+        if (array_key_exists('live_mode', $response)) {
+            return $response['live_mode'];
+        }
+
+        if (array_key_exists('livemode', $response)) {
+            return $response['livemode'];
+        }
+
+        if (array_key_exists('live', $response)) {
+            return $response['live_mode'] == 'LIVE';
+        }
+
+        return false;
     }
 
     /**
@@ -162,7 +198,11 @@ class ComproPagoGateway extends AbstractGateway
      */
     protected function getAuthorization($response)
     {
-        return 'https://www.compropago.com/comprobante/?confirmation_id='.$response['id'];
+        if (array_key_exists('object', $response) && $response['object'] == 'charge') {
+            return 'https://www.compropago.com/comprobante/?confirmation_id='.$response['id'];
+        }
+
+        return $response['id'];
     }
 
     /**
@@ -176,6 +216,10 @@ class ComproPagoGateway extends AbstractGateway
     {
         if (isset($response['refunded']) && $response['refunded'] == true) {
             return new Status('refunded');
+        }
+
+        if (!isset($response['status']) && !isset($response['type'])) {
+            return;
         }
 
         $status = isset($response['status']) ? $response['status'] : $response['type'];
