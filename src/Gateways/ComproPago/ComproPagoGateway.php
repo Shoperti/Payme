@@ -225,15 +225,20 @@ class ComproPagoGateway extends AbstractGateway
         $status = isset($response['status']) ? $response['status'] : $response['type'];
 
         switch ($status) {
+            case 'pending':
             case 'charge.pending':
                 return new Status('pending');
                 break;
+            case 'success':
             case 'charge.success':
                 return new Status('paid');
+            case 'declined':
             case 'charge.declined':
                 return new Status('failed');
+            case 'deleted':
             case 'charge.deleted':
                 return new Status('canceled');
+            case 'expired':
             case 'charge.expired':
                 return new Status('voided');
                 break;
