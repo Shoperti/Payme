@@ -175,15 +175,15 @@ class ComproPagoGateway extends AbstractGateway
     protected function getTest($response)
     {
         if (array_key_exists('live_mode', $response)) {
-            return $response['live_mode'];
+            return !$response['live_mode'];
         }
 
         if (array_key_exists('livemode', $response)) {
-            return $response['livemode'];
+            return !$response['livemode'];
         }
 
         if (array_key_exists('live', $response)) {
-            return $response['live_mode'] == 'LIVE';
+            return $response['live_mode'] !== 'LIVE';
         }
 
         return false;
