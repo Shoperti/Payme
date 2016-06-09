@@ -10,7 +10,7 @@ use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the paypal express gateway class.
+ * This is the PayPal express gateway class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -89,14 +89,14 @@ class PaypalExpressGateway extends AbstractGateway
      *
      * @return void
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         Arr::requires($config, ['username', 'password', 'signature']);
 
         $config['version'] = $this->apiVersion;
         $config['test'] = (bool) Arr::get($config, 'test', false);
 
-        $this->config = $config;
+        parent::__construct($config);
     }
 
     /**
@@ -192,7 +192,7 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Map paypal response to reference.
+     * Map PayPal response to reference.
      *
      * @param array $response
      * @param bool  $isRedirect
@@ -216,7 +216,7 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Map paypal response to authorization.
+     * Map PayPal response to authorization.
      *
      * @param array $response
      * @param bool  $success
@@ -241,7 +241,7 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Map paypal response to status object.
+     * Map PayPal response to status object.
      *
      * @param array $response
      * @param bool  $isRedirect
@@ -263,7 +263,7 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Map PaypalExpress response to error code object.
+     * Map PayPalExpress response to error code object.
      *
      * @param array $error
      *

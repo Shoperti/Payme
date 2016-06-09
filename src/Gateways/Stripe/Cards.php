@@ -4,16 +4,17 @@ namespace Shoperti\PayMe\Gateways\Stripe;
 
 use Shoperti\PayMe\Contracts\CardInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
-  * This is the stripe cards class.
+  * This is the Stripe cards class.
   *
   * @author Joseph Cohen <joseph.cohen@dinkbit.com>
   */
  class Cards extends AbstractApi implements CardInterface
  {
      /**
-     * Stores a credit card.
+     * Store a credit card.
      *
      * @param string   $creditcard
      * @param string[] $options
@@ -36,7 +37,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
     }
 
     /**
-     * Deletes a credit card.
+     * Delete a credit card.
      *
      * @param string   $id
      * @param string[] $options

@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways;
 
+use GuzzleHttp\Client as GuzzleClient;
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\GatewayInterface;
 use Shoperti\PayMe\Currency;
@@ -27,29 +28,10 @@ abstract class AbstractGateway implements GatewayInterface
      *
      * @return void
      */
-    abstract public function __construct($config);
-
-    /**
-     * Commit a HTTP request.
-     *
-     * @param string   $method
-     * @param string   $url
-     * @param string[] $params
-     * @param string[] $options
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    abstract public function commit($method, $url, $params = [], $options = []);
-
-    /**
-     * Map HTTP response to response object.
-     *
-     * @param bool  $success
-     * @param array $response
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    abstract public function mapResponse($success, $response);
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * Get the gateway request url.
@@ -59,7 +41,7 @@ abstract class AbstractGateway implements GatewayInterface
     abstract protected function getRequestUrl();
 
     /**
-     * Returns the current config array.
+     * Return the current config array.
      *
      * @return string[]
      */
@@ -69,7 +51,7 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
-     * Sets the current config array.
+     * Set the current config array.
      *
      * @param string[]
      *
@@ -89,7 +71,7 @@ abstract class AbstractGateway implements GatewayInterface
      */
     protected function getHttpClient()
     {
-        return new \GuzzleHttp\Client();
+        return new GuzzleClient();
     }
 
     /**
@@ -135,7 +117,7 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
-     * Accepts the amount of money in base unit and returns cants or base unit.
+     * Accept the amount of money in base unit and returns cants or base unit.
      *
      * @param int|float $money
      *

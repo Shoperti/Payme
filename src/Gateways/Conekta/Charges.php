@@ -2,13 +2,14 @@
 
 namespace Shoperti\PayMe\Gateways\Conekta;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 use Shoperti\PayMe\Support\Helper;
 
 /**
- * This is the conekta charges class.
+ * This is the Conekta charges class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -36,6 +37,18 @@ class Charges extends AbstractApi implements ChargeInterface
         }
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('charges'), $params);
+    }
+
+    /**
+     * Complete a charge.
+     *
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function complete($options = [])
+    {
+        throw new BadMethodCallException();
     }
 
     /**
@@ -99,11 +112,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param string[] $params
      * @param string[] $options
      *
-     * @return array
+     * @return array|null
      */
     protected function addAddress(array $params, array $options)
     {
-        if ($address = Arr::get($options, 'address') || Arr::get($options, 'billing_address')) {
+        if ($address = Arr::get($options, 'address') ?: Arr::get($options, 'billing_address')) {
             $params['address'] = [];
             $params['address']['street1'] = Arr::get($address, 'address1');
             $params['address']['street2'] = Arr::get($address, 'address2');
@@ -151,7 +164,6 @@ class Charges extends AbstractApi implements ChargeInterface
      * Add customer to request.
      *
      * @param string[] $params
-     * @param string   $creditcard
      * @param string[] $options
      *
      * @return array

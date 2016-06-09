@@ -19,9 +19,9 @@ abstract class AbstractApi implements ApiInterface
     protected $gateway;
 
     /**
-     * Inject the Gateway for to use on an Api instance.
+     * Create a new API object with the specified configuration.
      *
-     * @param \Shoperti\PayMe\Contracts\GatewayInterface
+     * @param \Shoperti\PayMe\Contracts\GatewayInterface $gateway
      *
      * @return void
      */

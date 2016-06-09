@@ -10,7 +10,16 @@ namespace Shoperti\PayMe\Contracts;
 interface GatewayInterface
 {
     /**
-     * Sets the current config array.
+     * Create a new gateway with the specified configuration.
+     *
+     * @param string[] $config
+     *
+     * @return void
+     */
+    public function __construct(array $config);
+
+    /**
+     * Set the current config array.
      *
      * @param string[]
      *
@@ -19,7 +28,7 @@ interface GatewayInterface
     public function getConfig();
 
     /**
-     * Sets the current config array.
+     * Set the current config array.
      *
      * @param string[]
      *
@@ -28,7 +37,19 @@ interface GatewayInterface
     public function setConfig($config);
 
     /**
-     * Map HTTP response to transaction object.
+     * Commit a HTTP request.
+     *
+     * @param string   $method
+     * @param string   $url
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function commit($method, $url, $params = [], $options = []);
+
+    /**
+     * Map an HTTP response to transaction object.
      *
      * @param bool  $success
      * @param array $response
@@ -38,6 +59,15 @@ interface GatewayInterface
     public function mapResponse($success, $response);
 
     /**
+     * Build request url from string.
+     *
+     * @param string $endpoint
+     *
+     * @return string
+     */
+    public function buildUrlFromString($endpoint);
+
+    /**
      * Get gateway display name.
      *
      * @return string
@@ -45,7 +75,7 @@ interface GatewayInterface
     public function getDisplayName();
 
     /**
-     * Accepts the amount of money in base unit and returns cants or base unit.
+     * Accept the amount of money in base unit and returns cants or base unit.
      *
      * @param int|float $money
      *
@@ -97,7 +127,7 @@ interface GatewayInterface
     public function getCurrencyDecimalPlaces();
 
     /**
-     * Format amount to the current currency.
+     * Format an amount to the current currency.
      *
      * @param int|string $amount
      *

@@ -13,12 +13,12 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 class Cards extends AbstractApi implements CardInterface
 {
     /**
-     * Stores a credit card.
+     * Store a credit card.
      *
      * @param string   $creditcard
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function create($creditcard, $options = [])
     {
@@ -30,16 +30,16 @@ class Cards extends AbstractApi implements CardInterface
             $params['transaction'] = 'success';
         }
 
-        return $this->commit('post', 'create', $params);
+        return $this->gateway->commit('post', 'create', $params);
     }
 
     /**
-     * Deletes a credit card.
+     * Delete a credit card.
      *
      * @param string   $id
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\Transaction
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function delete($id, $options = [])
     {
@@ -51,6 +51,6 @@ class Cards extends AbstractApi implements CardInterface
             $params['transaction'] = 'success';
         }
 
-        return $this->commit('post', 'delete', $params);
+        return $this->gateway->commit('post', 'delete', $params);
     }
 }

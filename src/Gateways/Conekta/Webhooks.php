@@ -5,6 +5,7 @@ namespace Shoperti\PayMe\Gateways\Conekta;
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\WebhookInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the conekta events class.

@@ -7,7 +7,7 @@ use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
- * This is the conekta events class.
+ * This is the Stripe events class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
