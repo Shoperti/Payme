@@ -9,7 +9,7 @@ use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the conekta gateway class.
+ * This is the Conekta gateway class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -64,14 +64,14 @@ class ConektaGateway extends AbstractGateway
      *
      * @return void
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         Arr::requires($config, ['private_key']);
 
         $config['version'] = $this->apiVersion;
         $config['locale'] = $this->locale;
 
-        $this->config = $config;
+        parent::__construct($config);
     }
 
     /**

@@ -43,18 +43,6 @@ class BogusGateway extends AbstractGateway
     protected $moneyFormat = 'cents';
 
     /**
-     * Inject the configuration for a Gateway.
-     *
-     * @param string[] $config
-     *
-     * @return void
-     */
-    public function __construct($config)
-    {
-        $this->config = $config;
-    }
-
-    /**
      * Commit a HTTP request.
      *
      * @param string   $method

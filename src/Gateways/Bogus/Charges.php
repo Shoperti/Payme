@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\Bogus;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 
@@ -32,5 +33,17 @@ class Charges extends AbstractApi implements ChargeInterface
         }
 
         return $this->gateway->commit('post', 'charges', $params);
+    }
+
+    /**
+     * Complete a charge.
+     *
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function complete($options = [])
+    {
+        throw new BadMethodCallException();
     }
 }

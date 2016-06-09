@@ -6,18 +6,18 @@ use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\FactoryInterface;
 
 /**
- * This is the payme factory class.
+ * This is the PayMe factory class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class PayMeFactory implements FactoryInterface
 {
     /**
-     * The current factory instances.
+     * The instantiated PayMe objects.
      *
-     * @var \Shoperti\PayMe\Contracts\Factory[]
+     * @var \Shoperti\PayMe\PayMe[]
      */
-    protected $factories = [];
+    protected $instances = [];
 
     /**
      * Create a new gateway instance.
@@ -34,39 +34,26 @@ class PayMeFactory implements FactoryInterface
             throw new InvalidArgumentException('A gateway must be specified.');
         }
 
-        return $this->factory($config);
+        return $this->resolve($config);
     }
 
     /**
-     * Get a factory instance by name.
+     * Obtain or generates a PayMe instance with the specified configuration.
      *
-     * @param string $config
-     *
-     * @return \Shoperti\PayMe\Contracts\FactoryInterface
-     */
-    public function factory($config)
-    {
-        $name = $config['driver'];
-
-        return $this->factories[$name] = $this->get($name, $config);
-    }
-
-    /**
-     * Attempt to get the gateway from the local cache.
-     *
-     * @param string   $name
      * @param string[] $config
      *
      * @throws \InvalidArgumentException
      *
-     * @return \Shoperti\PayMe\Contracts\Gateway
+     * @return \Shoperti\PayMe\PayMe
      */
-    protected function get($name, $config)
+    protected function resolve($config)
     {
-        if (isset($this->factories[$name]) && $this->factories[$name]->getConfig() === $config) {
-            return $this->factories[$name];
+        $name = $config['driver'];
+
+        if (isset($this->instances[$name]) && $this->instances[$name]->getConfig() === $config) {
+            return $this->instances[$name];
         }
 
-        return PayMe::make($config);
+        return $this->instances[$name] = PayMe::make($config);
     }
 }

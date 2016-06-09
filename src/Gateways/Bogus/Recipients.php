@@ -13,11 +13,11 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 class Recipients extends AbstractApi implements RecipientInterface
 {
     /**
-     * Stores a new recipient.
+     * Store a new recipient.
      *
      * @param string[] $attributes
      *
-     * @return \Shoperti\PayMe\ResponseInterface
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function create($attributes = [])
     {
@@ -29,16 +29,16 @@ class Recipients extends AbstractApi implements RecipientInterface
             $params['transaction'] = 'success';
         }
 
-        return $this->commit('post', 'recipients', $params);
+        return $this->gateway->commit('post', 'recipients', $params);
     }
 
     /**
-     * Deletes an existing recipient.
+     * Delete an existing recipient.
      *
      * @param string   $id
      * @param string[] $options
      *
-     * @return \Shoperti\PayMe\ResponseInterface
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function delete($id, $options = [])
     {
@@ -50,6 +50,6 @@ class Recipients extends AbstractApi implements RecipientInterface
             $params['transaction'] = 'success';
         }
 
-        return $this->commit('post', 'recipients', $params);
+        return $this->gateway->commit('post', 'recipients', $params);
     }
 }

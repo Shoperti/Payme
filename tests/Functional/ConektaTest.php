@@ -109,7 +109,23 @@ class ConektaTest extends AbstractFunctionalTestCase
         $gateway = PayMe::make($this->credentials['conekta']);
         $url = 'http://payme.com/hook/'.time();
 
-        $created = $gateway->webhooks()->create(['url' => $url])->data();
+        $payload = [
+            'events' => [
+                'charge.created', 'charge.paid', 'charge.under_fraud_review',
+                'charge.fraudulent', 'charge.refunded', 'charge.created',
+                'charge.chargeback.created', 'charge.chargeback.updated',
+                'charge.chargeback.under_review', 'charge.chargeback.lost',
+                'charge.chargeback.won', 'subscription.created', 'subscription.paused',
+                'subscription.resumed', 'subscription.canceled', 'subscription.expired',
+                'subscription.updated', 'subscription.paid', 'subscription.payment_failed',
+            ],
+            'url'                 => $url,
+            'production_enabled'  => 1,
+            'development_enabled' => 1,
+        ];
+
+        $created = $gateway->webhooks()->create($payload)->data();
+
         $webhook = $gateway->webhooks()->find($created['id']);
         $gateway->webhooks()->delete($created['id']);
 

@@ -58,13 +58,13 @@ class StripeGateway extends AbstractGateway
      *
      * @return void
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         Arr::requires($config, ['private_key']);
 
         $config['version'] = $this->apiVersion;
 
-        $this->config = $config;
+        parent::__construct($config);
     }
 
     /**
@@ -176,7 +176,7 @@ class StripeGateway extends AbstractGateway
     }
 
     /**
-     * Map Conekta response to status object.
+     * Map Stripe response to status object.
      *
      * @param string $status
      *

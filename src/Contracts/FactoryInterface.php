@@ -3,18 +3,20 @@
 namespace Shoperti\PayMe\Contracts;
 
 /**
- * This is the factory interface.
+ * This is the factories interface.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 interface FactoryInterface
 {
     /**
-     * Create a new gateway instance..
+     * Create a new gateway instance.
      *
-     * @param string[] $driver
+     * @param string[] $config
      *
-     * @return \Shoperti\PayMe\Contracts\Gateway
+     * @throws \InvalidArgumentException
+     *
+     * @return \Shoperti\PayMe\Contracts\GatewayInterface
      */
     public function make(array $config);
 }

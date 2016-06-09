@@ -138,6 +138,8 @@ class Helper
     /**
      * Resolves a camel case class name.
      *
+     * @param string $value
+     *
      * @return string
      */
     public static function className($value)

@@ -4,9 +4,10 @@ namespace Shoperti\PayMe\Gateways\Conekta;
 
 use Shoperti\PayMe\Contracts\RecipientInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the conekta recipients class.
+ * This is the Conekta recipients class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -27,7 +28,7 @@ class Recipients extends AbstractApi implements RecipientInterface
         $params = $this->addPayoutMethod($params, $attributes);
         $params = $this->addPayoutBilling($params, $attributes);
 
-        return $this->commit('post', $this->gateway->buildUrlFromString('payees'), $params);
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('payees'), $params);
     }
 
     // /**
@@ -51,7 +52,7 @@ class Recipients extends AbstractApi implements RecipientInterface
     // }
 
     /**
-     * Unstores an existing recipient.
+     * Unstore an existing recipient.
      *
      * @param string   $id
      * @param string[] $options
@@ -60,25 +61,7 @@ class Recipients extends AbstractApi implements RecipientInterface
      */
     public function delete($id, $options = [])
     {
-        return $this->commit('delete', $this->gateway->buildUrlFromString('payees/'.$id));
-    }
-
-    /**
-     * Add payment method to request.
-     *
-     * @param string[] $params
-     * @param mixed    $payment
-     * @param string[] $options
-     *
-     * @return array
-     */
-    protected function addPaymentMethod(array $params, $payment, array $options)
-    {
-        if (is_string($payment)) {
-            $params['payee_id'] = $payment;
-        }
-
-        return $params;
+        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('payees/'.$id));
     }
 
     /**

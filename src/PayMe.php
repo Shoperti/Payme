@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use Shoperti\PayMe\Support\Helper;
 
 /**
- * This is the payme class.
+ * This is the PayMe class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -35,9 +35,9 @@ class PayMe
     protected $config;
 
     /**
-     * The current instatiated gateway.
+     * The current instantiated gateway.
      *
-     * @return \Shoperti\PayMe\Contracts\Gateway
+     * @return \Shoperti\PayMe\Contracts\GatewayInterface
      */
     protected $gateway;
 
@@ -45,6 +45,8 @@ class PayMe
      * Create a new PayMe instance.
      *
      * @param string[] $config
+     *
+     * @throws \InvalidArgumentException
      *
      * @return void
      */
@@ -60,11 +62,11 @@ class PayMe
 
         $class = "\\Shoperti\\PayMe\\Gateways\\{$gateway}\\{$gateway}Gateway";
 
-        if (class_exists($class)) {
-            return $this->gateway = new $class($config);
+        if (!class_exists($class)) {
+            throw new InvalidArgumentException('Unsupported gateway ['.$this->getDriver().'].');
         }
 
-        throw new InvalidArgumentException('Unsupported gateway ['.$this->getDriver().'].');
+        $this->gateway = new $class($config);
     }
 
     /**
@@ -72,7 +74,9 @@ class PayMe
      *
      * @param string[] $config
      *
-     * @return \Shoperti\PayMe\Payme
+     * @throws \InvalidArgumentException
+     *
+     * @return \Shoperti\PayMe\PayMe
      */
     public static function make($config)
     {
@@ -80,7 +84,7 @@ class PayMe
     }
 
     /**
-     * Return the current package version.
+     * Get the current package version.
      *
      * @return string
      */
@@ -92,7 +96,7 @@ class PayMe
     /**
      * Get the current gateway.
      *
-     * @return \Shoperti\PayMe\Contracts\Gateway
+     * @return \Shoperti\PayMe\Contracts\GatewayInterface
      */
     public function getGateway()
     {
@@ -100,7 +104,7 @@ class PayMe
     }
 
     /**
-     * Return the current config array.
+     * Get the current config array.
      *
      * @return string[]
      */
@@ -147,7 +151,7 @@ class PayMe
     }
 
     /**
-     * Returns the Api class instance for the given method.
+     * Return the Api class instance for the given method.
      *
      * @param string $method
      *
@@ -161,10 +165,10 @@ class PayMe
 
         $class = "\\Shoperti\\PayMe\\Gateways\\{$gateway}\\".Helper::className($method);
 
-        if (class_exists($class)) {
-            return new $class($this->gateway);
+        if (!class_exists($class)) {
+            throw new BadMethodCallException("Undefined method [{$method}] called.");
         }
 
-        throw new BadMethodCallException("Undefined method [{$method}] called.");
+        return new $class($this->gateway);
     }
 }

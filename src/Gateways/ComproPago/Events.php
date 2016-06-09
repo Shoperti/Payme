@@ -8,7 +8,7 @@ use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 
 /**
- * This is the compro pago events class.
+ * This is the Compro Pago events class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */

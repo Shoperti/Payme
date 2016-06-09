@@ -6,6 +6,11 @@ use Shoperti\PayMe\PayMeFactory;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * The PayMe factory instance.
+     *
+     * @var \Shoperti\PayMe\PayMeFactory
+     */
     protected $factory;
 
     protected function setUp()
@@ -15,7 +20,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage A gateway must be specified.
      */
     public function it_throws_if_no_driver_specified()
@@ -25,12 +30,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Unsupported gateway [bar].
      */
     public function it_thorws_on_not_gateway_supported()
     {
-        $this->factory->factory(['driver' => 'bar']);
+        $this->factory->make(['driver' => 'bar']);
     }
 
     /** @test */

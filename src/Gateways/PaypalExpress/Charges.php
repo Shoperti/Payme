@@ -8,7 +8,7 @@ use Shoperti\PayMe\Support\Arr;
 use Shoperti\PayMe\Support\Helper;
 
 /**
- * This is the paypal express charges class.
+ * This is the PayPal express charges class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -43,7 +43,6 @@ class Charges extends AbstractApi implements ChargeInterface
     /**
      * Complete a charge.
      *
-     * @param mixed    $payment
      * @param string[] $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface

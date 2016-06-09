@@ -2,13 +2,14 @@
 
 namespace Shoperti\PayMe\Gateways\ComproPago;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 use Shoperti\PayMe\Support\Helper;
 
 /**
- * This is the compro pago charges class.
+ * This is the Compro Pago charges class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -32,6 +33,18 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['payment_type'] = mb_strtoupper($payment, 'UTF-8');
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('charges'), $params);
+    }
+
+    /**
+     * Complete a charge.
+     *
+     * @param string[] $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function complete($options = [])
+    {
+        throw new BadMethodCallException();
     }
 
     /**
