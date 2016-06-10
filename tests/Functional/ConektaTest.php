@@ -78,6 +78,25 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertSame($response['details']['line_items'][1]['description'], 'Wooden');
         $this->assertSame($response['details']['name'], 'TheCustomerName');
         $this->assertSame($response['details']['billing_address']['city'], 'Guerrero');
+
+        return $response;
+    }
+
+    /**
+     * @test
+     * @depends is_should_succeed_to_charge_a_token_with_params
+     */
+    public function is_should_succeed_to_refund_a_charge($response)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $charge = $gateway->charges()->refund(1000, $response['id']);
+
+        $response = $charge->data();
+
+        $this->assertTrue($charge->success());
+        // previous test creates a charge of 1000
+        $this->assertSame($response['refunds'][0]['amount'], -1000);
     }
 
     /** @test */

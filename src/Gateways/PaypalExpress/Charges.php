@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\PaypalExpress;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
@@ -70,6 +71,20 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addBN($params, $options);
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params);
+    }
+
+    /**
+     * Refund a charge.
+     *
+     * @param int|float $amount
+     * @param string    $reference
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function refund($amount, $reference, array $options = [])
+    {
+        throw new BadMethodCallException();
     }
 
     /**

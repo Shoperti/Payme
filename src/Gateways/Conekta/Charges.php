@@ -52,6 +52,24 @@ class Charges extends AbstractApi implements ChargeInterface
     }
 
     /**
+     * Refund a charge.
+     *
+     * @param int|float $amount
+     * @param string    $reference
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function refund($amount, $reference, array $options = [])
+    {
+        $url = sprintf($this->gateway->buildUrlFromString('charges').'/%s/refund', $reference);
+
+        return $this->gateway->commit('post', $url, [
+            'amount' => $amount,
+        ]);
+    }
+
+    /**
      * Add order params to request.
      *
      * @param string[] $params
