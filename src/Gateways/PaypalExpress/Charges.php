@@ -105,14 +105,25 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addLineItems(array $params, array $options)
     {
         if (isset($options['line_items']) && is_array($options['line_items'])) {
+            $item = 0;
             $params['PAYMENTREQUEST_0_ITEMAMT'] = 0;
 
-            foreach ($options['line_items'] as $n => $lineItem) {
-                $params["L_PAYMENTREQUEST_0_NAME$n"] = Arr::get($lineItem, 'name');
-                $params["L_PAYMENTREQUEST_0_DESC$n"] = Arr::get($lineItem, 'description');
-                $params["L_PAYMENTREQUEST_0_QTY$n"] = Arr::get($lineItem, 'quantity', 1);
-                $params["L_PAYMENTREQUEST_0_AMT$n"] = $this->gateway->amount(Arr::get($lineItem, 'unit_price'));
+            foreach ($options['line_items'] as $lineItem) {
+                $params["L_PAYMENTREQUEST_0_NAME{$item}"] = Arr::get($lineItem, 'name');
+                $params["L_PAYMENTREQUEST_0_DESC{$item}"] = Arr::get($lineItem, 'description');
+                $params["L_PAYMENTREQUEST_0_QTY{$item}"] = Arr::get($lineItem, 'quantity', 1);
+                $params["L_PAYMENTREQUEST_0_AMT{$item}"] = $this->gateway->amount(Arr::get($lineItem, 'unit_price'));
                 $params['PAYMENTREQUEST_0_ITEMAMT'] += Arr::get($lineItem, 'quantity', 1) * Arr::get($lineItem, 'unit_price');
+                $item++;
+            }
+
+            if (isset($options['discount'])) {
+                $item++;
+                $params["L_PAYMENTREQUEST_0_NAME{$item}"] = Arr::get($options, 'discount_concept', 'Discount');
+                $params["L_PAYMENTREQUEST_0_DESC{$item}"] = '';
+                $params["L_PAYMENTREQUEST_0_QTY{$item}"] = 1;
+                $params["L_PAYMENTREQUEST_0_AMT{$item}"] = -$this->gateway->amount($options['discount']);
+                $params['PAYMENTREQUEST_0_ITEMAMT'] += -$options['discount'];
             }
 
             $params['PAYMENTREQUEST_0_ITEMAMT'] = $this->gateway->amount($params['PAYMENTREQUEST_0_ITEMAMT']);
