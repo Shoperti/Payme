@@ -119,7 +119,7 @@ class Charges extends AbstractApi implements ChargeInterface
 
             if (isset($options['discount'])) {
                 $item++;
-                $params["L_PAYMENTREQUEST_0_NAME{$item}"] = 'Discount';
+                $params["L_PAYMENTREQUEST_0_NAME{$item}"] = Arr::get($options, 'discount_concept', 'Discount');
                 $params["L_PAYMENTREQUEST_0_DESC{$item}"] = '';
                 $params["L_PAYMENTREQUEST_0_QTY{$item}"] = 1;
                 $params["L_PAYMENTREQUEST_0_AMT{$item}"] = -$this->gateway->amount($options['discount']);
