@@ -131,7 +131,7 @@ abstract class AbstractGateway implements GatewayInterface
             return;
         }
 
-        if (is_string($money) or $money < 0) {
+        if (is_string($money) || $money < 0) {
             throw new InvalidArgumentException('Money amount must be a positive number.');
         }
 
