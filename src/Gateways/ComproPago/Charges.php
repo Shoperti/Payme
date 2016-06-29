@@ -48,6 +48,20 @@ class Charges extends AbstractApi implements ChargeInterface
     }
 
     /**
+     * Refund a charge.
+     *
+     * @param int|float $amount
+     * @param string    $reference
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function refund($amount, $reference, array $options = [])
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
      * Add order params to request.
      *
      * @param string[] $params

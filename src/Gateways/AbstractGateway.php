@@ -123,7 +123,7 @@ abstract class AbstractGateway implements GatewayInterface
      *
      * @throws \InvalidArgumentException
      *
-     * @return int|float
+     * @return string|null
      */
     public function amount($money)
     {
@@ -143,7 +143,7 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
-     * Parse the amout to pay to the currency format.
+     * Parse the amount to pay to the currency format.
      *
      * @param int|string $amount
      *
@@ -190,13 +190,13 @@ abstract class AbstractGateway implements GatewayInterface
     /**
      * Get the gateway currency numeric representation.
      *
-     * @return int
+     * @return int|null
      */
     public function getCurrencyNumeric()
     {
-        if ($currency = Currency::find($this->getCurrency())) {
-            return $currency->getNumeric();
-        }
+        $currency = Currency::find($this->getCurrency());
+
+        return $currency ? $currency->getNumeric() : null;
     }
 
     /**
@@ -206,11 +206,9 @@ abstract class AbstractGateway implements GatewayInterface
      */
     public function getCurrencyDecimalPlaces()
     {
-        if ($currency = Currency::find($this->getCurrency())) {
-            return $currency->getDecimals();
-        }
+        $currency = Currency::find($this->getCurrency());
 
-        return 2;
+        return $currency ? $currency->getDecimals() : 2;
     }
 
     /**
