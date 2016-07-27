@@ -173,17 +173,61 @@ class ConektaGateway extends AbstractGateway
             $response = $response['data']['object'];
         }
 
+        $type = $this->getType($rawResponse);
+        list($reference, $authorization) = $success ? $this->getReferences($response, $type) : [null, null];
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
-            'reference'     => $success ? $response['id'] : null,
+            'reference'     => $reference,
             'message'       => $success ? 'Transaction approved' : Arr::get($response, 'message_to_purchaser', ''),
             'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
-            'authorization' => $success ? $this->getAuthorization($response) : false,
+            'authorization' => $authorization,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode(Arr::get($response, 'code', 'invalid_payment_type')),
-            'type'          => array_key_exists('type', $rawResponse) ? $rawResponse['type'] : Arr::get($rawResponse, 'object'),
+            'type'          => $type,
         ]);
+    }
+
+    /**
+     * Get the transaction type.
+     *
+     * @param array $rawResponse
+     *
+     * @return string
+     */
+    protected function getType($rawResponse)
+    {
+        if ($type = Arr::get($rawResponse, 'type')) {
+            return $type;
+        }
+
+        switch (Arr::get($rawResponse, 'status')) {
+            case 'partially_refunded':
+            case 'refunded':
+                return 'refund';
+        }
+
+        return Arr::get($rawResponse, 'object');
+    }
+
+    /**
+     * Get the transaction reference and auth code.
+     *
+     * @param array  $response
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function getReferences($response, $type)
+    {
+        if ($type == 'refund') {
+            $refund = $response['refunds'][count($response['refunds']) - 1];
+
+            return [$refund['id'], $refund['auth_code']];
+        }
+
+        return [$response['id'], $this->getAuthorization($response)];
     }
 
     /**
@@ -233,6 +277,7 @@ class ConektaGateway extends AbstractGateway
                 break;
             case 'paid':
             case 'refunded':
+            case 'partially_refunded':
             case 'paused':
             case 'active':
             case 'canceled':

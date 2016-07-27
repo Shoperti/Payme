@@ -38,7 +38,7 @@ class PayMeFactory implements FactoryInterface
     }
 
     /**
-     * Obtain or generates a PayMe instance with the specified configuration.
+     * Obtain or generate a PayMe instance with the specified configuration.
      *
      * @param string[] $config
      *
