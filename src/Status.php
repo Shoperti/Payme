@@ -61,7 +61,7 @@ class Status
     protected function disallowInvalidStatus($status)
     {
         if (!in_array($status, $this->statuses)) {
-            throw new InvalidArgumentException('Invalid status provided.');
+            throw new InvalidArgumentException(sprintf("Invalid status provided '%s'", $status));
         }
     }
 
