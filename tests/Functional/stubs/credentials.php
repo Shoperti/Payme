@@ -5,8 +5,10 @@ return [
         'driver' => 'bogus',
     ],
 
-    'manual' => [
-        'driver' => 'manual',
+    'compro_pago' => [
+        'driver'      => 'compro_pago',
+        'private_key' => 'sk_test_75c7b279365b4449d',
+        'public_key'  => 'pk_test_613ed49349849c194',
     ],
 
     'conekta' => [
@@ -14,9 +16,16 @@ return [
         'private_key' => 'key_eYvWV7gSDkNYXsmr',
     ],
 
-    'stripe' => [
-        'driver'      => 'stripe',
-        'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
+    'manual' => [
+        'driver' => 'manual',
+    ],
+
+    'open_pay' => [
+        'driver'      => 'open_pay',
+        'id'          => 'mygwhzzmbmrlcn0eu7b5',
+        'private_key' => 'sk_7494dfec2c514ca1a4bd40f8c4000d7b',
+        'public_key'  => 'pk_330f394b94574e70a4023c35f335b5e3',
+        'test'        => true,
     ],
 
     'paypal' => [
@@ -27,9 +36,8 @@ return [
         'test'      => true,
     ],
 
-    'compro_pago' => [
-        'driver'      => 'compro_pago',
-        'private_key' => 'sk_test_75c7b279365b4449d',
-        'public_key'  => 'pk_test_613ed49349849c194',
+    'stripe' => [
+        'driver'      => 'stripe',
+        'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
     ],
 ];

@@ -48,13 +48,13 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_sould_fail_with_invalid_access_key()
+    public function it_should_fail_with_invalid_access_key()
     {
         $gateway = PayMe::make(array_merge($this->credentials['compro_pago'], ['private_key' => 'invalid_key']));
 
         $charge = $gateway->charges()->create(1000, 'oxxo', $this->options);
 
-        $this->assertSame($charge->message(), 'Credenciales incorrectas. Por favor ingresar un usuario y contraseña válida.');
+        $this->assertSame($charge->message(), 'Acceso no Autorizado');
     }
 
     /** @test */
