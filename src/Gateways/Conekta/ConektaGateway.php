@@ -94,8 +94,6 @@ class ConektaGateway extends AbstractGateway
             'uname'            => php_uname(),
         ];
 
-        $success = false;
-
         $request = [
             'exceptions'      => false,
             'timeout'         => '80',
@@ -111,12 +109,8 @@ class ConektaGateway extends AbstractGateway
             ],
         ];
 
-        if (!empty($params) && $method !== 'get') {
-            $request['json'] = $params;
-        }
-
-        if (!empty($params) && $method === 'get') {
-            $request['query'] = $params;
+        if (!empty($params)) {
+            $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
@@ -127,18 +121,17 @@ class ConektaGateway extends AbstractGateway
             $response = $this->responseError($rawResponse->getBody());
         }
 
-        return $this->respond($success, $response);
+        return $this->respond($response);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool  $success
      * @param array $response
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($success, $response)
+    protected function respond($response)
     {
         if (!isset($response[0])) {
             $success = !(Arr::get($response, 'object', 'error') == 'error');
@@ -148,10 +141,10 @@ class ConektaGateway extends AbstractGateway
 
         $responses = [];
 
-        foreach ($response as $responds) {
-            $success = !(Arr::get($responds, 'object', 'error') == 'error');
+        foreach ($response as $responseItem) {
+            $success = !(Arr::get($responseItem, 'object', 'error') == 'error');
 
-            $responses[] = $this->mapResponse($success, $responds);
+            $responses[] = $this->mapResponse($success, $responseItem);
         }
 
         return $responses;
@@ -336,13 +329,13 @@ class ConektaGateway extends AbstractGateway
     /**
      * Get error response from server or fallback to general error.
      *
-     * @param string $parseResponse
+     * @param string $body
      *
      * @return array
      */
-    protected function responseError($parseResponse)
+    protected function responseError($body)
     {
-        return $this->parseResponse($parseResponse) ?: $this->jsonError($parseResponse);
+        return $this->parseResponse($body) ?: $this->jsonError($body);
     }
 
     /**
