@@ -65,7 +65,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $url = sprintf($this->gateway->buildUrlFromString('charges').'/%s/refund', $reference);
 
         return $this->gateway->commit('post', $url, [
-            'amount' => $amount,
+            'amount' => $this->gateway->amount($amount),
         ]);
     }
 
