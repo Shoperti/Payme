@@ -40,7 +40,7 @@ class Events extends AbstractApi implements EventInterface
         $event = func_get_args()[1];
         $endpoint = null;
 
-        switch($event) {
+        switch ($event) {
             case 'charge.created':
             case 'charge.succeeded':
             case 'charge.refunded':
@@ -86,7 +86,7 @@ class Events extends AbstractApi implements EventInterface
             throw new InvalidArgumentException('We need the event name as second argument');
         }
 
-        /** @var \Shoperti\PayMe\Response $event */
+        /* @var \Shoperti\PayMe\Response $event */
         $response = $this->gateway->commit('get', $this->gateway->buildUrlFromString("{$endpoint}/{$id}"));
         $response->type = $event;
 

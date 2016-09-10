@@ -224,8 +224,6 @@ class OpenPayGateway extends AbstractGateway
         if ($method == 'card') {
             return Arr::get($response, 'authorization');
         }
-
-        return null;
     }
 
     /**
