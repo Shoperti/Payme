@@ -25,7 +25,7 @@ return [
         'id'          => 'mygwhzzmbmrlcn0eu7b5',
         'private_key' => 'sk_7494dfec2c514ca1a4bd40f8c4000d7b',
         'public_key'  => 'pk_330f394b94574e70a4023c35f335b5e3',
-        'test'      => true,
+        'test'        => true,
     ],
 
     'paypal' => [

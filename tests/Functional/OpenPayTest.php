@@ -106,7 +106,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame($data['amount'], $amount/100);
+        $this->assertSame($data['amount'], $amount / 100);
         $this->assertSame($data['method'], 'card');
         $this->assertSame($data['status'], 'completed');
         $this->assertSame($data['customer']['name'], $payload['first_name']);
@@ -142,6 +142,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /**
      * @test
      * @depends is_should_succeed_to_charge_a_token_with_params
+     *
      * @param array $responseAndAmount
      */
     public function is_should_succeed_to_refund_a_charge($responseAndAmount)
