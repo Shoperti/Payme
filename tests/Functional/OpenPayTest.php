@@ -314,13 +314,13 @@ class OpenPayTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * Obtains a requestbin link
+     * Obtains a requestbin link.
      *
      * @return string
      */
     private function getRequestBin()
     {
-        $response = (new \GuzzleHttp\Client())->post("http://requestb.in/api/v1/bins");
+        $response = (new \GuzzleHttp\Client())->post('http://requestb.in/api/v1/bins');
 
         $response = json_decode($response->getBody(), true);
 
