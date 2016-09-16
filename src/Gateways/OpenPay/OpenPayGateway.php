@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\OpenPay;
 
-use GuzzleHttp\Psr7\Response as Psr7Response;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
