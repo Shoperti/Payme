@@ -19,9 +19,10 @@ interface EventInterface
     /**
      * Find an event by its id.
      *
-     * @param int|string|null $id
+     * @param int|string $id
+     * @param array      $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null);
+    public function find($id, array $options = []);
 }

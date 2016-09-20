@@ -93,8 +93,8 @@ class Charges extends AbstractApi implements ChargeInterface
             ];
 
             if ($installments = Arr::get($options, 'monthly_installments')) {
-                if (in_array($installments, [3, 6, 9, 12])) {
-                    $paymentData['payment_plan'] = ['payments' => $installments];
+                if (is_numeric($installments) && in_array($installments, [3, 6, 9, 12])) {
+                    $paymentData['payment_plan'] = ['payments' => (int) $installments];
                 }
             }
 

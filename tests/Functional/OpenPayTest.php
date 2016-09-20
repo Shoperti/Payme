@@ -128,16 +128,16 @@ class OpenPayTest extends AbstractFunctionalTestCase
      *
      * @param array $dataAndAmount
      */
-    public function it_can_retrieve_a_single_event($dataAndAmount)
+    public function it_should_retrieve_a_single_event($dataAndAmount)
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
 
         $chargeData = $dataAndAmount[0];
-        $event = 'charge.succeeded';
+        $options = ['event' => 'charge.succeeded'];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->events()->find($chargeData['id'], $event);
+        $response = $openPayPayMe->events()->find($chargeData['id'], $options);
 
         $data = $response->data();
 

@@ -26,7 +26,7 @@ class PayMeFactory implements FactoryInterface
      *
      * @throws \InvalidArgumentException
      *
-     * @return \Shoperti\PayMe\Contracts\GatewayInterface
+     * @return \Shoperti\PayMe\PayMe
      */
     public function make(array $config)
     {

@@ -6,6 +6,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the OpenPay events class.
@@ -28,16 +29,18 @@ class Events extends AbstractApi implements EventInterface
      * Find an event by its id.
      *
      * @param int|string $id
+     * @param array      $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null)
+    public function find($id, array $options = [])
     {
-        if (!$id || func_num_args() < 2) {
-            throw new InvalidArgumentException('We need an id as first parameter and the event as second parameter');
+        $event = Arr::get($options, 'event');
+
+        if (!$event) {
+            throw new InvalidArgumentException("You must specify the 'event' key in the options array");
         }
 
-        $event = func_get_args()[1];
         $endpoint = null;
 
         switch ($event) {
