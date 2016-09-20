@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\Stripe;
 
-use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 
@@ -27,15 +26,12 @@ class Events extends AbstractApi implements EventInterface
      * Find an event by its id.
      *
      * @param int|string $id
+     * @param array      $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null)
+    public function find($id, array $options = [])
     {
-        if (!$id) {
-            throw new InvalidArgumentException('We need an id');
-        }
-
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString("events/{$id}"));
     }
 }
