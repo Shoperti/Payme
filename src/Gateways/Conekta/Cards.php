@@ -7,13 +7,13 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 
 /**
-  * This is the Conekta cards class.
-  *
-  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
-  */
- class Cards extends AbstractApi implements CardInterface
- {
-     /**
+ * This is the Conekta cards class.
+ *
+ * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ */
+class Cards extends AbstractApi implements CardInterface
+{
+    /**
      * Store a credit card.
      *
      * @param string   $creditcard
@@ -52,4 +52,4 @@ use Shoperti\PayMe\Support\Arr;
             return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id));
         }
     }
- }
+}
