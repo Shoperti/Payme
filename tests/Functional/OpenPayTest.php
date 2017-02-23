@@ -324,7 +324,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     {
         $phoneNumber = '';
 
-        for ($i=0; $i < $digits; $i++) {
+        for ($i = 0; $i < $digits; $i++) {
             $phoneNumber .= rand(0, 9);
         }
 
