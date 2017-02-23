@@ -141,7 +141,7 @@ class Charges extends AbstractApi implements ChargeInterface
                 $params['PAYMENTREQUEST_0_ITEMAMT'] += -$options['discount'];
             }
 
-            $params['PAYMENTREQUEST_0_ITEMAMT'] = $this->gateway->amount($params['PAYMENTREQUEST_0_ITEMAMT']);
+            $params['PAYMENTREQUEST_0_ITEMAMT'] = $this->gateway->amount($params['PAYMENTREQUEST_0_ITEMAMT'], false);
         }
 
         return $params;
