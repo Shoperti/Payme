@@ -3,6 +3,7 @@
 namespace Shoperti\PayMe\Gateways\PaypalExpress;
 
 use GuzzleHttp\ClientInterface;
+use InvalidArgumentException;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
@@ -97,6 +98,33 @@ class PaypalExpressGateway extends AbstractGateway
         $config['test'] = (bool) Arr::get($config, 'test', false);
 
         parent::__construct($config);
+    }
+
+    /**
+     * Accept the amount of money in base unit and returns cants or base unit.
+     *
+     * @param int|float $money
+     * @param bool      $validateNegative
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string|null
+     */
+    public function amount($money, $validateNegative = true)
+    {
+        if (null === $money) {
+            return;
+        }
+
+        if (is_string($money) || ($validateNegative && $money < 0)) {
+            throw new InvalidArgumentException('Money amount must be a positive number.');
+        }
+
+        if ($this->getMoneyFormat() == 'cents') {
+            return number_format($money, 0, '', '');
+        }
+
+        return sprintf('%.2f', number_format($money, 2, '.', '') / 100);
     }
 
     /**

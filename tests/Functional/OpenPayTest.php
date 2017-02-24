@@ -238,7 +238,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
             'first_name'       => 'Juan',
             'last_name'        => 'Pérez',
             'email'            => 'customer1@mail.com',
-            'phone'            => '0987654321',
+            'phone'            => $this->generatePhoneNumber(),
             'discount'         => 0,
             'discount_concept' => null,
             'line_items'       => [
@@ -311,6 +311,24 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $response = json_decode($response->getBody(), true);
 
         return $response['id'];
+    }
+
+    /**
+     * Generates a random phone digits string.
+     *
+     * @param int $digits
+     *
+     * @return string
+     */
+    private function generatePhoneNumber($digits = 10)
+    {
+        $phoneNumber = '';
+
+        for ($i = 0; $i < $digits; $i++) {
+            $phoneNumber .= rand(0, 9);
+        }
+
+        return $phoneNumber;
     }
 
     /**
