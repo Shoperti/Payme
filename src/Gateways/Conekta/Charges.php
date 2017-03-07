@@ -102,13 +102,13 @@ class Charges extends AbstractApi implements ChargeInterface
         if (is_string($payment)) {
             if ($payment == 'spei') {
                 $params['charges'][0]['source']['type'] = 'spei';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date("Y-m-d H:i:s")) + 172800);
+                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
             } elseif ($payment == 'oxxo') {
                 $params['charges'][0]['source']['type'] = 'oxxo';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date("Y-m-d H:i:s")) + 172800);
+                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
             } elseif ($payment == 'oxxo_cash') {
                 $params['charges'][0]['source']['type'] = 'oxxo_cash';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date("Y-m-d H:i:s")) + 36000);
+                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 36000);
             } elseif (Helper::startsWith($payment, 'payee_')) {
                 $params['charges'][0]['source']['type'] = 'payout';
                 $params['charges'][0]['source']['payee_id'] = $payment;
@@ -291,7 +291,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['shipping_lines'][0]['description'] = Arr::get($address, 'carrier');
             $params['shipping_lines'][0]['carrier'] = Arr::get($address, 'carrier');
             $params['shipping_lines'][0]['method'] = Arr::get($address, 'service');
-            $params['shipping_lines'][0]['amount'] = (int) $this->gateway->amount(Arr::get($address, 'price'));;
+            $params['shipping_lines'][0]['amount'] = (int) $this->gateway->amount(Arr::get($address, 'price'));
 
             if ($trackingNumber = Arr::get($address, 'tracking_number')) {
                 $params['shipping_lines'][0]['tracking_number'] = $trackingNumber;
