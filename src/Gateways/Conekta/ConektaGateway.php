@@ -48,7 +48,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @var string
      */
-    protected $apiVersion = '0.3.0';
+    protected $apiVersion = '1.1.0';
 
     /**
      * Conekta API locale.
