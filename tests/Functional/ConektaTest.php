@@ -30,24 +30,24 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $charge = $gateway->charges()->create(1000, 'tok_test_visa_4242', [
+        $charge = $gateway->charges()->create(10000, 'tok_test_visa_4242', [
             'reference'  => 'order_1',
-            'name'       => 'TheCustomerName',
+            'name'       => 'John Doe',
             'email'      => 'customer@email.com',
-            'phone'      => '55555555',
+            'phone'      => '+525544443333',
             'line_items' => [
                 [
                     'name'        => 'Box of Cohiba S1s',
                     'description' => 'Imported From Mex.',
-                    'unit_price'  => 20000,
+                    'unit_price'  => 5000,
                     'quantity'    => 1,
                     'sku'         => 'cohb_s1',
                 ],
                 [
                     'name'        => 'Basic Toothpicks',
                     'description' => 'Wooden',
-                    'unit_price'  => 100,
-                    'quantity'    => 250,
+                    'unit_price'  => 500,
+                    'quantity'    => 10,
                     'sku'         => 'tooth_r3',
                 ],
             ],
@@ -55,17 +55,18 @@ class ConektaTest extends AbstractFunctionalTestCase
                 'address1' => 'Rio Missisipi #123',
                 'address2' => 'Paris',
                 'city'     => 'Guerrero',
-                'country'  => 'Mexico',
+                'country'  => 'MX',
+                'state'    => 'DF',
                 'zip'      => '01085',
             ],
             'shipping_address' => [
                 'address1' => '33 Main Street',
                 'address2' => 'Apartment 3',
                 'city'     => 'Wanaque',
-                'country'  => 'USA',
+                'country'  => 'US',
                 'state'    => 'NJ',
                 'zip'      => '01085',
-                'price'    => 100,
+                'price'    => 0,
                 'carrier'  => 'payme',
                 'service'  => 'pending',
             ],
@@ -74,12 +75,10 @@ class ConektaTest extends AbstractFunctionalTestCase
         $response = $charge->data();
 
         $this->assertTrue($charge->success());
-        $this->assertSame($response['details']['shipment']['address']['city'], 'Wanaque');
-        $this->assertSame($response['details']['line_items'][1]['description'], 'Wooden');
-        $this->assertSame($response['details']['name'], 'TheCustomerName');
-        $this->assertSame($response['details']['billing_address']['city'], 'Guerrero');
-
-        return $response;
+        $this->assertSame($response['shipping_contact']['address']['city'], 'Wanaque');
+        $this->assertSame($response['line_items']['data'][1]['description'], 'Wooden');
+        $this->assertSame($response['customer_info']['name'], 'John Doe');
+        // $this->assertSame($response['billing_address']['city'], 'Guerrero');
     }
 
     /**
