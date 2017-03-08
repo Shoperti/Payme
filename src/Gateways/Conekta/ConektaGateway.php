@@ -48,7 +48,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @var string
      */
-    protected $apiVersion = '1.1.0';
+    protected $apiVersion = '2.0.0';
 
     /**
      * Conekta API locale.
@@ -133,16 +133,16 @@ class ConektaGateway extends AbstractGateway
      */
     protected function respond($response)
     {
-        if (!isset($response[0])) {
-            $success = !(Arr::get($response, 'object', 'error') == 'error');
+        if (Arr::get($response, 'object') !== 'list') {
+            $success = Arr::get($response, 'object', 'error') !== 'error';
 
             return $this->mapResponse($success, $response);
         }
 
         $responses = [];
 
-        foreach ($response as $responseItem) {
-            $success = !(Arr::get($responseItem, 'object', 'error') == 'error');
+        foreach ($response['data'] as $responseItem) {
+            $success = Arr::get($responseItem, 'object', 'error') !== 'error';
 
             $responses[] = $this->mapResponse($success, $responseItem);
         }
@@ -169,14 +169,27 @@ class ConektaGateway extends AbstractGateway
         $type = $this->getType($rawResponse);
         list($reference, $authorization) = $success ? $this->getReferences($response, $type) : [null, null];
 
+        $message = '';
+
+        if ($success) {
+            $message = 'Transaction approved';
+        } elseif (Arr::get($response, 'object') === 'error') {
+            foreach (Arr::get($response, 'details') as $detail) {
+                $message .= ' '.Arr::get($detail, 'message', '');
+            }
+            $message = ltrim($message);
+        } else {
+            $message = Arr::get($response, 'message_to_purchaser') ?: Arr::get($response, 'message', '');
+        }
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $reference,
-            'message'       => $success ? 'Transaction approved' : Arr::get($response, 'message_to_purchaser', ''),
+            'message'       => $message,
             'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
             'authorization' => $authorization,
-            'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
+            'status'        => $success ? $this->getStatus(Arr::get($response, 'payment_status', 'paid')) : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode(Arr::get($response, 'code', 'invalid_payment_type')),
             'type'          => $type,
         ]);
@@ -235,9 +248,9 @@ class ConektaGateway extends AbstractGateway
         $object = Arr::get($response, 'object');
 
         if ($object == 'customer') {
-            return Arr::get($response, 'default_card_id');
+            return Arr::get($response, 'default_payment_source_id');
         } elseif ($object == 'card') {
-            return Arr::get($response, 'customer_id');
+            return Arr::get($response, 'parent_id');
         } elseif ($object == 'payee') {
             return Arr::get($response, 'id');
         } elseif ($object == 'transfer') {
@@ -246,12 +259,16 @@ class ConektaGateway extends AbstractGateway
             return Arr::get($response, 'id');
         }
 
-        if (isset($response['payment_method']['auth_code'])) {
-            return $response['payment_method']['auth_code'];
-        } elseif (isset($response['payment_method']['barcode_url'])) {
-            return $response['payment_method']['barcode_url'];
-        } elseif (isset($response['payment_method']['clabe'])) {
-            return $response['payment_method']['clabe'];
+        if (isset($response['charges']['data'][0]['payment_method'])) {
+            $paymentMethod = $response['charges']['data'][0]['payment_method'];
+
+            if (isset($paymentMethod['auth_code'])) {
+                return $paymentMethod['auth_code'];
+            } elseif (isset($paymentMethod['reference'])) {
+                return $paymentMethod['reference'];
+            } elseif (isset($paymentMethod['clabe'])) {
+                return $paymentMethod['clabe'];
+            }
         }
     }
 
@@ -319,7 +336,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @param string $body
      *
-     * @return array
+     * @return array|null
      */
     protected function parseResponse($body)
     {

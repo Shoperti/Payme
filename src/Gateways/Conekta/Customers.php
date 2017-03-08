@@ -44,7 +44,10 @@ class Customers extends AbstractApi implements CustomerInterface
         }
 
         if (isset($attributes['card'])) {
-            $params['cards'] = [$attributes['card']];
+            $params['payment_sources'] = [[
+                'token_id' => $attributes['card'],
+                'type'     => 'card',
+            ]];
         }
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers'), $params);
@@ -75,7 +78,7 @@ class Customers extends AbstractApi implements CustomerInterface
         }
 
         if (isset($attributes['default_card'])) {
-            $params['default_card_id'] = $attributes['default_card'];
+            $params['default_payment_source_id'] = $attributes['default_card'];
         }
 
         return $this->gateway->commit('put', $this->gateway->buildUrlFromString("customers/{$customer}"), $params);

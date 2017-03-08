@@ -76,9 +76,12 @@ class ConektaTest extends AbstractFunctionalTestCase
 
         $this->assertTrue($charge->success());
         $this->assertSame($response['shipping_contact']['address']['city'], 'Wanaque');
-        $this->assertSame($response['line_items']['data'][1]['description'], 'Wooden');
+        $this->assertSame(2, count($response['line_items']['data']));
+        $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
         $this->assertSame($response['customer_info']['name'], 'John Doe');
         // $this->assertSame($response['billing_address']['city'], 'Guerrero');
+
+        return $response;
     }
 
     /**
@@ -89,17 +92,36 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $charge = $gateway->charges()->refund(1000, $response['id']);
+        $charge = $gateway->charges()->refund(1000, $response['id'], [
+            'currency'   => 'MXN',
+            'reason'     => 'requested_by_client',
+            'line_items' => [
+                [
+                    'name'        => 'Box of Cohiba S1s',
+                    'description' => 'Imported From Mex.',
+                    'unit_price'  => 5000,
+                    'quantity'    => 1,
+                    'sku'         => 'cohb_s1',
+                ],
+                [
+                    'name'        => 'Basic Toothpicks',
+                    'description' => 'Wooden',
+                    'unit_price'  => 500,
+                    'quantity'    => 10,
+                    'sku'         => 'tooth_r3',
+                ],
+            ],
+        ]);
 
         $response = $charge->data();
 
         $this->assertTrue($charge->success());
         // previous test creates a charge of 1000
-        $this->assertSame($response['refunds'][0]['amount'], -1000);
+        $this->assertSame($response['amount_refunded'], 10000);
     }
 
     /** @test */
-    public function it_sould_fail_with_invalid_access_key()
+    public function it_should_fail_with_invalid_access_key()
     {
         $gateway = PayMe::make(array_merge($this->credentials['conekta'], ['private_key' => 'invalid_key']));
 
@@ -109,7 +131,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_can_retrieve_a_single_and_all_events()
+    public function it_should_retrieve_a_single_and_all_events()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
@@ -122,12 +144,32 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_should_create_a_new_webhook()
+    public function it_should_get_all_hooks()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
-        $url = 'http://payme.com/hook/'.time();
 
-        $payload = [
+        $webhooks = $gateway->webhooks()->all();
+
+        $this->assertFalse(array_key_exists('success', $webhooks));
+    }
+
+     /**
+      * @test
+      * depends it_should_get_all_hooks
+      */
+     public function it_should_create_and_delete_a_webhook()
+     {
+         $gateway = PayMe::make($this->credentials['conekta']);
+
+         $webhooks = $gateway->webhooks()->all();
+         if (count($webhooks) === 10) {
+             $deletable = $webhooks[count($webhooks) - 1];
+             $gateway->webhooks()->delete($deletable['id']);
+         }
+
+         $url = 'http://payme.com/hook/'.time().'-'.rand(100, 999);
+
+         $payload = [
             'events' => [
                 'charge.created', 'charge.paid', 'charge.under_fraud_review',
                 'charge.fraudulent', 'charge.refunded', 'charge.created',
@@ -142,11 +184,11 @@ class ConektaTest extends AbstractFunctionalTestCase
             'development_enabled' => 1,
         ];
 
-        $created = $gateway->webhooks()->create($payload)->data();
+         $created = $gateway->webhooks()->create($payload)->data();
 
-        $webhook = $gateway->webhooks()->find($created['id']);
-        $gateway->webhooks()->delete($created['id']);
+         $webhook = $gateway->webhooks()->find($created['id']);
+         $gateway->webhooks()->delete($created['id']);
 
-        $this->assertSame($created['url'], $webhook->data()['url']);
-    }
+         $this->assertSame($created['url'], $webhook->data()['url']);
+     }
 }

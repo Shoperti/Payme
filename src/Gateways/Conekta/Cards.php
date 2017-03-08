@@ -24,9 +24,10 @@ class Cards extends AbstractApi implements CardInterface
     public function create($creditcard, $options = [])
     {
         if (isset($options['customer'])) {
-            $params['token'] = $creditcard;
+            $params['type'] = 'card';
+            $params['token_id'] = $creditcard;
 
-            return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers/'.$options['customer'].'/cards'), $params);
+            return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers/'.$options['customer'].'/payment_sources'), $params);
         } else {
             $params['email'] = Arr::get($options, 'email');
             $params['name'] = Arr::get($options, 'name');
@@ -47,7 +48,7 @@ class Cards extends AbstractApi implements CardInterface
     public function delete($id, $options = [])
     {
         if (isset($options['card_id'])) {
-            return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id.'/cards/'.$options['card_id']));
+            return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id.'/payment_sources/'.$options['card_id']));
         } else {
             return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customers/'.$id));
         }
