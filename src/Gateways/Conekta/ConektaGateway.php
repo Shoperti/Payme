@@ -48,7 +48,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @var string
      */
-    protected $apiVersion = '1.1.0';
+    protected $apiVersion = '2.0.0';
 
     /**
      * Conekta API locale.
@@ -133,16 +133,16 @@ class ConektaGateway extends AbstractGateway
      */
     protected function respond($response)
     {
-        if (!isset($response[0])) {
-            $success = !(Arr::get($response, 'object', 'error') == 'error');
+        if (Arr::get($response, 'object') !== 'list') {
+            $success = Arr::get($response, 'object', 'error') !== 'error';
 
             return $this->mapResponse($success, $response);
         }
 
         $responses = [];
 
-        foreach ($response as $responseItem) {
-            $success = !(Arr::get($responseItem, 'object', 'error') == 'error');
+        foreach ($response['data'] as $responseItem) {
+            $success = Arr::get($responseItem, 'object', 'error') !== 'error';
 
             $responses[] = $this->mapResponse($success, $responseItem);
         }
@@ -169,11 +169,18 @@ class ConektaGateway extends AbstractGateway
         $type = $this->getType($rawResponse);
         list($reference, $authorization) = $success ? $this->getReferences($response, $type) : [null, null];
 
+        $message = $success
+            ? 'Transaction approved'
+            : (Arr::get($response, 'object') === 'error'
+                ? Arr::get($response['details'][0], 'message', '')
+                : Arr::get($response, 'message_to_purchaser') ?: Arr::get($response, 'message', '')
+            );
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $reference,
-            'message'       => $success ? 'Transaction approved' : Arr::get($response, 'message_to_purchaser', ''),
+            'message'       => $message,
             'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
             'authorization' => $authorization,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'status', 'paid')) : new Status('failed'),
@@ -219,7 +226,8 @@ class ConektaGateway extends AbstractGateway
 
             return [$refund['id'], $refund['auth_code']];
         }
-
+//print_r($response);
+//die;
         return [$response['id'], $this->getAuthorization($response)];
     }
 
@@ -319,7 +327,7 @@ class ConektaGateway extends AbstractGateway
      *
      * @param string $body
      *
-     * @return array
+     * @return array|null
      */
     protected function parseResponse($body)
     {

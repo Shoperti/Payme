@@ -62,11 +62,13 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function refund($amount, $reference, array $options = [])
     {
-        $url = sprintf($this->gateway->buildUrlFromString('charges').'/%s/refund', $reference);
+        $params = [];
+        $params['amount'] = $this->gateway->amount($amount);
+        $params = $this->addLineItems($params, $options);
 
-        return $this->gateway->commit('post', $url, [
-            'amount' => $this->gateway->amount($amount),
-        ]);
+        $url = sprintf($this->gateway->buildUrlFromString('orders').'/%s/refund', $reference);
+
+        return $this->gateway->commit('post', $url, $options);
     }
 
     /**
@@ -101,29 +103,29 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         if (is_string($payment)) {
             if ($payment == 'spei') {
-                $params['charges'][0]['source']['type'] = 'spei';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
+                $params['charges'][0]['payment_method']['type'] = 'spei';
+                $params['charges'][0]['payment_method']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
             } elseif ($payment == 'oxxo') {
-                $params['charges'][0]['source']['type'] = 'oxxo';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
+                $params['charges'][0]['payment_method']['type'] = 'oxxo';
+                $params['charges'][0]['payment_method']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 172800);
             } elseif ($payment == 'oxxo_cash') {
-                $params['charges'][0]['source']['type'] = 'oxxo_cash';
-                $params['charges'][0]['source']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 36000);
+                $params['charges'][0]['payment_method']['type'] = 'oxxo_cash';
+                $params['charges'][0]['payment_method']['expires_at'] = Arr::get($options, 'expires', strtotime(date('Y-m-d H:i:s')) + 36000);
             } elseif (Helper::startsWith($payment, 'payee_')) {
-                $params['charges'][0]['source']['type'] = 'payout';
-                $params['charges'][0]['source']['payee_id'] = $payment;
+                $params['charges'][0]['payment_method']['type'] = 'payout';
+                $params['charges'][0]['payment_method']['payee_id'] = $payment;
             } else {
-                $params['charges'][0]['source']['type'] = 'card';
-                $params['charges'][0]['source']['token_id'] = $payment;
+                $params['charges'][0]['payment_method']['type'] = 'card';
+                $params['charges'][0]['payment_method']['token_id'] = $payment;
             }
         } elseif ($payment instanceof CreditCard) {
-            $params['charges'][0]['source']['card'] = [];
-            $params['charges'][0]['source']['card']['name'] = $payment->getName();
-            $params['charges'][0]['source']['card']['cvc'] = $payment->getCvv();
-            $params['charges'][0]['source']['card']['number'] = $payment->getNumber();
-            $params['charges'][0]['source']['card']['exp_month'] = $payment->getExpiryMonth();
-            $params['charges'][0]['source']['card']['exp_year'] = $payment->getExpiryYear();
-            $params['charges'][0]['source']['card'] = $this->addAddress($params['charges'][0]['source']['card'], $options);
+            $params['charges'][0]['payment_method']['card'] = [];
+            $params['charges'][0]['payment_method']['card']['name'] = $payment->getName();
+            $params['charges'][0]['payment_method']['card']['cvc'] = $payment->getCvv();
+            $params['charges'][0]['payment_method']['card']['number'] = $payment->getNumber();
+            $params['charges'][0]['payment_method']['card']['exp_month'] = $payment->getExpiryMonth();
+            $params['charges'][0]['payment_method']['card']['exp_year'] = $payment->getExpiryYear();
+            $params['charges'][0]['payment_method']['card'] = $this->addAddress($params['charges'][0]['source']['card'], $options);
         }
 
         $params['charges'][0]['amount'] = (int) $this->gateway->amount($amount);
@@ -142,7 +144,6 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'address') ?: Arr::get($options, 'billing_address')) {
-            $params['address'] = [];
             $params['address']['street1'] = Arr::get($address, 'address1');
             if ($address2 = Arr::get($address, 'address2')) {
                 $params['address']['street2'] = $address2;
@@ -156,7 +157,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['address']['city'] = Arr::get($address, 'city');
             $params['address']['country'] = Arr::get($address, 'country');
             $params['address']['state'] = Arr::get($address, 'state');
-            $params['address']['zip'] = Arr::get($address, 'zip');
+            $params['address']['postal_code'] = Arr::get($address, 'zip');
 
             return $params;
         }
@@ -201,8 +202,6 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addLineItems(array $params, array $options)
     {
-        $params['line_items'] = [];
-
         if (isset($options['line_items']) && is_array($options['line_items'])) {
             foreach ($options['line_items'] as $lineItem) {
                 $params['line_items'][] = [
@@ -232,7 +231,6 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addBillingAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'billing_address') && $taxId = Arr::get($address, 'tax_id') && $companyName = Arr::get($address, 'company_name')) {
-            $params['fiscal_entity']['address'] = [];
             $params['fiscal_entity']['address']['street1'] = Arr::get($address, 'address1');
             if ($address2 = Arr::get($address, 'address2')) {
                 $params['fiscal_entity']['address']['street2'] = $address2;
@@ -246,7 +244,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['fiscal_entity']['address']['city'] = Arr::get($address, 'city');
             $params['fiscal_entity']['address']['country'] = Arr::get($address, 'country');
             $params['fiscal_entity']['address']['state'] = Arr::get($address, 'state');
-            $params['fiscal_entity']['address']['zip'] = Arr::get($address, 'zip');
+            $params['fiscal_entity']['address']['postal_code'] = Arr::get($address, 'zip');
             $params['fiscal_entity']['phone'] = Arr::get($address, 'phone', Arr::get($options, 'phone', 'none'));
             $params['fiscal_entity']['email'] = Arr::get($address, 'email', Arr::get($options, 'email', 'none'));
             $params['fiscal_entity']['tax_id'] = $taxId;
@@ -267,7 +265,6 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addShippingAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'shipping_address')) {
-            $params['shipping_contact']['address'] = [];
             $params['shipping_contact']['address']['street1'] = Arr::get($address, 'address1');
             if ($address2 = Arr::get($address, 'address2')) {
                 $params['shipping_contact']['address']['street2'] = $address2;
@@ -281,7 +278,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['shipping_contact']['address']['external_number'] = Arr::get($address, 'external_number', '');
             $params['shipping_contact']['address']['city'] = Arr::get($address, 'city');
             $params['shipping_contact']['address']['state'] = Arr::get($address, 'state');
-            $params['shipping_contact']['address']['zip'] = Arr::get($address, 'zip');
+            $params['shipping_contact']['address']['postal_code'] = Arr::get($address, 'zip');
             $params['shipping_contact']['address']['country'] = Arr::get($address, 'country');
             $params['shipping_contact']['receiver'] = Arr::get($address, 'name', Arr::get($options, 'name', ''));
             $params['shipping_contact']['phone'] = Arr::get($address, 'phone', Arr::get($options, 'phone', ''));
