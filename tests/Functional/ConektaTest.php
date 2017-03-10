@@ -160,16 +160,16 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertTrue(empty($webhooks));
     }
 
-    /**
-     * @test
-     * @depends it_should_get_and_delete_hooks
-     */
+     /**
+      * @test
+      * @depends it_should_get_and_delete_hooks
+      */
      public function it_should_create_a_new_webhook()
-    {
-        $gateway = PayMe::make($this->credentials['conekta']);
-        $url = 'http://payme.com/hook/'.time().'-'.rand(100,999);
+     {
+         $gateway = PayMe::make($this->credentials['conekta']);
+         $url = 'http://payme.com/hook/'.time().'-'.rand(100, 999);
 
-        $payload = [
+         $payload = [
             'events' => [
                 'charge.created', 'charge.paid', 'charge.under_fraud_review',
                 'charge.fraudulent', 'charge.refunded', 'charge.created',
@@ -184,11 +184,11 @@ class ConektaTest extends AbstractFunctionalTestCase
             'development_enabled' => 1,
         ];
 
-        $created = $gateway->webhooks()->create($payload)->data();
+         $created = $gateway->webhooks()->create($payload)->data();
 
-        $webhook = $gateway->webhooks()->find($created['id']);
-        $gateway->webhooks()->delete($created['id']);
+         $webhook = $gateway->webhooks()->find($created['id']);
+         $gateway->webhooks()->delete($created['id']);
 
-        $this->assertSame($created['url'], $webhook->data()['url']);
-    }
+         $this->assertSame($created['url'], $webhook->data()['url']);
+     }
 }
