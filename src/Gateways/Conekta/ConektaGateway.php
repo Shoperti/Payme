@@ -226,8 +226,7 @@ class ConektaGateway extends AbstractGateway
 
             return [$refund['id'], $refund['auth_code']];
         }
-//print_r($response);
-//die;
+
         return [$response['id'], $this->getAuthorization($response)];
     }
 
