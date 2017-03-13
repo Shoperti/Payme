@@ -144,30 +144,30 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_should_get_and_delete_hooks()
+    public function it_should_get_all_hooks()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
         $webhooks = $gateway->webhooks()->all();
 
-        foreach ($webhooks as $webhook) {
-            $data = $webhook->data();
-            $gateway->webhooks()->delete($data['id']);
-        }
-
-        $webhooks = $gateway->webhooks()->all();
-
-        $this->assertTrue(empty($webhooks));
+        $this->assertFalse(array_key_exists('success', $webhooks));
     }
 
-     /**
-      * @test
-      * @depends it_should_get_and_delete_hooks
-      */
-     public function it_should_create_a_new_webhook()
-     {
-         $gateway = PayMe::make($this->credentials['conekta']);
-         $url = 'http://payme.com/hook/'.time().'-'.rand(100, 999);
+    /**
+     * @test
+     * depends it_should_get_all_hooks
+     */
+     public function it_should_create_and_delete_a_webhook()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $webhooks = $gateway->webhooks()->all();
+        if (count($webhooks) === 10) {
+            $deletable = $webhooks[count($webhooks) - 1];
+            $gateway->webhooks()->delete($deletable['id']);
+        }
+
+        $url = 'http://payme.com/hook/'.time().'-'.rand(100,999);
 
          $payload = [
             'events' => [
