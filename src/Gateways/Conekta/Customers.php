@@ -46,7 +46,7 @@ class Customers extends AbstractApi implements CustomerInterface
         if (isset($attributes['card'])) {
             $params['payment_sources'] = [[
                 'token_id' => $attributes['card'],
-                'type'     => 'card'
+                'type'     => 'card',
             ]];
         }
 
