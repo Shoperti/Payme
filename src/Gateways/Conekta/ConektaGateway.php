@@ -169,12 +169,18 @@ class ConektaGateway extends AbstractGateway
         $type = $this->getType($rawResponse);
         list($reference, $authorization) = $success ? $this->getReferences($response, $type) : [null, null];
 
-        $message = $success
-            ? 'Transaction approved'
-            : (Arr::get($response, 'object') === 'error'
-                ? Arr::get($response['details'][0], 'message', '')
-                : Arr::get($response, 'message_to_purchaser') ?: Arr::get($response, 'message', '')
-            );
+        $message = '';
+
+        if ($success) {
+            $message = 'Transaction approved';
+        } elseif (Arr::get($response, 'object') === 'error') {
+            foreach (Arr::get($response, 'details') as $detail) {
+                $message .= ' '.Arr::get($detail, 'message', '');
+            }
+            $message = ltrim($message);
+        } else {
+            $message = Arr::get($response, 'message_to_purchaser') ?: Arr::get($response, 'message', '');
+        }
 
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
