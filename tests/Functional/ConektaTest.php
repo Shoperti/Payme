@@ -79,7 +79,6 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertSame(2, count($response['line_items']['data']));
         $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
         $this->assertSame($response['customer_info']['name'], 'John Doe');
-        // $this->assertSame($response['billing_address']['city'], 'Guerrero');
 
         return $response;
     }
