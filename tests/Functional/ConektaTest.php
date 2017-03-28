@@ -16,6 +16,114 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
+    public function it_should_create_a_new_customer()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $customer = $gateway->customers()->create([
+            'name'  => 'Jimmi Hendrix',
+            'email' => 'jimmihendrix21@gmail.com',
+            'phone' => '+525511223344',
+            'card'  => 'tok_test_visa_4242',
+        ]);
+
+        $response = $customer->data();
+
+        $this->assertTrue($customer->success());
+        $this->assertequals('Jimmi Hendrix', $response['name']);
+        $this->assertequals('jimmihendrix21@gmail.com', $response['email']);
+        $this->assertequals('+525511223344', $response['phone']);
+        $this->assertArrayHasKey('payment_sources', $response);
+
+        return $response;
+    }
+
+    /**
+     * @test
+     * @depends it_should_create_a_new_customer
+     */
+    public function it_should_find_a_customer($data)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $customer = $gateway->customers()->find($data['id']);
+
+        $response = $customer->data();
+
+        $this->assertTrue($customer->success());
+        $this->assertEquals($response['id'], $data['id']);
+        $this->assertEquals($response['default_payment_source_id'], $data['payment_sources']['data'][0]['id']);
+
+        return $response;
+    }
+
+    /**
+     * @test
+     * @depends it_should_find_a_customer
+     */
+    public function it_should_create_a_customer_card($data)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $card = $gateway->cards()->create('tok_test_mastercard_4444', [
+            'customer' => $data['id'],
+        ]);
+
+        $response = $card->data();
+
+        $this->assertTrue($card->success());
+        $this->assertEquals('payment_source', $response['object']);
+        $this->assertEquals('card', $response['type']);
+
+        return [
+            'customer' => $data,
+            'card'     => $response,
+        ];
+    }
+
+    /**
+     * @test
+     * @depends it_should_create_a_customer_card
+     */
+    public function it_should_update_a_customer($data)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $newName = 'Alice Cooper';
+
+        $customer = $gateway->customers()->update($data['customer']['id'], [
+            'name'         => $newName,
+            'default_card' => $data['card']['id'],
+        ]);
+
+        $response = $customer->data();
+
+        $this->assertTrue($customer->success());
+        $this->assertEquals($newName, $response['name']);
+        $this->assertEquals($data['card']['id'], $response['default_payment_source_id']);
+
+        return $data['customer'];
+    }
+
+    /**
+     * @test
+     * @depends it_should_update_a_customer
+     */
+    public function it_should_delete_a_customer_card($data)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $card = $gateway->cards()->delete($data['id'], [
+            'card_id' => $data['payment_sources']['data'][0]['id'],
+        ]);
+
+        $response = $card->data();
+
+        $this->assertTrue($card->success());
+        $this->assertEquals(1, $response['deleted']);
+    }
+
+    /** @test */
     public function is_should_fail_to_charge_a_token()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
