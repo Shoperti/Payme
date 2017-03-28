@@ -87,7 +87,6 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_update_a_customer($data)
     {
-
         $gateway = PayMe::make($this->credentials['conekta']);
 
         $newName = 'Alice Cooper';
@@ -112,7 +111,6 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_delete_a_customer_card($data)
     {
-
         $gateway = PayMe::make($this->credentials['conekta']);
 
         $card = $gateway->cards()->delete($data['id'], [
