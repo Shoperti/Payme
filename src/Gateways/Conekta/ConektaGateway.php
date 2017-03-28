@@ -249,7 +249,7 @@ class ConektaGateway extends AbstractGateway
 
         if ($object == 'customer') {
             return Arr::get($response, 'default_payment_source_id');
-        } elseif ($object == 'card') {
+        } elseif ($object == 'payment_source') {
             return Arr::get($response, 'parent_id');
         } elseif ($object == 'payee') {
             return Arr::get($response, 'id');

@@ -13,7 +13,7 @@ return [
 
     'conekta' => [
         'driver'      => 'conekta',
-        'private_key' => 'key_eYvWV7gSDkNYXsmr',
+        'private_key' => 'key_m4muxZ4LjxbmR3tcLrFJNw',
     ],
 
     'manual' => [
