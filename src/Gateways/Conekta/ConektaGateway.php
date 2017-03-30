@@ -134,21 +134,23 @@ class ConektaGateway extends AbstractGateway
      */
     protected function respond($response)
     {
-        if (Arr::get($response, 'object') !== 'list') {
-            $success = Arr::get($response, 'object', 'error') !== 'error';
+        if (Arr::get($response, 'object') === 'list') {
+            if (!empty($response['data'])) {
+                foreach ($response['data'] as $responseItem) {
+                    $success = Arr::get($responseItem, 'object', 'error') !== 'error';
 
-            return $this->mapResponse($success, $response);
+                    $responses[] = $this->mapResponse($success, $responseItem);
+                }
+
+                return $responses;
+            } else {
+                $response = $response['data'];
+            }
         }
 
-        $responses = [];
+        $success = Arr::get($response, 'object', 'error') !== 'error';
 
-        foreach ($response['data'] as $responseItem) {
-            $success = Arr::get($responseItem, 'object', 'error') !== 'error';
-
-            $responses[] = $this->mapResponse($success, $responseItem);
-        }
-
-        return $responses;
+        return $this->mapResponse($success, $response);
     }
 
     /**
@@ -197,7 +199,7 @@ class ConektaGateway extends AbstractGateway
             'test'          => $isTest,
             'authorization' => $authorization,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'payment_status', 'paid')) : new Status('failed'),
-            'errorCode'     => $object === 'error' ? $this->getErrorCode($response) : null,
+            'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
     }
