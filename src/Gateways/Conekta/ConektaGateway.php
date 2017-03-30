@@ -12,6 +12,7 @@ use Shoperti\PayMe\Support\Arr;
  * This is the Conekta gateway class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ * @author Arturo Rodríguez <arturo.rodriguez@dinkbit.com>
  */
 class ConektaGateway extends AbstractGateway
 {
@@ -162,7 +163,9 @@ class ConektaGateway extends AbstractGateway
     {
         $rawResponse = $response;
 
-        if (array_key_exists('type', $response) && isset($response['data']['object'])) {
+        $object = Arr::get($response, 'object');
+
+        if ($object !== 'error' && array_key_exists('type', $response) && isset($response['data']['object'])) {
             $response = $response['data']['object'];
         }
 
@@ -173,7 +176,7 @@ class ConektaGateway extends AbstractGateway
 
         if ($success) {
             $message = 'Transaction approved';
-        } elseif (Arr::get($response, 'object') === 'error') {
+        } elseif ($object === 'error') {
             foreach (Arr::get($response, 'details') as $detail) {
                 $message .= ' '.Arr::get($detail, 'message', '');
             }
@@ -182,15 +185,19 @@ class ConektaGateway extends AbstractGateway
             $message = Arr::get($response, 'message_to_purchaser') ?: Arr::get($response, 'message', '');
         }
 
+        $isTest = $object === 'error' && isset($response['data'])
+            ? !(Arr::get($response['data'], 'livemode', true))
+            : !(Arr::get($response, 'livemode', true));
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
             'reference'     => $reference,
             'message'       => $message,
-            'test'          => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
+            'test'          => $isTest,
             'authorization' => $authorization,
             'status'        => $success ? $this->getStatus(Arr::get($response, 'payment_status', 'paid')) : new Status('failed'),
-            'errorCode'     => $success ? null : $this->getErrorCode(Arr::get($response, 'code', 'invalid_payment_type')),
+            'errorCode'     => $object === 'error' ? $this->getErrorCode($response) : null,
             'type'          => $type,
         ]);
     }
@@ -284,7 +291,6 @@ class ConektaGateway extends AbstractGateway
         switch ($status) {
             case 'pending_payment':
                 return new Status('pending');
-                break;
             case 'paid':
             case 'refunded':
             case 'partially_refunded':
@@ -292,43 +298,44 @@ class ConektaGateway extends AbstractGateway
             case 'active':
             case 'canceled':
                 return new Status($status);
-                break;
             case 'in_trial':
                 return new Status('trial');
-                break;
         }
     }
 
     /**
      * Map Conekta response to error code object.
      *
-     * @param string $code
+     * @param array $response
      *
      * @return \Shoperti\PayMe\ErrorCode
      */
-    protected function getErrorCode($code)
+    protected function getErrorCode($response)
     {
+        $code = isset($response['details']) ? $response['details'][0]['code'] : null;
+
         switch ($code) {
-            case 'invalid_expiry_month':
-            case 'invalid_expiry_year':
+            case 'conekta.errors.processing.bank_bindings.declined':
+                return new ErrorCode('card_declined');
+            case 'conekta.errors.processing.bank_bindings.insufficient_funds':
+                return new ErrorCode('insufficient_funds');
+            // to be confirmed
+            case 'conekta.errors.processing.bank_bindings.expired':
+                return new ErrorCode('expired_card');
+            // to be confirmed
+            case 'conekta.errors.processing.bank_bindings.suspected_fraud':
+                return new ErrorCode('suspected_fraud');
+            case 'conekta.errors.parameter_validation.expiration_date.expired':
                 return new ErrorCode('invalid_expiry_date');
-                break;
-            case 'invalid_number':
-            case 'invalid_cvc':
-            case 'card_declined':
-            case 'processing_error':
-            case 'expired_card':
-            case 'insufficient_funds':
-            case 'suspected_fraud':
-                return new ErrorCode($code);
-                break;
-            case 'invalid_amount':
-            case 'invalid_payment_type':
-            case 'unsupported_currency':
-            case 'missing_description':
-                return new ErrorCode('config_error');
-                break;
+            case 'conekta.errors.parameter_validation.card.number':
+                return new ErrorCode('invalid_number');
+            case 'conekta.errors.parameter_validation.card.cvc':
+                return new ErrorCode('invalid_cvc');
         }
+
+        $code = Arr::get($response, 'type');
+
+        return new ErrorCode($code === 'processing_error' ? $code : 'config_error');
     }
 
     /**
