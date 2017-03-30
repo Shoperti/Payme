@@ -297,7 +297,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_should_retrieve_a_single_and_all_events()
+    public function it_should_retrieve_all_events()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
@@ -306,7 +306,30 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertNotEmpty($events[0]->data()['data']);
         $this->assertInternalType('array', $events[0]->data()['data']);
 
+        return $events;
+    }
+
+    /**
+     * @test
+     * @depends it_should_retrieve_all_events
+     */
+    public function it_should_retrieve_a_single_event($events)
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
         $event = $gateway->events()->find($events[0]->data()['id']);
+
+        $this->assertCount(1, $event);
+    }
+
+    /** @test */
+    public function it_should_fail_to_retrive_an_inexistent_event()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $event = $gateway->events()->find('qiq');
+
+        $this->assertEquals('failed', $event->status);
     }
 
     /** @test */
