@@ -312,33 +312,30 @@ class ConektaGateway extends AbstractGateway
      */
     protected function getErrorCode($response)
     {
-        $code = Arr::get($response, 'type');
-
-        if ($code === 'processing_error' && isset($response['details'])) {
-            // declined, insufficient funds, ...
-            $code = $response['details'][0]['code'];
-        } elseif ($code === 'parameter_validation_error' && isset($response['code'])) {
-            // card token generation, ...
-            $code = Arr::get($response, 'code');
-        }
+        $code = isset($response['details']) ? $response['details'][0]['code'] : null;
 
         switch ($code) {
             case 'conekta.errors.processing.bank_bindings.declined':
                 return new ErrorCode('card_declined');
             case 'conekta.errors.processing.bank_bindings.insufficient_funds':
                 return new ErrorCode('insufficient_funds');
-            case 'invalid_expiry_month':
-            case 'invalid_expiry_year':
+            // to be confirmed
+            case 'conekta.errors.processing.bank_bindings.expired':
+                return new ErrorCode('expired_card');
+            // to be confirmed
+            case 'conekta.errors.processing.bank_bindings.suspected_fraud':
+                return new ErrorCode('suspected_fraud');
+            case 'conekta.errors.parameter_validation.expiration_date.expired':
                 return new ErrorCode('invalid_expiry_date');
-            case 'invalid_number':
-            case 'invalid_cvc':
-            case 'expired_card':
-            case 'suspected_fraud':
-            case 'processing_error':
-                return new ErrorCode($code);
-            default:
-                return new ErrorCode('config_error');
+            case 'conekta.errors.parameter_validation.card.number':
+                return new ErrorCode('invalid_number');
+            case 'conekta.errors.parameter_validation.card.cvc':
+                return new ErrorCode('invalid_cvc');
         }
+
+        $code = Arr::get($response, 'type');
+
+        return new ErrorCode($code === 'processing_error' ? $code : 'config_error');
     }
 
     /**
