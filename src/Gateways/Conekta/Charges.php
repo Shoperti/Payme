@@ -32,10 +32,6 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addPaymentMethod($params, $amount, $payment, $options);
         $params = $this->addOrderDetails($params, $options);
 
-        if (isset($options['monthly_installments']) && in_array($options['monthly_installments'], [3, 6, 9, 12])) {
-            $params['monthly_installments'] = $options['monthly_installments'];
-        }
-
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('orders'), $params);
     }
 
@@ -129,6 +125,10 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['charges'][0]['payment_method']['card']['exp_month'] = $payment->getExpiryMonth();
             $params['charges'][0]['payment_method']['card']['exp_year'] = $payment->getExpiryYear();
             $params['charges'][0]['payment_method']['card'] = $this->addAddress($params['charges'][0]['source']['card'], $options);
+        }
+
+        if (isset($options['monthly_installments']) && in_array($options['monthly_installments'], [3, 6, 9, 12])) {
+            $params['charges'][0]['payment_method']['monthly_installments'] = (int) $options['monthly_installments'];
         }
 
         $params['charges'][0]['amount'] = (int) $this->gateway->amount($amount);
