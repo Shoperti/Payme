@@ -66,6 +66,6 @@ class ComproPagoTest extends AbstractFunctionalTestCase
 
         $response = $event->data();
 
-        $this->assertSame($response['amount'], '15.00000000');
+        $this->assertSame($response['amount'], '15.0');
     }
 }
