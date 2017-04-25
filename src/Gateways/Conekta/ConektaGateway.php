@@ -236,13 +236,23 @@ class ConektaGateway extends AbstractGateway
      */
     protected function getReferences($response, $type)
     {
-        if ($type == 'refund') {
-            $refund = $response['refunds'][count($response['refunds']) - 1];
+        if ($type == 'order') {
+            $charges = $response['charges']['data'];
+            $charge = end($charges);
 
-            return [$refund['id'], $refund['auth_code']];
+            if (Arr::get($response, 'amount_refunded')) {
+                $refunds = $charge['refunds']['data'];
+                $refund = end($refunds);
+
+                return [$refund['id'], $refund['auth_code']];
+            }
+
+            $id = $charge['id'];
+        } else {
+            $id = $response['id'];
         }
 
-        return [$response['id'], $this->getAuthorization($response)];
+        return [$id, $this->getAuthorization($response)];
     }
 
     /**
@@ -268,8 +278,10 @@ class ConektaGateway extends AbstractGateway
             return Arr::get($response, 'id');
         }
 
-        if (isset($response['charges']['data'][0]['payment_method'])) {
-            $paymentMethod = $response['charges']['data'][0]['payment_method'];
+        if (isset($response['charges'])) {
+            $charges = $response['charges']['data'];
+            $charge = end($charges);
+            $paymentMethod = $charge['payment_method'];
 
             if (isset($paymentMethod['auth_code'])) {
                 return $paymentMethod['auth_code'];
