@@ -42,13 +42,15 @@ class ConektaTest extends AbstractFunctionalTestCase
      * @test
      * @depends it_should_create_a_new_customer
      */
-    public function is_should_succeed_to_charge_an_order_with_customer_token($data)
+    public function it_should_succeed_to_charge_an_order_with_customer_token($data)
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $payload = include __DIR__.'/stubs/orderPayload.php';
+        $order = include __DIR__.'/stubs/orderPayload.php';
+        $total = $order['total'];
+        $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create(10000, $data['id'], $payload);
+        $charge = $gateway->charges()->create($total, $data['id'], $payload);
 
         $response = $charge->data();
 
@@ -147,7 +149,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_charge_an_icomplete_order()
+    public function it_should_fail_to_charge_an_incomplete_order()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
@@ -162,13 +164,15 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_charge_an_order_with_invalid_card_token()
+    public function it_should_fail_to_charge_an_order_with_invalid_card_token()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $payload = include __DIR__.'/stubs/orderPayload.php';
+        $order = include __DIR__.'/stubs/orderPayload.php';
+        $total = $order['total'];
+        $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create(10000, 'tok_test_card_declined', $payload);
+        $charge = $gateway->charges()->create($total, 'tok_test_card_declined', $payload);
 
         $response = $charge->data();
 
@@ -178,13 +182,63 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_an_order_with_card_token()
+    public function it_should_succeed_to_generate_a_charge_with_oxxo()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $payload = include __DIR__.'/stubs/orderPayload.php';
+        $order = include __DIR__.'/stubs/orderPayload.php';
+        $total = $order['total'];
+        $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create(10000, 'tok_test_visa_4242', $payload);
+        $charge = $gateway->charges()->create($total, 'oxxo_cash', $payload);
+
+        $response = $charge->data();
+
+        $this->assertTrue($charge->success());
+        $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
+        $this->assertSame(2, count($response['line_items']['data']));
+        $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
+        $this->assertSame($payload['name'], $response['customer_info']['name']);
+        $this->assertSame($charge->reference(), $response['charges']['data'][0]['id']);
+        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['payment_method']['reference']);
+
+        return $response;
+    }
+
+    /** @test */
+    public function it_should_succeed_to_generate_a_charge_with_spei()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $order = include __DIR__.'/stubs/orderPayload.php';
+        $total = $order['total'];
+        $payload = $order['payload'];
+
+        $charge = $gateway->charges()->create($total, 'spei', $payload);
+
+        $response = $charge->data();
+
+        $this->assertTrue($charge->success());
+        $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
+        $this->assertSame(2, count($response['line_items']['data']));
+        $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
+        $this->assertSame($payload['name'], $response['customer_info']['name']);
+        $this->assertSame($charge->reference(), $response['charges']['data'][0]['id']);
+        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['payment_method']['clabe']);
+
+        return $response;
+    }
+
+    /** @test */
+    public function it_should_succeed_to_charge_an_order_with_card_token()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $order = include __DIR__.'/stubs/orderPayload.php';
+        $total = $order['total'];
+        $payload = $order['payload'];
+
+        $charge = $gateway->charges()->create($total, 'tok_test_visa_4242', $payload);
 
         $response = $charge->data();
 
@@ -201,9 +255,9 @@ class ConektaTest extends AbstractFunctionalTestCase
 
     /**
      * @test
-     * @depends is_should_succeed_to_charge_an_order_with_card_token
+     * @depends it_should_succeed_to_charge_an_order_with_card_token
      */
-    public function is_should_succeed_to_refund_a_charge($response)
+    public function it_should_succeed_to_refund_a_charge($response)
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
@@ -275,7 +329,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_should_fail_to_retrive_an_inexistent_event()
+    public function it_should_fail_to_retrieve_a_nonexistent_event()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 

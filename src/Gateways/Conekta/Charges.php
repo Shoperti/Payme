@@ -189,6 +189,7 @@ class Charges extends AbstractApi implements ChargeInterface
         }
 
         $params = $this->addLineItems($params, $options);
+        $params = $this->addDiscountLines($params, $options);
         $params = $this->addBillingAddress($params, $options);
         $params = $this->addShippingAddress($params, $options);
 
@@ -218,6 +219,37 @@ class Charges extends AbstractApi implements ChargeInterface
                     'tags'        => ['none'],
                 ];
             }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Add order discount lines param.
+     *
+     * @param string[] $params
+     * @param string[] $options
+     *
+     * @return array
+     */
+    protected function addDiscountLines(array $params, array $options)
+    {
+        if (isset($options['discount'])) {
+            $type = Arr::get($options, 'discount_type');
+            if (!in_array($type, ['loyalty', 'campaign', 'coupon', 'sign'])) {
+                $type = 'loyalty';
+            }
+
+            $code = Arr::get($options, 'discount_code', '---');
+            if (strlen($code) < 3) {
+                $code .= str_repeat('-', 3 - strlen($code));
+            }
+
+            $params['discount_lines'][] = [
+                'type'   => $type,
+                'code'   => $code,
+                'amount' => $options['discount'],
+            ];
         }
 
         return $params;
