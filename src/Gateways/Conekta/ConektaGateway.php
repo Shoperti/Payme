@@ -333,6 +333,7 @@ class ConektaGateway extends AbstractGateway
                 return new ErrorCode('card_declined');
             case 'conekta.errors.processing.bank_bindings.insufficient_funds':
                 return new ErrorCode('insufficient_funds');
+
                 return new ErrorCode('expired_card');
             case 'conekta.errors.processing.charge.card_payment.suspicious_behaviour':
                 return new ErrorCode('suspected_fraud');
