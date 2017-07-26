@@ -2,9 +2,9 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
 use Shoperti\PayMe\Gateways\ComproPago\Charges;
 use Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway;
+use Shoperti\PayMe\PayMe;
 
 class ComproPagoTest extends AbstractFunctionalTestCase
 {
@@ -72,6 +72,6 @@ class ComproPagoTest extends AbstractFunctionalTestCase
 
         $response = $event->data();
 
-        $this->assertEquals($amount/100, $response['amount']);
+        $this->assertEquals($amount / 100, $response['amount']);
     }
 }
