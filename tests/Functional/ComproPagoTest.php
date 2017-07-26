@@ -3,6 +3,8 @@
 namespace Shoperti\Tests\PayMe\Functional;
 
 use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\ComproPago\Charges;
+use Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway;
 
 class ComproPagoTest extends AbstractFunctionalTestCase
 {
@@ -22,8 +24,8 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_create_a_new_conekta_gateway()
     {
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway', $this->gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\Charges', $this->gateway->charges());
+        $this->assertInstanceOf(ComproPagoGateway::class, $this->gateway->getGateway());
+        $this->assertInstanceOf(Charges::class, $this->gateway->charges());
     }
 
     /** @test */
@@ -37,14 +39,16 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function is_should_succeed_to_charge_a_token_with_params()
     {
+        $reference = 'order_1';
+
         $charge = $this->gateway->charges()->create(1000, 'oxxo', $this->options + [
-            'reference' => 'order_1',
+            'reference' => $reference,
         ]);
 
         $response = $charge->data();
 
         $this->assertTrue($charge->success());
-        $this->assertSame($response['order_info']['order_id'], 'order_1');
+        $this->assertSame($reference, $response['order_info']['order_id']);
     }
 
     /** @test */
@@ -54,18 +58,20 @@ class ComproPagoTest extends AbstractFunctionalTestCase
 
         $charge = $gateway->charges()->create(1000, 'oxxo', $this->options);
 
-        $this->assertSame($charge->message(), 'Acceso no Autorizado');
+        $this->assertSame('Acceso no Autorizado', $charge->message());
     }
 
     /** @test */
     public function it_can_retrieve_a_single_event()
     {
-        $charge = $this->gateway->charges()->create(1500, 'oxxo', $this->options);
+        $amount = 1500;
+
+        $charge = $this->gateway->charges()->create($amount, 'oxxo', $this->options);
 
         $event = $this->gateway->events()->find($charge->reference());
 
         $response = $event->data();
 
-        $this->assertSame($response['amount'], '15.0');
+        $this->assertEquals($amount/100, $response['amount']);
     }
 }
