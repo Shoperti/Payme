@@ -2,8 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\ComproPago\Charges;
-use Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway;
 use Shoperti\PayMe\PayMe;
 
 class ComproPagoTest extends AbstractFunctionalTestCase
@@ -24,8 +22,8 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_create_a_new_conekta_gateway()
     {
-        $this->assertInstanceOf(ComproPagoGateway::class, $this->gateway->getGateway());
-        $this->assertInstanceOf(Charges::class, $this->gateway->charges());
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway', $this->gateway->getGateway());
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\Charges', $this->gateway->charges());
     }
 
     /** @test */
