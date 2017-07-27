@@ -37,7 +37,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $openPayPayMe->charges()->create(1000, 'tok_test_card_declined');
 
-        $this->assertSame($response->message(), 'The api key or merchant id are invalid');
+        $this->assertSame('The api key or merchant id are invalid', $response->message());
     }
 
     /** @test */
@@ -58,12 +58,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame("{$data['amount']}", $openPayPayMe->getGateway()->amount($amount));
-        $this->assertSame($data['method'], 'store');
-        $this->assertSame($data['status'], 'in_progress');
-        $this->assertSame($data['customer']['name'], $payload['first_name']);
-        $this->assertSame($data['customer']['last_name'], $payload['last_name']);
-        $this->assertSame($data['currency'], $payload['currency']);
+        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertSame('store', $data['method']);
+        $this->assertSame('in_progress', $data['status']);
+        $this->assertSame($payload['first_name'], $data['customer']['name']);
+        $this->assertSame($payload['last_name'], $data['customer']['last_name']);
+        $this->assertSame($payload['currency'], $data['currency']);
     }
 
     /** @test */
@@ -84,12 +84,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame("{$data['amount']}", $openPayPayMe->getGateway()->amount($amount));
-        $this->assertSame($data['method'], 'bank_account');
-        $this->assertSame($data['status'], 'in_progress');
-        $this->assertSame($data['customer']['name'], $payload['first_name']);
-        $this->assertSame($data['customer']['last_name'], $payload['last_name']);
-        $this->assertSame($data['currency'], $payload['currency']);
+        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertSame('bank_account', $data['method']);
+        $this->assertSame('in_progress', $data['status']);
+        $this->assertSame($payload['first_name'], $data['customer']['name']);
+        $this->assertSame($payload['last_name'], $data['customer']['last_name']);
+        $this->assertSame($payload['currency'], $data['currency']);
     }
 
     /** @test */
@@ -112,12 +112,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame("{$data['amount']}", $openPayPayMe->getGateway()->amount($amount));
-        $this->assertSame($data['method'], 'card');
-        $this->assertSame($data['status'], 'completed');
-        $this->assertSame($data['customer']['name'], $payload['first_name']);
-        $this->assertSame($data['customer']['last_name'], $payload['last_name']);
-        $this->assertSame($data['currency'], $payload['currency']);
+        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertSame('card', $data['method']);
+        $this->assertSame('completed', $data['status']);
+        $this->assertSame($payload['first_name'], $data['customer']['name']);
+        $this->assertSame($payload['last_name'], $data['customer']['last_name']);
+        $this->assertSame($payload['currency'], $data['currency']);
 
         return [$data, $amount];
     }
@@ -165,14 +165,15 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
         $this->assertTrue($response->success());
         // previous test creates a charge of 1000
-        $this->assertSame("{$data['refund']['amount']}", $openPayPayMe->getGateway()->amount($amount));
+        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
     }
 
     /** @test */
     public function it_should_create_get_and_delete_a_webhook()
     {
-        $gateway = PayMe::make($this->credentials['open_pay']);
         $url = $this->getRequestBin();
+
+        $gateway = PayMe::make($this->credentials['open_pay']);
 
         $payload = [
             'url'         => $url,
@@ -338,10 +339,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
      */
     private function getRequestBin()
     {
-        $response = (new \GuzzleHttp\Client())->post('http://requestb.in/api/v1/bins');
+        $requestBinUrl = 'https://requestb.in';
+
+        $response = (new \GuzzleHttp\Client())->post("{$requestBinUrl}/api/v1/bins");
 
         $response = json_decode($response->getBody(), true);
 
-        return "http://requestb.in/{$response['name']}";
+        return "{$requestBinUrl}/{$response['name']}";
     }
 }
