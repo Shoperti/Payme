@@ -74,7 +74,7 @@ class MercadoPagoGateway extends AbstractGateway
         parent::__construct($config);
     }
 
-     /**
+    /**
      * Commit a HTTP request.
      *
      * @param string   $method
@@ -229,9 +229,9 @@ class MercadoPagoGateway extends AbstractGateway
         }
 
         $codeMap = [
-            1 => 'config_error', // Params Error
-            3 => 'config_error', // Token must be for test
-            5 => 'config_error', // Must provide your access_token to proceed
+            1    => 'config_error', // Params Error
+            3    => 'config_error', // Token must be for test
+            5    => 'config_error', // Must provide your access_token to proceed
             1000 => 'processing_error', // Number of rows exceeded the limits
             1001 => 'invalid_expiry_date', // Date format must be yyyy-MM-dd'T'HH:mm:ss.SSSZ
             2001 => 'processing_error', // Already posted the same request in the last minute
