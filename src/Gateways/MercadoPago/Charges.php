@@ -35,8 +35,6 @@ class Charges extends AbstractApi implements ChargeInterface
 
         $params['binary_mode'] = true;
 
-        // var_dump($params);die;
-
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('payments'), $params);
     }
 
