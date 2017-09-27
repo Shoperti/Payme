@@ -40,4 +40,9 @@ return [
         'driver'      => 'stripe',
         'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
     ],
+
+    'mercadopago' => [
+        'driver'      => 'mercadopago',
+        'private_key' => 'TEST-8527269031909288-071213-0fc96cb7cd3633189bfbe29f63722700__LB_LA__-263489584',
+    ],
 ];
