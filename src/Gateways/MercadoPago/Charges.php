@@ -36,7 +36,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['binary_mode'] = true;
 
         // var_dump($params);die;
-        
+
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('payments'), $params);
     }
 
@@ -80,7 +80,7 @@ class Charges extends AbstractApi implements ChargeInterface
      * @return array
      */
     protected function addPaymentMethod(array $params, $payment, array $options)
-    { 
+    {
         $params['token'] = $payment;
 
         if ($card = Arr::get($options, 'card')) {
