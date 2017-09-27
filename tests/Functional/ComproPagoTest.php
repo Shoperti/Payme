@@ -56,7 +56,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
 
         $charge = $gateway->charges()->create(1000, 'oxxo', $this->options);
 
-        $this->assertSame('Acceso no Autorizado', $charge->message());
+        $this->assertSame('Credenciales incorrectas. Por favor ingresar un usuario y contraseña válida.', $charge->message());
     }
 
     /** @test */
