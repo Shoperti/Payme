@@ -4,7 +4,7 @@ namespace Shoperti\Tests\PayMe\Functional;
 
 use Shoperti\PayMe\PayMe;
 
-class PaypalExpressTest extends AbstractFunctionalTestCase
+class MercadoPagoBasicTest extends AbstractFunctionalTestCase
 {
     protected $gateway;
 
@@ -12,24 +12,26 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->gateway = PayMe::make($this->credentials['paypal']);
+        $this->gateway = PayMe::make($this->credentials['mercadopago_basic']);
     }
 
     /** @test */
-    public function it_should_create_a_new_paypal_express_gateway()
+    public function it_should_create_a_new_mercadopago_basic_gateway()
     {
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway', $this->gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\PaypalExpress\Charges', $this->gateway->charges());
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway', $this->gateway->getGateway());
+        $this->assertInstanceOf('Shoperti\PayMe\Gateways\MercadoPagoBasic\Charges', $this->gateway->charges());
     }
 
     /** @test */
     public function is_should_succeed_to_create_a_charge()
     {
-        $charge = $this->gateway->charges()->create(11000, 'SetExpressCheckout', [
+        $charge = $this->gateway->charges()->create(11010, 'regular_payment', [
             'return_url' => 'http://localhost/return',
             'cancel_url' => 'http://localhost/cancel',
             'notify_url' => 'http://localhost/notify',
+            'description' => 'PayMe Payment',
             'reference'  => 'order_1',
+            'currency'   => 'MXN',
             'name'       => 'TheCustomerName',
             'email'      => 'customer@email.com',
             'phone'      => '55555555',
@@ -71,13 +73,13 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
-        $this->assertContains('https://www.sandbox.paypal.com/cgi-bin/webscr', $charge->authorization());
+        $this->assertContains('https://sandbox.mercadopago.com/mlm/checkout/pay', $charge->authorization());
     }
 
     /** @test */
     public function is_should_fail_to_create_a_charge()
     {
-        $charge = $this->gateway->charges()->create(1000, 'SetExpressCheckout', [
+        $charge = $this->gateway->charges()->create(1000, 'regular_payment', [
             'return_url' => 'http://localhost/return',
             'cancel_url' => 'http://localhost/cancel',
             'notify_url' => 'http://localhost/notify',

@@ -45,4 +45,11 @@ return [
         'driver'      => 'mercado_pago',
         'private_key' => 'TEST-8527269031909288-071213-0fc96cb7cd3633189bfbe29f63722700__LB_LA__-263489584',
     ],
+
+    'mercadopago_basic' => [
+        'driver'        => 'mercado_pago_basic',
+        'client_id'     => '3922721115991786',
+        'client_secret' => 'v9khOipwEgdSlpw0xyp0W4RmknNKnnmr',
+        'test'          => true,
+    ],
 ];

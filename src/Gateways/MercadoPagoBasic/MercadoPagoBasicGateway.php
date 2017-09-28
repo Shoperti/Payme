@@ -1,6 +1,6 @@
 <?php
 
-namespace Shoperti\PayMe\Gateways\MercadoPago;
+namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
@@ -13,7 +13,7 @@ use Shoperti\PayMe\Support\Arr;
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
-class MercadoPagoGateway extends AbstractGateway
+class MercadoPagoBasicGateway extends AbstractGateway
 {
     /**
      * Gateway API endpoint.
@@ -27,7 +27,7 @@ class MercadoPagoGateway extends AbstractGateway
      *
      * @var string
      */
-    protected $displayName = 'mercadopago';
+    protected $displayName = 'mercadopago_basic';
 
     /**
      * Gateway default currency.
@@ -44,7 +44,7 @@ class MercadoPagoGateway extends AbstractGateway
     protected $moneyFormat = 'dollars';
 
     /**
-     * MercadoPago API version.
+     * MercadoPagoBasic API version.
      *
      * @var string
      */
@@ -59,9 +59,10 @@ class MercadoPagoGateway extends AbstractGateway
      */
     public function __construct(array $config)
     {
-        Arr::requires($config, ['private_key']);
+        Arr::requires($config, ['client_id', 'client_secret']);
 
         $config['version'] = $this->apiVersion;
+        $config['test'] = (bool) Arr::get($config, 'test', false);
 
         parent::__construct($config);
     }
@@ -92,11 +93,25 @@ class MercadoPagoGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
-        $authUrl = sprintf('%s?access_token=%s', $url, $this->config['private_key']);
+        $oauthUrl = $this->buildUrlFromString('oauth/token');
+
+        $authRawResponse = $this->getHttpClient()->{$method}($oauthUrl, [
+            'json' => [
+                'client_id'     => $this->config['client_id'],
+                'client_secret' => $this->config['client_secret'],
+                'grant_type'    => 'client_credentials'
+            ]
+        ]);
+
+        $authResponse = $this->parseResponse($authRawResponse);
+
+        $authUrl = sprintf('%s?access_token=%s', $url, Arr::get($authResponse, 'access_token', ''));
 
         $rawResponse = $this->getHttpClient()->{$method}($authUrl, $request);
 
         $response = $this->parseResponse($rawResponse);
+
+        $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
 
         return $this->respond($response);
     }
@@ -154,6 +169,28 @@ class MercadoPagoGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
+        $rawResponse = $response;
+        
+        unset($rawResponse['isRedirect']);
+
+        if ($response['isRedirect']) {
+            $authorization = $success
+                ? $this->config['test'] ? $response['sandbox_init_point'] : $response['init_point']
+                : null;
+
+            return (new Response())->setRaw($rawResponse)->map([
+                'isRedirect'      => $response['isRedirect'],
+                'success'         => $response['isRedirect'] ? false : $success,
+                'reference'       => $success ? $response['id'] : false,
+                'message'         => $success ? 'Transaction approved' : 'Redirect',
+                'test'            => $this->config['test'],
+                'authorization'   => $authorization,
+                'status'          => $success ? new Status('pending') : new Status('failed'),
+                'errorCode'       => $success ? null : $this->getErrorCode($response),
+                'type'            => false,
+            ]);
+        }
+
         $type = Arr::get($response, 'operation_type');
 
         list($reference, $authorization) = $success
@@ -164,8 +201,8 @@ class MercadoPagoGateway extends AbstractGateway
             ? 'Transaction approved'
             : Arr::get($response, 'message', '');
 
-        return (new Response())->setRaw($response)->map([
-            'isRedirect'    => false,
+        return (new Response())->setRaw($rawResponse)->map([
+            'isRedirect'    => $response['isRedirect'],
             'success'       => $success,
             'reference'     => $reference,
             'message'       => $message,
@@ -344,6 +381,6 @@ class MercadoPagoGateway extends AbstractGateway
      */
     protected function getRequestUrl()
     {
-        return $this->endpoint.'/'.$this->apiVersion;
+        return $this->endpoint;
     }
 }
