@@ -26,16 +26,16 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     public function is_should_succeed_to_create_a_charge()
     {
         $charge = $this->gateway->charges()->create(11010, 'regular_payment', [
-            'return_url' => 'http://localhost/return',
-            'cancel_url' => 'http://localhost/cancel',
-            'notify_url' => 'http://localhost/notify',
+            'return_url'  => 'http://localhost/return',
+            'cancel_url'  => 'http://localhost/cancel',
+            'notify_url'  => 'http://localhost/notify',
             'description' => 'PayMe Payment',
-            'reference'  => 'order_1',
-            'currency'   => 'MXN',
-            'name'       => 'TheCustomerName',
-            'email'      => 'customer@email.com',
-            'phone'      => '55555555',
-            'line_items' => [
+            'reference'   => 'order_1',
+            'currency'    => 'MXN',
+            'name'        => 'TheCustomerName',
+            'email'       => 'customer@email.com',
+            'phone'       => '55555555',
+            'line_items'  => [
                 [
                     'name'        => 'Box of Cohiba S1s',
                     'description' => 'Imported From Mex.',

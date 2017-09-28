@@ -2,11 +2,9 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
-use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
-use Shoperti\PayMe\Support\Helper;
 
 /**
  * This is the MercadoPagoBasic charges class.
@@ -113,7 +111,7 @@ class Charges extends AbstractApi implements ChargeInterface
         return array_merge($params, [
             'currency_id'        => Arr::get($options, 'currency'),
             'external_reference' => Arr::get($options, 'reference'),
-            'expires'            =>  Arr::get($options, 'expires', false),
+            'expires'            => Arr::get($options, 'expires', false),
         ]);
     }
 
@@ -173,7 +171,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['back_urls'] = [
             'success' => Arr::get($options, 'return_url'),
             'failure' => Arr::get($options, 'cancel_url'),
-            'pending' => isset($options['pending_url']) 
+            'pending' => isset($options['pending_url'])
                 ? Arr::get($options, 'pending_url')
                 : Arr::get($options, 'return_url'),
         ];

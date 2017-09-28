@@ -99,8 +99,8 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'json' => [
                 'client_id'     => $this->config['client_id'],
                 'client_secret' => $this->config['client_secret'],
-                'grant_type'    => 'client_credentials'
-            ]
+                'grant_type'    => 'client_credentials',
+            ],
         ]);
 
         $authResponse = $this->parseResponse($authRawResponse);
@@ -127,7 +127,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     public function mapResponse($success, $response)
     {
         $rawResponse = $response;
-        
+
         unset($rawResponse['isRedirect']);
 
         if ($response['isRedirect']) {
