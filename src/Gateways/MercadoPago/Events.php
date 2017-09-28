@@ -5,7 +5,6 @@ namespace Shoperti\PayMe\Gateways\MercadoPago;
 use BadMethodCallException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
-use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the MercadoPago events class.
