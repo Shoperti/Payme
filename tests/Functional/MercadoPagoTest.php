@@ -32,7 +32,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->charges()->create($amount, $token, $payload);
 
-        $data = $response->data(); 
+        $data = $response->data();
 
         $this->assertTrue($response->success());
         $this->assertSame($gateway->getGateway()->amount($amount), "{$data['transaction_details']['total_paid_amount']}");
