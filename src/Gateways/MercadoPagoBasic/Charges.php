@@ -47,7 +47,11 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function complete($options = [])
     {
-        throw new BadMethodCallException();
+        $id = Arr::get($options, 'collection_id');
+
+        $version = $this->gateway->getConfig()['version'];
+
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString($version.'/payments').'/'.$id);
     }
 
     /**

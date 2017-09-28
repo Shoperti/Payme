@@ -5,6 +5,7 @@ namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 use BadMethodCallException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the MercadoPagoBasic events class.
@@ -33,14 +34,15 @@ class Events extends AbstractApi implements EventInterface
      */
     public function find($id, array $options = [])
     {
-        $type = Arr::get($options, 'topic');
+        $type = Arr::get($options, 'type');
+        $topic = Arr::get($options, 'topic');
+        
+        if ($topic == 'merchant_order') {
+            return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id);
+        }
 
-        if ($type == 'payment') {
-            $version = $this->gateway->getConfig()['version'];
-            
-            return $this->gateway->commit('get', $this->gateway->buildUrlFromString($version.'/payments').'/'.$id);
-        } 
-    
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id);
+        $version = $this->gateway->getConfig()['version'];
+
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString($version.'/payments').'/'.$id);
     }
 }

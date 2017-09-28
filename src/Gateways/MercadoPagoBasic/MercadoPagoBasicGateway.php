@@ -95,7 +95,7 @@ class MercadoPagoBasicGateway extends AbstractGateway
 
         $oauthUrl = $this->buildUrlFromString('oauth/token');
 
-        $authRawResponse = $this->getHttpClient()->{$method}($oauthUrl, [
+        $authRawResponse = $this->getHttpClient()->post($oauthUrl, [
             'json' => [
                 'client_id'     => $this->config['client_id'],
                 'client_secret' => $this->config['client_secret'],
