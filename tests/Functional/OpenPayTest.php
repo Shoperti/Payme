@@ -341,7 +341,9 @@ class OpenPayTest extends AbstractFunctionalTestCase
     {
         $requestBinUrl = 'https://requestb.in';
 
-        $response = (new \GuzzleHttp\Client())->post("{$requestBinUrl}/api/v1/bins");
+        $response = (new \GuzzleHttp\Client())->post("{$requestBinUrl}/api/v1/bins", [
+            'debug' => true
+        ]);
 
         $response = json_decode($response->getBody(), true);
 
