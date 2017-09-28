@@ -36,7 +36,7 @@ class Events extends AbstractApi implements EventInterface
     {
         $type = Arr::get($options, 'type');
         $topic = Arr::get($options, 'topic');
-        
+
         if ($topic == 'merchant_order') {
             return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id);
         }
