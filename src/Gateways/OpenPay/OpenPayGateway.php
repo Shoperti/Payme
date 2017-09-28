@@ -111,6 +111,7 @@ class OpenPayGateway extends AbstractGateway
                 'X-OpenPay-Client-User-Agent' => json_encode($userAgent),
                 'User-Agent'                  => 'OpenPay PayMeBindings/'.$this->config['version'],
             ],
+            'debug'           => true,
         ];
 
         if (!empty($params)) {
