@@ -16,7 +16,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token_with_params()
+    public function it_should_succeed_to_charge_a_token_with_params()
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = PayMe::make($this->credentials['mercadopago']);
@@ -32,7 +32,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->charges()->create($amount, $token, $payload);
 
-        $data = $response->data();
+        $data = $response->data(); 
 
         $this->assertTrue($response->success());
         $this->assertSame($gateway->getGateway()->amount($amount), "{$data['transaction_details']['total_paid_amount']}");
@@ -45,7 +45,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_charge_a_token()
+    public function it_should_fail_to_charge_a_token()
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = PayMe::make($this->credentials['mercadopago']);
@@ -70,11 +70,11 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
 
     /**
      * @test
-     * @depends is_should_succeed_to_charge_a_token_with_params
+     * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $responseAndAmount
      */
-    public function is_should_succeed_to_refund_a_charge($responseAndAmount)
+    public function it_should_succeed_to_refund_a_charge($responseAndAmount)
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['mercadopago']);
@@ -89,6 +89,29 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $this->assertTrue($response->success());
         // previous test creates a charge of 1000
         $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+    }
+
+    /**
+     * @test
+     * @depends it_should_succeed_to_charge_a_token_with_params
+     *
+     * @param array $dataAndAmount
+     */
+    public function it_should_retrieve_a_single_event($dataAndAmount)
+    {
+        /** @var \Shoperti\PayMe\PayMe $gateway */
+        $gateway = PayMe::make($this->credentials['mercadopago']);
+
+        $chargeData = $dataAndAmount[0];
+        $options = ['type' => 'payment'];
+
+        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
+        $response = $gateway->events()->find($chargeData['id'], $options);
+
+        $data = $response->data();
+
+        $this->assertTrue($response->success());
+        $this->assertSame($chargeData['id'], $data['id']);
     }
 
     /**
@@ -109,7 +132,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
             'name'             => 'Juan Pérez',
             'first_name'       => 'Juan',
             'last_name'        => 'Pérez',
-            'email'            => 'customer1@mail.com',
+            'email'            => 'test_user_75095492@testuser.com',
             'phone'            => '525555555',
             'discount'         => 0,
             'discount_concept' => null,

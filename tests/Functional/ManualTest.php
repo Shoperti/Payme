@@ -16,7 +16,7 @@ class ManualTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_perform_a_charge()
+    public function it_should_succeed_to_perform_a_charge()
     {
         $gateway = PayMe::make($this->credentials['manual']);
 
@@ -28,7 +28,7 @@ class ManualTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_perform_a_completion()
+    public function it_should_succeed_to_perform_a_completion()
     {
         $gateway = PayMe::make($this->credentials['manual']);
 
@@ -40,7 +40,7 @@ class ManualTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_perform_a_refund()
+    public function it_should_succeed_to_perform_a_refund()
     {
         $gateway = PayMe::make($this->credentials['manual']);
 

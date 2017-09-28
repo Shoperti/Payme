@@ -23,7 +23,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_create_a_charge()
+    public function it_should_succeed_to_create_a_charge()
     {
         $charge = $this->gateway->charges()->create(11010, 'regular_payment', [
             'return_url'  => 'http://localhost/return',
@@ -77,7 +77,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_create_a_charge()
+    public function it_should_fail_to_create_a_charge()
     {
         $charge = $this->gateway->charges()->create(1000, 'regular_payment', [
             'return_url' => 'http://localhost/return',

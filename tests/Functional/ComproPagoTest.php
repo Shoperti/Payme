@@ -27,7 +27,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token()
+    public function it_should_succeed_to_charge_a_token()
     {
         $charge = $this->gateway->charges()->create(1000, 'oxxo', $this->options);
 
@@ -35,7 +35,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token_with_params()
+    public function it_should_succeed_to_charge_a_token_with_params()
     {
         $reference = 'order_1';
 

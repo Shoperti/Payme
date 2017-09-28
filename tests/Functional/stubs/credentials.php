@@ -43,13 +43,13 @@ return [
 
     'mercadopago' => [
         'driver'      => 'mercado_pago',
-        'private_key' => 'TEST-8527269031909288-071213-0fc96cb7cd3633189bfbe29f63722700__LB_LA__-263489584',
+        'private_key' => 'TEST-3448849932020678-092817-f2101495af54d88467ec560ab9d3cf04__LD_LA__-275561712',
     ],
 
     'mercadopago_basic' => [
         'driver'        => 'mercado_pago_basic',
-        'client_id'     => '3922721115991786',
-        'client_secret' => 'v9khOipwEgdSlpw0xyp0W4RmknNKnnmr',
+        'client_id'     => '3448849932020678',
+        'client_secret' => '4Ca4PGM5AgvIeIUBFXxO9n0Ki858a6KA',
         'test'          => true,
     ],
 ];
