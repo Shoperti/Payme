@@ -17,7 +17,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_charge_a_token()
+    public function it_should_fail_to_charge_a_token()
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
@@ -41,7 +41,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_generate_a_store_payment()
+    public function it_should_succeed_to_generate_a_store_payment()
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
@@ -67,7 +67,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_generate_a_bank_transfer()
+    public function it_should_succeed_to_generate_a_bank_transfer()
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
@@ -93,7 +93,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token_with_params()
+    public function it_should_succeed_to_charge_a_token_with_params()
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
@@ -124,7 +124,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
     /**
      * @test
-     * @depends is_should_succeed_to_charge_a_token_with_params
+     * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $dataAndAmount
      */
@@ -147,11 +147,11 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
     /**
      * @test
-     * @depends is_should_succeed_to_charge_a_token_with_params
+     * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $responseAndAmount
      */
-    public function is_should_succeed_to_refund_a_charge($responseAndAmount)
+    public function it_should_succeed_to_refund_a_charge($responseAndAmount)
     {
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
@@ -171,7 +171,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_create_get_and_delete_a_webhook()
     {
-        $url = $this->getRequestBin();
+        $url = 'https://httpbin.org/post';
 
         $gateway = PayMe::make($this->credentials['open_pay']);
 
@@ -330,21 +330,5 @@ class OpenPayTest extends AbstractFunctionalTestCase
         }
 
         return $phoneNumber;
-    }
-
-    /**
-     * Obtains a requestbin link.
-     *
-     * @return string
-     */
-    private function getRequestBin()
-    {
-        $requestBinUrl = 'https://requestb.in';
-
-        $response = (new \GuzzleHttp\Client())->post("{$requestBinUrl}/api/v1/bins");
-
-        $response = json_decode($response->getBody(), true);
-
-        return "{$requestBinUrl}/{$response['name']}";
     }
 }

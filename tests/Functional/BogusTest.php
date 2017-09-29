@@ -16,7 +16,7 @@ class BogusTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_succeed_to_charge_a_token()
+    public function it_should_succeed_to_charge_a_token()
     {
         $gateway = PayMe::make($this->credentials['bogus']);
 
@@ -26,7 +26,7 @@ class BogusTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function is_should_fail_to_charge_a_token()
+    public function it_should_fail_to_charge_a_token()
     {
         $gateway = PayMe::make($this->credentials['bogus']);
 

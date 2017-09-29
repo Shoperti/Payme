@@ -40,4 +40,16 @@ return [
         'driver'      => 'stripe',
         'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
     ],
+
+    'mercadopago' => [
+        'driver'      => 'mercado_pago',
+        'private_key' => 'TEST-3448849932020678-092817-f2101495af54d88467ec560ab9d3cf04__LD_LA__-275561712',
+    ],
+
+    'mercadopago_basic' => [
+        'driver'        => 'mercado_pago_basic',
+        'client_id'     => '3448849932020678',
+        'client_secret' => '4Ca4PGM5AgvIeIUBFXxO9n0Ki858a6KA',
+        'test'          => true,
+    ],
 ];
