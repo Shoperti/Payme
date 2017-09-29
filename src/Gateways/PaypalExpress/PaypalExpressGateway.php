@@ -220,7 +220,7 @@ class PaypalExpressGateway extends AbstractGateway
                 'errorCode'       => null,
                 'type'            => false,
             ]);
-        } 
+        }
 
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
