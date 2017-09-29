@@ -171,7 +171,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_create_get_and_delete_a_webhook()
     {
-        $url = $this->getRequestBin();
+        $url = 'https://httpbin.org/post';
 
         $gateway = PayMe::make($this->credentials['open_pay']);
 
@@ -330,23 +330,5 @@ class OpenPayTest extends AbstractFunctionalTestCase
         }
 
         return $phoneNumber;
-    }
-
-    /**
-     * Obtains a requestbin link.
-     *
-     * @return string
-     */
-    private function getRequestBin()
-    {
-        $requestBinUrl = 'https://requestb.in';
-
-        $response = (new \GuzzleHttp\Client())->post("{$requestBinUrl}/api/v1/bins", [
-            'debug' => true,
-        ]);
-
-        $response = json_decode($response->getBody(), true);
-
-        return "{$requestBinUrl}/{$response['name']}";
     }
 }
