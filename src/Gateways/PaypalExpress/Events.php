@@ -5,7 +5,6 @@ namespace Shoperti\PayMe\Gateways\PaypalExpress;
 use BadMethodCallException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
-use Shoperti\PayMe\Support\Arr;
 
 /**
  * This is the PaypalExpress events class.
@@ -49,7 +48,7 @@ class Events extends AbstractApi implements EventInterface
 
         $url = $test
             ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
-            : 'https://ipnpb.paypal.com/cgi-bin/webscr'; 
+            : 'https://ipnpb.paypal.com/cgi-bin/webscr';
 
         return $this->gateway->commit('post', $url, $params);
     }
