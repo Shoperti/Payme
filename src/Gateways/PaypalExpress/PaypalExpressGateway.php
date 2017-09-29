@@ -206,6 +206,22 @@ class PaypalExpressGateway extends AbstractGateway
 
         unset($rawResponse['isRedirect']);
 
+        if (array_key_exists('INVALID', $response) || array_key_exists('VERIFIED', $response)) {
+            $success = array_key_exists('VERIFIED', $response);
+
+            return (new Response())->setRaw($rawResponse)->map([
+                'isRedirect'      => false,
+                'success'         => $success ? true : false,
+                'reference'       => false,
+                'message'         => $success ? 'Transaction approved' : 'Transaction failed',
+                'test'            => $this->config['test'],
+                'authorization'   => '',
+                'status'          => $success ? new Status('paid') : new Status('failed'),
+                'errorCode'       => null,
+                'type'            => false,
+            ]);
+        } 
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,

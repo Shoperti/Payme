@@ -55,7 +55,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['METHOD'] = 'DoExpressCheckoutPayment';
         $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Arr::get($options, 'action', 'Sale');
         $params['TOKEN'] = Arr::get($options, 'token');
-        $params['PAYERID'] = Arr::get($options, 'payerid');
+        $params['PAYERID'] = Arr::get($options, 'PayerID');
 
         $params['PAYMENTREQUEST_0_DESC'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['PAYMENTREQUEST_0_INVNUM'] = Arr::get($options, 'reference');
