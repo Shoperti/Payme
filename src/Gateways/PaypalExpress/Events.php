@@ -35,8 +35,6 @@ class Events extends AbstractApi implements EventInterface
     {
         $test = $this->gateway->getConfig()['test'];
 
-        $params = [];
-
         foreach ($options as $key => $value) {
             $options[$key] = $value == null ? '' : $value;
         }
