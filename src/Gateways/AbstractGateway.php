@@ -2,15 +2,14 @@
 
 namespace Shoperti\PayMe\Gateways;
 
-use InvalidArgumentException;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\HandlerStack;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Shoperti\PayMe\Contracts\GatewayInterface;
 use Shoperti\PayMe\Currency;
 
