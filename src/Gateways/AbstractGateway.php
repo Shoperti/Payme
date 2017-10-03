@@ -3,7 +3,13 @@
 namespace Shoperti\PayMe\Gateways;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Shoperti\PayMe\Contracts\GatewayInterface;
 use Shoperti\PayMe\Currency;
 
@@ -71,7 +77,15 @@ abstract class AbstractGateway implements GatewayInterface
      */
     protected function getHttpClient()
     {
-        return new GuzzleClient();
+        $stack = HandlerStack::create();
+
+        $stack->push(Middleware::retry(function ($retries, RequestInterface $request, ResponseInterface $response = null, TransferException $exception = null) {
+            return $retries < 3 && ($exception instanceof ConnectException || ($response && $response->getStatusCode() >= 500));
+        }, function ($retries) {
+            return (int) pow(2, $retries) * 1000;
+        }));
+
+        return new GuzzleClient(['handler' => $stack]);
     }
 
     /**
