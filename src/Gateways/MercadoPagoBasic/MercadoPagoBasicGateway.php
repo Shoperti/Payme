@@ -124,6 +124,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
         $response['topic'] = Arr::get($options, 'topic');
+        $response['reference'] = Arr::get($options, 'reference');
 
         return $this->respond($response);
     }
@@ -142,6 +143,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
 
         unset($rawResponse['isRedirect']);
         unset($rawResponse['topic']);
+        unset($rawResponse['reference']);
 
         if ($response['isRedirect']) {
             return (new Response())->setRaw($rawResponse)->map([
@@ -161,7 +163,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return (new Response())->setRaw($rawResponse)->map([
                 'isRedirect'      => false,
                 'success'         => $success,
-                'reference'       => $success ? $response['external_reference'] : null,
+                'reference'       => $success ? $response['reference'] : null,
                 'message'         => $success ? 'Transaction approved' : null,
                 'test'            => $this->config['test'],
                 'authorization'   => $success ? $response['preference_id'] : null,
