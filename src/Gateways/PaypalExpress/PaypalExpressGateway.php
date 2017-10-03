@@ -171,21 +171,26 @@ class PaypalExpressGateway extends AbstractGateway
             $response = $this->responseError((string) $rawResponse->getBody());
         }
 
-        return $this->respond($success, $response, $options);
+        return $this->respond($success, $params, $response, $options);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
      * @param bool  $success
+     * @param array $request
      * @param array $response
      * @param array $options
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($success, $response, $options)
+    protected function respond($success, $request, $response, $options)
     {
         $success = isset($response['ACK']) && in_array($response['ACK'], ['Success', 'SuccessWithWarning']);
+
+        if (array_key_exists('INVALID', $response) || array_key_exists('VERIFIED', $response)) {
+            $response = array_merge($response, $request);
+        }
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
 
@@ -206,6 +211,22 @@ class PaypalExpressGateway extends AbstractGateway
 
         unset($rawResponse['isRedirect']);
 
+        if (array_key_exists('INVALID', $response) || array_key_exists('VERIFIED', $response)) {
+            $success = array_key_exists('VERIFIED', $response);
+
+            return (new Response())->setRaw($rawResponse)->map([
+                'isRedirect'      => false,
+                'success'         => $success ? true : false,
+                'reference'       => $success ? Arr::get($response, 'invoice') : false,
+                'message'         => $success ? 'Transaction approved' : 'Transaction failed',
+                'test'            => $this->config['test'],
+                'authorization'   => $success ? Arr::get($response, 'txn_id') : '',
+                'status'          => $success ? new Status('paid') : new Status('failed'),
+                'errorCode'       => null,
+                'type'            => $success ? Arr::get($response, 'payment_status') : null,
+            ]);
+        }
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,
@@ -215,7 +236,7 @@ class PaypalExpressGateway extends AbstractGateway
             'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
             'status'          => $success ? $this->getStatus($response, $response['isRedirect']) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response['L_ERRORCODE0']),
-            'type'            => false,
+            'type'            => null,
         ]);
     }
 
