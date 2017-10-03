@@ -117,7 +117,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         }
 
         $authUrl = sprintf('%s?access_token=%s', $url, $this->oauthToken);
-        
+
         $rawResponse = $this->getHttpClient()->{$method}($authUrl, $request);
 
         $response = $this->parseResponse($rawResponse);
