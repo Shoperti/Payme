@@ -34,7 +34,6 @@ class Events extends AbstractApi implements EventInterface
      */
     public function find($id, array $options = [])
     {
-        $type = Arr::get($options, 'type');
         $topic = Arr::get($options, 'topic');
 
         if ($topic == 'payment') {
