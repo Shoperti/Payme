@@ -41,7 +41,7 @@ class Events extends AbstractApi implements EventInterface
             $response = $this->gateway->commit('get', $this->gateway->buildUrlFromString('collections/notifications').'/'.$id);
 
             if (!$response->success()) {
-                return;
+                return $response;
             }
 
             $responseData = $response->data()['collection'];
