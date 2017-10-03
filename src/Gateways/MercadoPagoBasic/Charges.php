@@ -47,9 +47,17 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         $id = Arr::get($options, 'collection_id');
 
-        $version = $this->gateway->getConfig()['version'];
+        $response = $this->gateway->commit('get', $this->gateway->buildUrlFromString('collections/notifications').'/'.$id);
 
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString($version.'/payments').'/'.$id);
+        if (!$response->success()) {
+            return $response;
+        }
+
+        $responseData = $response->data();
+
+        $orderId = Arr::get($responseData, 'merchant_order_id');
+
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$orderId);
     }
 
     /**

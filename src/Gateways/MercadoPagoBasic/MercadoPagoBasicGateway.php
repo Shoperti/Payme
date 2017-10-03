@@ -124,7 +124,6 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
         $response['topic'] = Arr::get($options, 'topic');
-        $response['reference'] = Arr::get($options, 'reference');
 
         return $this->respond($response);
     }
@@ -139,41 +138,42 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
      */
     public function mapResponse($success, $response)
     {
+        if (array_key_exists('collection', $response)) {
+            $response = array_merge($response, $response['collection']);
+
+            unset($response['collection']);
+        }
+        
         $rawResponse = $response;
 
         unset($rawResponse['isRedirect']);
         unset($rawResponse['topic']);
-        unset($rawResponse['reference']);
 
         if ($response['isRedirect']) {
             return (new Response())->setRaw($rawResponse)->map([
                 'isRedirect'      => $response['isRedirect'],
                 'success'         => $response['isRedirect'] ? false : $success,
-                'reference'       => $success ? $response['id'] : false,
+                'reference'       => $success ? Arr::get($response, 'id') : null,
                 'message'         => $success ? 'Transaction approved' : 'Redirect',
                 'test'            => $this->config['test'],
-                'authorization'   => $success ? $response['init_point'] : null,
+                'authorization'   => $success ? Arr::get($response, 'init_point') : null,
                 'status'          => $success ? new Status('pending') : new Status('failed'),
                 'errorCode'       => $success ? null : $this->getErrorCode($response),
                 'type'            => null,
             ]);
         }
 
-        if ($response['topic']) {
-            return (new Response())->setRaw($rawResponse)->map([
-                'isRedirect'      => false,
-                'success'         => $success,
-                'reference'       => $success ? $response['reference'] : null,
-                'message'         => $success ? 'Transaction approved' : null,
-                'test'            => $this->config['test'],
-                'authorization'   => $success ? $response['preference_id'] : null,
-                'status'          => $success ? $this->getStatus($response) : new Status('failed'),
-                'errorCode'       => $success ? null : $this->getErrorCode($response),
-                'type'            => $response['topic'],
-            ]);
-        }
-
-        return parent::mapResponse($success, $response);
+        return (new Response())->setRaw($rawResponse)->map([
+            'isRedirect'      => false,
+            'success'         => $success,
+            'reference'       => $success ? Arr::get($response, 'id') : null,
+            'message'         => $success ? 'Transaction approved' : null,
+            'test'            => $this->config['test'],
+            'authorization'   => $success ? Arr::get($response, 'authorization_code') : null,
+            'status'          => $success ? $this->getStatus($response) : new Status('failed'),
+            'errorCode'       => $success ? null : $this->getErrorCode($response),
+            'type'            => $response['topic'],
+        ]);
     }
 
     /**

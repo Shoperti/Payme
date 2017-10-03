@@ -43,13 +43,11 @@ class Events extends AbstractApi implements EventInterface
                 return $response;
             }
 
-            $responseData = $response->data()['collection'];
+            $responseData = $response->data();
 
             $id = Arr::get($responseData, 'merchant_order_id');
         }
 
-        $options['reference'] = $id;
-
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id, [], $options);
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id);
     }
 }
