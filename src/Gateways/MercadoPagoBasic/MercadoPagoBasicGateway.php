@@ -169,10 +169,10 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'reference'       => $success ? Arr::get($response, 'id') : null,
             'message'         => $success ? 'Transaction approved' : null,
             'test'            => $this->config['test'],
-            'authorization'   => $success ? Arr::get($response, 'authorization_code') : null,
+            'authorization'   => $success ? Arr::get($response, 'preference_id') : null,
             'status'          => $success ? $this->getStatus($response) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response),
-            'type'            => $response['topic'],
+            'type'            => Arr::get($response, 'topic'),
         ]);
     }
 
