@@ -192,10 +192,12 @@ class MercadoPagoGateway extends AbstractGateway
             case 'charged_back':
                 return new Status($status);
             case 'approved':
+            case 'closed':
                 return new Status('paid');
             case 'pending':
             case 'in_process':
             case 'in_mediation':
+            case 'open':
                 return new Status('pending');
             case 'cancelled':
                 return new Status('canceled');

@@ -51,6 +51,13 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     protected $apiVersion = 'v1';
 
     /**
+     * MercadoPagoBasic OAuth token.
+     *
+     * @var null|string
+     */
+    protected $oauthToken = null;
+
+    /**
      * Inject the configuration for a Gateway.
      *
      * @param string[] $config
@@ -103,15 +110,20 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             ],
         ]);
 
-        $authResponse = $this->parseResponse($authRawResponse);
+        if (!$this->oauthToken) {
+            $authResponse = $this->parseResponse($authRawResponse);
 
-        $authUrl = sprintf('%s?access_token=%s', $url, Arr::get($authResponse, 'access_token', ''));
+            $this->oauthToken = Arr::get($authResponse, 'access_token');
+        }
 
+        $authUrl = sprintf('%s?access_token=%s', $url, $this->oauthToken);
+        
         $rawResponse = $this->getHttpClient()->{$method}($authUrl, $request);
 
         $response = $this->parseResponse($rawResponse);
 
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
+        $response['topic'] = Arr::get($options, 'topic');
 
         return $this->respond($response);
     }
@@ -129,22 +141,33 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         $rawResponse = $response;
 
         unset($rawResponse['isRedirect']);
+        unset($rawResponse['topic']);
 
         if ($response['isRedirect']) {
-            $authorization = $success
-                ? $this->config['test'] ? $response['sandbox_init_point'] : $response['init_point']
-                : null;
-
             return (new Response())->setRaw($rawResponse)->map([
                 'isRedirect'      => $response['isRedirect'],
                 'success'         => $response['isRedirect'] ? false : $success,
                 'reference'       => $success ? $response['id'] : false,
                 'message'         => $success ? 'Transaction approved' : 'Redirect',
                 'test'            => $this->config['test'],
-                'authorization'   => $authorization,
+                'authorization'   => $success ? $response['init_point'] : null,
                 'status'          => $success ? new Status('pending') : new Status('failed'),
                 'errorCode'       => $success ? null : $this->getErrorCode($response),
-                'type'            => false,
+                'type'            => null,
+            ]);
+        }
+
+        if ($response['topic']) {
+            return (new Response())->setRaw($rawResponse)->map([
+                'isRedirect'      => false,
+                'success'         => $success,
+                'reference'       => $success ? $response['external_reference'] : null,
+                'message'         => $success ? 'Transaction approved' : null,
+                'test'            => $this->config['test'],
+                'authorization'   => $success ? $response['preference_id'] : null,
+                'status'          => $success ? $this->getStatus($response) : new Status('failed'),
+                'errorCode'       => $success ? null : $this->getErrorCode($response),
+                'type'            => $response['topic'],
             ]);
         }
 
