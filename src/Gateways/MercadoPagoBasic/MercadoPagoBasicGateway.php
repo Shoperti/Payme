@@ -143,7 +143,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
 
             unset($response['collection']);
         }
-        
+
         $rawResponse = $response;
 
         unset($rawResponse['isRedirect']);
