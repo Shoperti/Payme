@@ -43,7 +43,7 @@ class Events extends AbstractApi implements EventInterface
             if (!$response->success()) {
                 return;
             }
-            
+
             $responseData = $response->data()['collection'];
 
             $id = Arr::get($responseData, 'merchant_order_id');
