@@ -2,6 +2,8 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
+use Shoperti\PayMe\Gateways\Conekta\Charges;
+use Shoperti\PayMe\Gateways\Conekta\ConektaGateway;
 use Shoperti\PayMe\PayMe;
 
 class ConektaTest extends AbstractFunctionalTestCase
@@ -11,8 +13,8 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Conekta\ConektaGateway', $gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Conekta\Charges', $gateway->charges());
+        $this->assertInstanceOf(ConektaGateway::class, $gateway->getGateway());
+        $this->assertInstanceOf(Charges::class, $gateway->charges());
     }
 
     /** @test */

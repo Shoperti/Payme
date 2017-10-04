@@ -115,12 +115,11 @@ class ConektaGateway extends AbstractGateway
         }
 
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
+        $statusCode = $rawResponse->getStatusCode();
 
-        if ($rawResponse->getStatusCode() == 200) {
-            $response = $this->parseResponse($rawResponse->getBody());
-        } else {
-            $response = $this->responseError($rawResponse->getBody());
-        }
+        $response = $statusCode == 200
+            ? $this->parseResponse($rawResponse->getBody())
+            : $this->responseError($rawResponse->getBody(), $statusCode);
 
         return $this->respond($response);
     }
@@ -364,25 +363,27 @@ class ConektaGateway extends AbstractGateway
      * Get error response from server or fallback to general error.
      *
      * @param string $body
+     * @param int    $httpCode
      *
      * @return array
      */
-    protected function responseError($body)
+    protected function responseError($body, $httpCode)
     {
-        return $this->parseResponse($body) ?: $this->jsonError($body);
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**
      * Default JSON response.
      *
      * @param string $rawResponse
+     * @param int    $httpCode
      *
      * @return array
      */
-    public function jsonError($rawResponse)
+    public function jsonError($rawResponse, $httpCode)
     {
         $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
+        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
 
         return [
             'message_to_purchaser' => $msg,
