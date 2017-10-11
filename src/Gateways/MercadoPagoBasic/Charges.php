@@ -101,7 +101,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $paymentTypes = ['prepaid_card', 'digital_currency', 'credit_card', 'debit_card', 'ticket', 'atm', 'bank_transfer'];
             $enabledTypes = Arr::get($options, 'enabled_brands', []);
 
-            $excludedTypes = array_map(function($type) {
+            $excludedTypes = array_map(function ($type) {
                 return ['id' => $type];
             }, array_values(array_filter($paymentTypes, function ($type) use ($enabledTypes) {
                 return !in_array($type, $enabledTypes);

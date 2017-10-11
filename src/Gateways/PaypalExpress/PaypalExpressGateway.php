@@ -325,7 +325,7 @@ class PaypalExpressGateway extends AbstractGateway
             case 'Processed':
                 return new Status('paid');
             case 'Created':
-            case 'Pending': 
+            case 'Pending':
                 return new Status('pending');
             case 'Canceled_Reversal':
                 return new Status('canceled');
