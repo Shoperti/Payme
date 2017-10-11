@@ -218,12 +218,12 @@ class PaypalExpressGateway extends AbstractGateway
                 'isRedirect'      => false,
                 'success'         => $success ? true : false,
                 'reference'       => $success ? Arr::get($response, 'invoice') : false,
-                'message'         => $success ? 'Transaction approved' : 'Transaction failed',
+                'message'         => $success ? 'VERIFIED' : 'INVALID',
                 'test'            => $this->config['test'],
                 'authorization'   => $success ? Arr::get($response, 'txn_id') : '',
-                'status'          => $success ? new Status('paid') : new Status('failed'),
+                'status'          => $success ? $this->getPaymentStatus($response) : new Status('failed'),
                 'errorCode'       => null,
-                'type'            => $success ? Arr::get($response, 'payment_status') : null,
+                'type'            => $success ? Arr::get($response, 'txn_type') : null,
             ]);
         }
 
@@ -231,7 +231,7 @@ class PaypalExpressGateway extends AbstractGateway
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,
             'reference'       => $success ? $this->getReference($response, $response['isRedirect']) : false,
-            'message'         => $success ? 'Transaction approved' : $response['L_LONGMESSAGE0'],
+            'message'         => $success ? Arr::get($response, 'ACK', 'Transaction approved') : $response['L_LONGMESSAGE0'],
             'test'            => $this->config['test'],
             'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
             'status'          => $success ? $this->getStatus($response, $response['isRedirect']) : new Status('failed'),
@@ -309,6 +309,40 @@ class PaypalExpressGateway extends AbstractGateway
         }
 
         return new Status('paid');
+    }
+
+    /**
+     * Map PayPal payment response to status object.
+     *
+     * @param array $response
+     *
+     * @return \Shoperti\PayMe\Status
+     */
+    protected function getPaymentStatus($response)
+    {
+        switch ($status = Arr::get($response, 'payment_status', 'paid')) {
+            case 'Completed':
+            case 'Processed':
+                return new Status('paid');
+            case 'Created':
+            case 'Pending': 
+                return new Status('pending');
+            case 'Canceled_Reversal':
+                return new Status('canceled');
+            case 'Failed':
+            case 'Denied':
+                return new Status('failed');
+            case 'Declined':
+                return new Status('declined');
+            case 'Expired':
+                return new Status('expired');
+            case 'Refunded':
+                return new Status('refunded');
+            case 'Reversed':
+                return new Status('charged_back');
+            case 'Voided':
+                return new Status('voided');
+        }
     }
 
     /**
