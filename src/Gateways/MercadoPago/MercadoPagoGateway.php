@@ -178,7 +178,7 @@ class MercadoPagoGateway extends AbstractGateway
     }
 
     /**
-     * Map OpenPay response to status object.
+     * Map MercadoPago response to status object.
      *
      * @param array $response
      *
@@ -189,25 +189,26 @@ class MercadoPagoGateway extends AbstractGateway
         switch ($status = Arr::get($response, 'status', 'paid')) {
             case 'authorized':
             case 'refunded':
+            case 'partially_refunded':
             case 'charged_back':
                 return new Status($status);
             case 'approved':
-            case 'closed':
                 return new Status('paid');
             case 'pending':
             case 'in_process':
             case 'in_mediation':
-            case 'open':
                 return new Status('pending');
             case 'cancelled':
                 return new Status('canceled');
             case 'rejected':
                 return new Status('failed');
+            default:
+                return new Status('pending');
         }
     }
 
     /**
-     * Map OpenPay response to error code object.
+     * Map MercadoPago response to error code object.
      *
      * @param array $response
      *
