@@ -37,6 +37,8 @@ class Status
         'canceled',
         'trial',
         'charged_back',
+        'expired',
+        'declined',
     ];
 
     /**

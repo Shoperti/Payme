@@ -154,7 +154,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
                 'isRedirect'      => $response['isRedirect'],
                 'success'         => $response['isRedirect'] ? false : $success,
                 'reference'       => $success ? Arr::get($response, 'id') : null,
-                'message'         => $success ? 'Transaction approved' : 'Redirect',
+                'message'         => 'Redirect',
                 'test'            => $this->config['test'],
                 'authorization'   => $success ? Arr::get($response, 'init_point') : null,
                 'status'          => $success ? new Status('pending') : new Status('failed'),
@@ -166,14 +166,84 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => false,
             'success'         => $success,
-            'reference'       => $success ? Arr::get($response, 'id') : null,
+            'reference'       => $success ? $this->getReference($response) : null,
             'message'         => $success ? 'Transaction approved' : null,
             'test'            => $this->config['test'],
-            'authorization'   => $success ? Arr::get($response, 'preference_id') : null,
+            'authorization'   => $success ? Arr::get($response, 'id') : null,
             'status'          => $success ? $this->getStatus($response) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response),
             'type'            => Arr::get($response, 'topic'),
         ]);
+    }
+
+    /**
+     * Get MercadoPago authorization.
+     *
+     * @param array $response
+     *
+     * @return string|null
+     */
+    protected function getReference(array $response)
+    {
+        $payments = Arr::get($response, 'payments');
+
+        if (!$payments) {
+            return Arr::get($response, 'preference_id');
+        }
+
+        $lastPayment = end($payments);
+
+        return Arr::get($lastPayment, 'id');
+    }
+
+    /**
+     * Map MercadoPago response to status object.
+     *
+     * @param array $response
+     *
+     * @return \Shoperti\PayMe\Status|null
+     */
+    protected function getStatus(array $response)
+    {
+        $payments = Arr::get($response, 'payments');
+
+        if (!$payments) {
+            return parent::getStatus($response);
+        }
+
+        $newResponse = $response;
+
+        if (count($payments) > 1) {
+            $totalPaid = 0;
+            $totalRefund = 0;
+            $total = $newResponse['shipping_cost'] + $newResponse['total_amount'];
+
+            foreach ($payments as $payment) {
+                if ($payment['status'] === 'approved') {
+                    // Get the total paid amount, considering only approved incomings.
+                    $totalPaid += $payment['total_paid_amount'] - $payment['amount_refunded'];
+                } elseif ($payment['status'] === 'refunded') {
+                    // Get the total refunded amount.
+                    $totalRefund += $payment['amount_refunded'];
+                }
+            }
+
+            if ($totalPaid >= $total) {
+                $newResponse['status'] = 'approved';
+            } elseif ($totalRefund >= $total) {
+                $newResponse['status'] = 'refunded';
+            } elseif ($totalRefund > 0) {
+                $newResponse['status'] = 'partially_refunded';
+            } else {
+                $newResponse['status'] = 'pending';
+            }
+
+            return parent::getStatus($newResponse);
+        }
+
+        $newResponse['status'] = $payments[0]['amount_refunded'] > 0 ? 'partially_refunded' : $payments[0]['status'];
+
+        return parent::getStatus($newResponse);
     }
 
     /**

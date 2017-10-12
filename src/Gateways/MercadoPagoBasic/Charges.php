@@ -89,9 +89,26 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addPaymentMethod(array $params, $payment, array $options)
     {
-        $params['installments'] = isset($options['monthly_installments']) && in_array($options['monthly_installments'], [3, 6, 9, 12])
-            ? (int) Arr::get($options, 'monthly_installments')
-            : 1;
+        $params['payment_methods'] = [];
+
+        if (isset($options['monthly_installments'])) {
+            $params['payment_methods']['installments'] = in_array($options['monthly_installments'], [3, 6, 9, 12])
+                ? (int) Arr::get($options, 'monthly_installments')
+                : 1;
+        }
+
+        if (isset($options['enabled_brands'])) {
+            $paymentTypes = ['prepaid_card', 'digital_currency', 'credit_card', 'debit_card', 'ticket', 'atm', 'bank_transfer'];
+            $enabledTypes = Arr::get($options, 'enabled_brands', []);
+
+            $excludedTypes = array_map(function ($type) {
+                return ['id' => $type];
+            }, array_values(array_filter($paymentTypes, function ($type) use ($enabledTypes) {
+                return !in_array($type, $enabledTypes);
+            })));
+
+            $params['payment_methods']['excluded_payment_types'] = $excludedTypes;
+        }
 
         return $params;
     }
