@@ -155,7 +155,7 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addAdditionData(array $params, array $options)
     {
         if (array_key_exists('application', $options)) {
-            $params['sponsor_id'] = $options['application'];
+            $params['sponsor_id'] = (int) $options['application'];
         }
 
         if (array_key_exists('notify_url', $options)) {
