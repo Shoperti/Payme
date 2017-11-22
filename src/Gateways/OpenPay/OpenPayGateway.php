@@ -138,7 +138,7 @@ class OpenPayGateway extends AbstractGateway
 
         return 200 <= $code && $code <= 299
             ? json_decode($body, true)
-            : json_decode($body, true) ?: $this->jsonError($body);
+            : (json_decode($body, true) ?: $this->jsonError($body, $code));
     }
 
     /**
@@ -150,7 +150,11 @@ class OpenPayGateway extends AbstractGateway
      */
     protected function respond($response)
     {
-        if (!isset($response[0])) {
+        if ($response === null) {
+            return $this->mapResponse(true, []);
+        }
+
+        if (!empty($response) && !isset($response[0])) {
             $success = null === Arr::get($response, 'error_code');
 
             return $this->mapResponse($success, $response);
@@ -315,13 +319,14 @@ class OpenPayGateway extends AbstractGateway
      * Default JSON response.
      *
      * @param string $rawResponse
+     * @param int    $httpCode
      *
      * @return array
      */
-    public function jsonError($rawResponse)
+    public function jsonError($rawResponse, $httpCode)
     {
         $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
+        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
 
         return [
             'message_to_purchaser' => $msg,
