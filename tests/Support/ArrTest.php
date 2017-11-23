@@ -32,4 +32,17 @@ class ArrTest extends \PHPUnit_Framework_TestCase
 
         Arr::requires($array, ['baz']);
     }
+
+    /** @test */
+    public function testArrFilter()
+    {
+        $array = [
+            'foo' => 'bar',
+            'baz' => null,
+        ];
+
+        $a1 = Arr::filters($array);
+
+        $this->assertEquals(['foo' => 'bar'], $a1);
+    }
 }
