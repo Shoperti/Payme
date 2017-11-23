@@ -267,20 +267,20 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         if ($address = Arr::get($options, 'billing_address') && $taxId = Arr::get($address, 'tax_id') && $companyName = Arr::get($address, 'company_name')) {
             $addressFiltered = Arr::filters([
-                'street1' => Arr::get($address, 'address1'),
-                'street2' => Arr::get($address, 'address2'),
-                'street3' => Arr::get($address, 'address3'),
+                'street1'         => Arr::get($address, 'address1'),
+                'street2'         => Arr::get($address, 'address2'),
+                'street3'         => Arr::get($address, 'address3'),
                 'external_number' => Arr::get($address, 'external_number'),
-                'city' => Arr::get($address, 'city'),
-                'country' => Arr::get($address, 'country'),
-                'state' => Arr::get($address, 'state'),
-                'postal_code' => Arr::get($address, 'zip'),
+                'city'            => Arr::get($address, 'city'),
+                'country'         => Arr::get($address, 'country'),
+                'state'           => Arr::get($address, 'state'),
+                'postal_code'     => Arr::get($address, 'zip'),
             ]);
 
             if (!empty($addressFiltered)) {
                 $params['fiscal_entity']['address'] = $addressFiltered;
             }
-            
+
             $params['fiscal_entity']['phone'] = Arr::get($address, 'phone', Arr::get($options, 'phone', 'none'));
             $params['fiscal_entity']['email'] = Arr::get($address, 'email', Arr::get($options, 'email', 'none'));
             $params['fiscal_entity']['tax_id'] = $taxId;
@@ -302,14 +302,14 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         if ($address = Arr::get($options, 'shipping_address')) {
             $addressFiltered = Arr::filters([
-                'street1' => Arr::get($address, 'address1'),
-                'street2' => Arr::get($address, 'address2'),
-                'street3' => Arr::get($address, 'address3'),
+                'street1'         => Arr::get($address, 'address1'),
+                'street2'         => Arr::get($address, 'address2'),
+                'street3'         => Arr::get($address, 'address3'),
                 'external_number' => Arr::get($address, 'external_number'),
-                'city' => Arr::get($address, 'city'),
-                'country' => Arr::get($address, 'country'),
-                'state' => Arr::get($address, 'state'),
-                'postal_code' => Arr::get($address, 'zip'),
+                'city'            => Arr::get($address, 'city'),
+                'country'         => Arr::get($address, 'country'),
+                'state'           => Arr::get($address, 'state'),
+                'postal_code'     => Arr::get($address, 'zip'),
             ]);
 
             if (!empty($addressFiltered)) {
