@@ -52,7 +52,7 @@ class Arr
      * @return array
      */
     public static function filters(array $array)
-    { 
+    {
         return array_filter($array, function ($item) {
             return $item !== null;
         });
