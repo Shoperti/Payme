@@ -43,4 +43,18 @@ class Arr
             }
         }
     }
+
+    /**
+     * Filter null items from an array.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function filters(array $array)
+    { 
+        return array_filter($array, function ($item) {
+            return $item !== null;
+        });
+    }
 }

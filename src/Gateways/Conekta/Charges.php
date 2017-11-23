@@ -266,20 +266,21 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addBillingAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'billing_address') && $taxId = Arr::get($address, 'tax_id') && $companyName = Arr::get($address, 'company_name')) {
-            $params['fiscal_entity']['address']['street1'] = Arr::get($address, 'address1');
-            if ($address2 = Arr::get($address, 'address2')) {
-                $params['fiscal_entity']['address']['street2'] = $address2;
+            $addressFiltered = Arr::filters([
+                'street1' => Arr::get($address, 'address1'),
+                'street2' => Arr::get($address, 'address2'),
+                'street3' => Arr::get($address, 'address3'),
+                'external_number' => Arr::get($address, 'external_number'),
+                'city' => Arr::get($address, 'city'),
+                'country' => Arr::get($address, 'country'),
+                'state' => Arr::get($address, 'state'),
+                'postal_code' => Arr::get($address, 'zip'),
+            ]);
+
+            if (!empty($addressFiltered)) {
+                $params['fiscal_entity']['address'] = $addressFiltered;
             }
-            if ($address3 = Arr::get($address, 'address3')) {
-                $params['fiscal_entity']['address']['street3'] = $address3;
-            }
-            if ($externalNumber = Arr::get($address, 'external_number')) {
-                $params['fiscal_entity']['address']['external_number'] = $externalNumber;
-            }
-            $params['fiscal_entity']['address']['city'] = Arr::get($address, 'city');
-            $params['fiscal_entity']['address']['country'] = Arr::get($address, 'country');
-            $params['fiscal_entity']['address']['state'] = Arr::get($address, 'state');
-            $params['fiscal_entity']['address']['postal_code'] = Arr::get($address, 'zip');
+            
             $params['fiscal_entity']['phone'] = Arr::get($address, 'phone', Arr::get($options, 'phone', 'none'));
             $params['fiscal_entity']['email'] = Arr::get($address, 'email', Arr::get($options, 'email', 'none'));
             $params['fiscal_entity']['tax_id'] = $taxId;
@@ -300,21 +301,21 @@ class Charges extends AbstractApi implements ChargeInterface
     protected function addShippingAddress(array $params, array $options)
     {
         if ($address = Arr::get($options, 'shipping_address')) {
-            $params['shipping_contact']['address']['street1'] = Arr::get($address, 'address1');
-            if ($address2 = Arr::get($address, 'address2')) {
-                $params['shipping_contact']['address']['street2'] = $address2;
+            $addressFiltered = Arr::filters([
+                'street1' => Arr::get($address, 'address1'),
+                'street2' => Arr::get($address, 'address2'),
+                'street3' => Arr::get($address, 'address3'),
+                'external_number' => Arr::get($address, 'external_number'),
+                'city' => Arr::get($address, 'city'),
+                'country' => Arr::get($address, 'country'),
+                'state' => Arr::get($address, 'state'),
+                'postal_code' => Arr::get($address, 'zip'),
+            ]);
+
+            if (!empty($addressFiltered)) {
+                $params['shipping_contact']['address'] = $addressFiltered;
             }
-            if ($address3 = Arr::get($address, 'address3')) {
-                $params['shipping_contact']['address']['street3'] = $address3;
-            }
-            if ($externalNumber = Arr::get($address, 'external_number')) {
-                $params['shipping_contact']['address']['external_number'] = $externalNumber;
-            }
-            $params['shipping_contact']['address']['external_number'] = Arr::get($address, 'external_number', '');
-            $params['shipping_contact']['address']['city'] = Arr::get($address, 'city');
-            $params['shipping_contact']['address']['state'] = Arr::get($address, 'state');
-            $params['shipping_contact']['address']['postal_code'] = Arr::get($address, 'zip');
-            $params['shipping_contact']['address']['country'] = Arr::get($address, 'country');
+
             $params['shipping_contact']['receiver'] = Arr::get($address, 'name', Arr::get($options, 'name', ''));
             $params['shipping_contact']['phone'] = Arr::get($address, 'phone', Arr::get($options, 'phone', ''));
             $params['shipping_contact']['email'] = Arr::get($address, 'email', Arr::get($options, 'email', ''));
