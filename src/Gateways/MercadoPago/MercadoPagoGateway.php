@@ -164,6 +164,8 @@ class MercadoPagoGateway extends AbstractGateway
             return true;
         }
 
+        $success = false;
+
         // Checking refund, docs say 200 but 201 is currently returned
         // https://www.mercadopago.com.mx/developers/en/solutions/payments/basic-checkout/refund-cancel/
         if ($code === 200 || $code === 201) {
