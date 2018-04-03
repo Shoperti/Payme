@@ -85,7 +85,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['payment_method_id'] = Arr::get($card, 'brand');
         }
 
-        $params['installments'] = isset($options['monthly_installments']) && ctype_digit($options['monthly_installments'])
+        $params['installments'] = isset($options['monthly_installments']) && ctype_digit((string) $options['monthly_installments'])
             ? (int) Arr::get($options, 'monthly_installments')
             : 1;
 
@@ -157,7 +157,7 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addAdditionData(array $params, array $options)
     {
-        if (isset($options['application']) && ctype_digit($options['application'])) {
+        if (isset($options['application']) && ctype_digit((string) $options['application'])) {
             $params['sponsor_id'] = (int) $options['application'];
         }
 
