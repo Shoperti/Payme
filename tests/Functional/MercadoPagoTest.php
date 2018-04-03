@@ -145,6 +145,22 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $this->assertSame($chargeData['id'], $data['id']);
     }
 
+    /** @test */
+    public function it_should_retrieve_the_account_info()
+    {
+        /** @var \Shoperti\PayMe\PayMe $gateway */
+        $gateway = PayMe::make($this->credentials['mercadopago']);
+
+        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
+        $response = $gateway->account()->info();
+
+        $data = $response->data();
+
+        $this->assertTrue($response->success());
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('site_id', $data);
+    }
+
     /**
      * Generate a token for tests.
      *

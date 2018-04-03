@@ -159,7 +159,10 @@ class MercadoPagoGateway extends AbstractGateway
             return true;
         }
 
-        $success = false;
+        // Account::info() case
+        if (isset($response['site_id'])) {
+            return true;
+        }
 
         // Checking refund, docs say 200 but 201 is currently returned
         // https://www.mercadopago.com.mx/developers/en/solutions/payments/basic-checkout/refund-cancel/
@@ -399,6 +402,11 @@ class MercadoPagoGateway extends AbstractGateway
         ];
 
         $code = Arr::get($response, 'status_detail', Arr::get($response, 'status'));
+
+        // when requesting Account::info() status is an array
+        if (is_array($code)) {
+            $code = '';
+        }
 
         $message = Arr::get($codeMap, $code);
 
