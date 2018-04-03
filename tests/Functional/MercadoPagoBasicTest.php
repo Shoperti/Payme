@@ -43,7 +43,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
         $payload = $order['payload'];
         $amount = $order['total'];
 
-        $charge = $this->gateway->charges()->create((int) ($amount/2), 'regular_payment', $payload);
+        $charge = $this->gateway->charges()->create((int) ($amount / 2), 'regular_payment', $payload);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
