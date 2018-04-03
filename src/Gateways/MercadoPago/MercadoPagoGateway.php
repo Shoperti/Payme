@@ -98,7 +98,7 @@ class MercadoPagoGateway extends AbstractGateway
 
         $response = $this->parseResponse($rawResponse);
 
-        return $this->respond($response);
+        return $this->respond($response, $rawResponse->getStatusCode());
     }
 
     /**
@@ -122,26 +122,56 @@ class MercadoPagoGateway extends AbstractGateway
      * Respond with an array of responses or a single response.
      *
      * @param array $response
+     * @param int   $code
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response)
+    protected function respond($response, $code)
     {
-        if (!isset($response[0])) {
-            $success = null === Arr::get($response, 'error');
+        if (isset($response[0])) {
+            foreach ($response as $responseItem) {
+                $responses[] = $this->respond($responseItem);
+            }
 
-            return $this->mapResponse($success, $response);
+            return $responses;
         }
 
-        $responses = [];
+        return $this->mapResponse($this->isSuccess($response, $code), $response);
+    }
 
-        foreach ($response as $responseItem) {
-            $success = null === Arr::get($responseItem, 'error');
-
-            $responses[] = $this->mapResponse($success, $responseItem);
+    /**
+     * Check if it's a successful response.
+     *
+     * @param array $response
+     * @param int   $code
+     *
+     * @return bool
+     */
+    protected function isSuccess($response, $code)
+    {
+        if (in_array(Arr::get($response, 'status'), [
+            'pending',  // atm
+            'approved',
+            'authorized',
+            'refunded',
+            'charged_back',
+        ])) {
+            return true;
         }
 
-        return $responses;
+        $success = false;
+
+        // Checking refund, docs say 200 but 201 is currently returned
+        // https://www.mercadopago.com.mx/developers/en/solutions/payments/basic-checkout/refund-cancel/
+        if ($code === 200 || $code === 201) {
+            $success = isset($response['id'])
+                && isset($response['payment_id'])
+                && isset($response['amount'])
+                && isset($response['metadata'])
+                && isset($response['source']);
+        }
+
+        return $success;
     }
 
     /**
@@ -160,9 +190,7 @@ class MercadoPagoGateway extends AbstractGateway
             ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
             : [Arr::get($response, 'id'), null];
 
-        $message = $success
-            ? 'Transaction approved'
-            : Arr::get($response, 'message', '');
+        $message = $this->getClientMessage($response);
 
         return (new Response())->setRaw($response)->map([
             'isRedirect'    => false,
@@ -234,7 +262,7 @@ class MercadoPagoGateway extends AbstractGateway
             2002 => 'processing_error', // Customer not found
             2006 => 'incorrect_number', // Card Token not found
             2007 => 'processing_error', // Connection to Card Token API fail
-            2009 => 'config_error', // Card token isssuer can't be null
+            2009 => 'config_error', // Card token issuer can't be null
             2010 => 'config_error', // Card not found
             2013 => 'config_error', // Invalid profileId
             2014 => 'config_error', // Invalid reference_id
@@ -288,30 +316,30 @@ class MercadoPagoGateway extends AbstractGateway
             3028 => 'config_error', // Invalid payment_method_id
             3029 => 'invalid_expiry_date', // Invalid card expiration month
             3030 => 'invalid_expiry_date', // Invalid card expiration year
-            4000 => 'invalid_number', // card atributte can't be null
-            4001 => 'config_error', // payment_method_id atributte can't be null
-            4002 => 'config_error', // transaction_amount atributte can't be null
-            4003 => 'invalid_number', // transaction_amount atributte must be numeric
-            4004 => 'config_error', // installments atributte can't be null
-            4005 => 'config_error', // installments atributte must be numeric
-            4006 => 'config_error', // payer atributte is malformed
-            4007 => 'config_error', // site_id atributte can't be null
-            4012 => 'config_error', // payer.id atributte can't be null
-            4013 => 'config_error', // payer.type atributte can't be null
-            4015 => 'config_error', // payment_method_reference_id atributte can't be null
-            4016 => 'config_error', // payment_method_reference_id atributte must be numeric
-            4017 => 'config_error', // status atributte can't be null
-            4018 => 'config_error', // payment_id atributte can't be null
-            4019 => 'config_error', // payment_id atributte must be numeric
-            4020 => 'config_error', // notificaction_url atributte must be url valid
-            4021 => 'config_error', // notificaction_url atributte must be shorter than 500 character
-            4022 => 'config_error', // metadata atributte must be a valid JSON
-            4023 => 'config_error', // transaction_amount atributte can't be null
-            4024 => 'config_error', // transaction_amount atributte must be numeric
+            4000 => 'invalid_number', // card attribute can't be null
+            4001 => 'config_error', // payment_method_id attribute can't be null
+            4002 => 'config_error', // transaction_amount attribute can't be null
+            4003 => 'invalid_number', // transaction_amount attribute must be numeric
+            4004 => 'config_error', // installments attribute can't be null
+            4005 => 'config_error', // installments attribute must be numeric
+            4006 => 'config_error', // payer attribute is malformed
+            4007 => 'config_error', // site_id attribute can't be null
+            4012 => 'config_error', // payer.id attribute can't be null
+            4013 => 'config_error', // payer.type attribute can't be null
+            4015 => 'config_error', // payment_method_reference_id attribute can't be null
+            4016 => 'config_error', // payment_method_reference_id attribute must be numeric
+            4017 => 'config_error', // status attribute can't be null
+            4018 => 'config_error', // payment_id attribute can't be null
+            4019 => 'config_error', // payment_id attribute must be numeric
+            4020 => 'config_error', // notification_url attribute must be url valid
+            4021 => 'config_error', // notification_url attribute must be shorter than 500 character
+            4022 => 'config_error', // metadata attribute must be a valid JSON
+            4023 => 'config_error', // transaction_amount attribute can't be null
+            4024 => 'config_error', // transaction_amount attribute must be numeric
             4025 => 'config_error', // refund_id can't be null
             4026 => 'config_error', // Invalid coupon_amount
-            4027 => 'config_error', // campaign_id atributte must be numeric
-            4028 => 'config_error', // coupon_amount atributte must be numeric
+            4027 => 'config_error', // campaign_id attribute must be numeric
+            4028 => 'config_error', // coupon_amount attribute must be numeric
             4029 => 'config_error', // Invalid payer type
             4037 => 'config_error', // Invalid transaction_amount
             4038 => 'config_error', // application_fee cannot be bigger than transaction_amount
@@ -321,6 +349,64 @@ class MercadoPagoGateway extends AbstractGateway
         ];
 
         return new ErrorCode($codeMap[$code]);
+    }
+
+    /**
+     * Gets the message to present to the client.
+     *
+     * @param array $response
+     *
+     * @see https://www.mercadopago.com.mx/developers/en/api-docs/custom-checkout/create-payments/
+     * @see https://www.mercadopago.com.mx/developers/en/guides/payments/api/handling-responses/
+     *
+     * @return string
+     */
+    protected function getClientMessage(array $response)
+    {
+        if (isset($response['message'])) {
+            return $response['message'];
+        }
+
+        $codeMap = [
+            // status_detail messages
+            'accredited'                           => 'Done, your payment was approved! You will see the amount charged in your bill as statement_descriptor.',
+            'pending_contingency'                  => 'We are processing the payment. In less than an hour we will e-mail you the results.',
+            'pending_review_manual'                => 'We are processing the payment. In less than 2 business days we will tell you by e-mail whether it was approved or if we need more information.',
+            'cc_rejected_bad_filled_card_number'   => 'Check the card number.',
+            'cc_rejected_bad_filled_date'          => 'Check the expiration date.',
+            'cc_rejected_bad_filled_other'         => 'Check the information.',
+            'cc_rejected_bad_filled_security_code' => 'Check the security code.',
+            'cc_rejected_blacklist'                => 'We could not process your payment.',
+            'cc_rejected_call_for_authorize'       => 'You must authorize payment_method_id to pay the amount to MercadoPago',
+            'cc_rejected_card_disabled'            => 'Call payment_method_id to activate your card. The phone number is on the back of your card.',
+            'cc_rejected_card_error'               => 'We could not process your payment.',
+            'cc_rejected_duplicated_payment'       => 'You already made a payment for that amount. If you need to repay, use another card or other payment method.',
+            'cc_rejected_high_risk'                => 'Your payment was declined. Choose another payment method.',
+            'cc_rejected_insufficient_amount'      => 'Your payment_method_id do not have sufficient funds.',
+            'cc_rejected_invalid_installments'     => 'payment_method_id does not process payments in installments.',
+            'cc_rejected_max_attempts'             => 'You have reached the limit of allowed attempts. Choose another card or another payment method.',
+            'cc_rejected_other_reason'             => 'payment_method_id did not process the payment.',
+            // undocumented status_detail
+            'pending_waiting_payment'              => 'Please perform your payment using the given information.',
+            // status without status_detail docs
+            'pending'                              => 'Your payment is pending.',
+            'authorized'                           => 'Your payment was authorized but not approved yet.',
+        ];
+
+        $values = [
+            'payment_method_id'    => Arr::get($response, 'payment_method_id', 'card issuer'),
+            'statement_descriptor' => Arr::get($response, 'statement_descriptor'),
+        ];
+
+        $code = Arr::get($response, 'status_detail', Arr::get($response, 'status'));
+
+        $message = Arr::get($codeMap, $code);
+
+        $message = $message
+            ? str_replace(array_keys($values), array_values($values), $message)
+            : str_replace('_', ' ', $code);
+
+        return ucfirst($message);
     }
 
     /**

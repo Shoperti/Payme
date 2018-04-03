@@ -85,7 +85,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['payment_method_id'] = Arr::get($card, 'brand');
         }
 
-        $params['installments'] = isset($options['monthly_installments']) && in_array($options['monthly_installments'], [3, 6, 9, 12])
+        $params['installments'] = isset($options['monthly_installments']) && ctype_digit($options['monthly_installments'])
             ? (int) Arr::get($options, 'monthly_installments')
             : 1;
 
@@ -103,11 +103,14 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addOrder(array $params, $money, array $options)
     {
-        return array_merge($params, [
-            'transaction_amount' => (float) $this->gateway->amount($money),
-            'description'        => Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase')),
-            'external_reference' => Arr::get($options, 'reference'),
-        ]);
+        $params['transaction_amount'] = (float) $this->gateway->amount($money);
+        $params['external_reference'] = Arr::get($options, 'reference');
+
+        if (isset($options['description'])) {
+            $params['statement_descriptor'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
+        }
+
+        return $params;
     }
 
     /**
@@ -154,11 +157,11 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addAdditionData(array $params, array $options)
     {
-        if (array_key_exists('application', $options)) {
+        if (isset($options['application']) && ctype_digit($options['application'])) {
             $params['sponsor_id'] = (int) $options['application'];
         }
 
-        if (array_key_exists('notify_url', $options)) {
+        if (isset($options['notify_url'])) {
             $params['notification_url'] = $options['notify_url'];
         }
 

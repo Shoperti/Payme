@@ -10,4 +10,13 @@ abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->credentials = require __DIR__.'/stubs/credentials.php';
     }
+
+    protected function getOrderPayload(array $customData = [])
+    {
+        $order = include __DIR__.'/stubs/orderPayload.php';
+
+        $order['payload'] = array_merge($order['payload'], $customData);
+
+        return $order;
+    }
 }

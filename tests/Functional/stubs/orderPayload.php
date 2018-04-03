@@ -3,10 +3,20 @@
 return [
     'total'   => 9900,
     'payload' => [
-        'reference'  => 'order_1',
+        'device_id'   => 'test',
+        'application' => 'PayMe_cart',
+        'return_url'  => 'http://google.com',
+        'cancel_url'  => 'http://google.com',
+
+        'reference'   => 'order_'.time().rand(10000, 99999),
+        'description' => 'Awesome Store',
+        'currency'    => 'MXN',
+
         'name'       => 'François Hollande',
+        'first_name' => 'François',
+        'last_name'  => 'Hollande',
         'phone'      => '+5215511223344',
-        'email'      => 'customer@email.com',
+        'email'      => 'customer@example.com',
         'line_items' => [
             [
                 'name'        => 'Box of Cohiba S1s',

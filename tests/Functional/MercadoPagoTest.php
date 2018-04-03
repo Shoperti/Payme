@@ -11,49 +11,81 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['mercadopago']);
 
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway', $gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\MercadoPago\Charges', $gateway->charges());
+        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway::class, $gateway->getGateway());
+        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPago\Charges::class, $gateway->charges());
     }
 
-    /** @test */
-    public function it_should_succeed_to_charge_a_token_with_params()
+    private function paymentTest($methodId, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = PayMe::make($this->credentials['mercadopago']);
+        $gateway = $gateway ?: PayMe::make($this->credentials['mercadopago']);
 
-        $cardNumber = '5031755734530604';
+        $order = $this->getOrderPayload([
+            'card' => [
+                'brand' => $methodId,
+            ],
+        ]);
 
-        $amount = 1234;
-
-        $payload = $this->getPayload();
-
-        $token = $this->getToken($this->credentials['mercadopago'], $cardNumber, $payload);
+        $payload = $order['payload'];
+        $amount = $order['total'];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->charges()->create($amount, $token, $payload);
 
         $data = $response->data();
 
-        $this->assertTrue($response->success());
-        $this->assertSame($gateway->getGateway()->amount($amount), "{$data['transaction_details']['total_paid_amount']}");
-        $this->assertSame('regular_payment', $data['operation_type']);
-        $this->assertSame('approved', $data['status']);
-        $this->assertSame($payload['first_name'], $data['additional_info']['payer']['first_name']);
-        $this->assertSame($payload['last_name'], $data['additional_info']['payer']['last_name']);
+        $this->assertSame($success, $response->success());
 
-        return [$data, $amount];
+        if ($success) {
+            $this->assertEquals($gateway->getGateway()->amount($amount), "{$data['transaction_details']['total_paid_amount']}");
+            $this->assertSame('regular_payment', $data['operation_type']);
+            $this->assertSame($responseStatus, $data['status']);
+            $this->assertSame($responseType, $data['payment_type_id']);
+            $this->assertSame($payload['first_name'], $data['additional_info']['payer']['first_name']);
+            $this->assertSame($payload['last_name'], $data['additional_info']['payer']['last_name']);
+        }
+
+        return [$data, $amount, $response];
+    }
+
+    /** @test */
+    public function it_should_succeed_to_charge_a_token_with_params()
+    {
+        $cardNumber = '5031755734530604';
+
+        $token = $this->getToken(
+            $this->credentials['mercadopago'],
+            $cardNumber,
+            $this->getOrderPayload()['payload']
+        );
+
+        return $this->paymentTest('master', $token, true, 'approved', 'credit_card');
+    }
+
+    /** @test */
+    public function it_should_succeed_to_create_a_charge_with_atm()
+    {
+        $data = $this->paymentTest('banamex', null, true, 'pending', 'atm')[0];
+
+        $this->assertArrayHasKey('transaction_details', $data);
+        $this->assertArrayHasKey('external_resource_url', $data['transaction_details']);
+    }
+
+    /** @test */
+    public function it_should_succeed_to_create_a_charge_with_ticket()
+    {
+        $data = $this->paymentTest('oxxo', null, true, 'pending', 'ticket')[0];
+
+        $this->assertArrayHasKey('transaction_details', $data);
+        $this->assertArrayHasKey('external_resource_url', $data['transaction_details']);
     }
 
     /** @test */
     public function it_should_fail_to_charge_a_token()
     {
-        /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = PayMe::make($this->credentials['mercadopago']);
+        $response = $this->paymentTest('master', 'invalid_token', false)[2];
 
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->charges()->create(1000, 'tok_test_card_declined');
-
-        $this->assertFalse($response->success());
+        $this->assertSame('Card Token not found', $response->message());
     }
 
     /** @test */
@@ -62,10 +94,9 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = PayMe::make(array_merge($this->credentials['mercadopago'], ['private_key' => 'invalid_key']));
 
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->charges()->create(1000, 'tok_test_card_declined');
+        $response = $this->paymentTest('master', 'invalid_token', false, null, null, $gateway)[2];
 
-        $this->assertSame('Malformed access_token: null', $response->message());
+        $this->assertSame('Malformed access_token: invalid_key', $response->message());
     }
 
     /**
@@ -87,8 +118,8 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        // previous test creates a charge of 1000
-        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+
+        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
     }
 
     /**
@@ -115,62 +146,6 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * Gets a request payload array.
-     *
-     * @return array
-     */
-    private function getPayload()
-    {
-        return [
-            'reference'        => 'order_'.time().rand(10000, 99999),
-            'device_id'        => 'test',
-            'description'      => 'Awesome Store',
-            'currency'         => 'MXN',
-            'return_url'       => 'http://google.com',
-            'notify_url'       => 'http://google.com',
-            'cancel_url'       => 'http://google.com',
-            'name'             => 'Juan Pérez',
-            'first_name'       => 'Juan',
-            'last_name'        => 'Pérez',
-            'email'            => 'test_user_75095492@testuser.com',
-            'phone'            => '525555555',
-            'discount'         => 0,
-            'discount_concept' => null,
-            'card'             => [
-                'brand' => 'master',
-            ],
-            'line_items'       => [
-                [
-                    'name'        => 'Zapato dama modelo TOLDA 24 Negro',
-                    'description' => 'Zapato dama modelo TOLDA 24 Negro',
-                    'unit_price'  => 14000,
-                    'quantity'    => 2,
-                    'sku'         => 'TOLDAA',
-                ],
-            ],
-            'billing_address' => [
-                'address1' => 'calle falsa 123',
-                'address2' => 'Colonia',
-                'city'     => 'delegación',
-                'country'  => 'MX',
-                'state'    => 'Ciudad de México',
-                'zip'      => '12345',
-            ],
-            'shipping_address' => [
-                'address1' => 'calle falsa 123',
-                'address2' => 'Colonia',
-                'city'     => 'delegación',
-                'country'  => 'MX',
-                'state'    => 'Ciudad de México',
-                'zip'      => '12345',
-                'price'    => 10000,
-                'carrier'  => 'shoperti',
-                'service'  => 'pending',
-            ],
-        ];
-    }
-
-    /**
      * Generate a token for tests.
      *
      * @param array  $credentials
@@ -188,14 +163,12 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
             ],
             'json' => [
                 'card_number'      => $cardNumber,
-                'holder_name'      => $payload['name'],
                 'expiration_year'  => 2022,
                 'expiration_month' => 2,
                 'security_code'    => '123',
                 'cardholder'       => [
                     'name' => $payload['name'],
                 ],
-                'currency_id'      => 'USD',
             ],
         ]);
 

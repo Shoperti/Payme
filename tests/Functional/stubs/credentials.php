@@ -43,7 +43,7 @@ return [
 
     'mercadopago' => [
         'driver'      => 'mercado_pago',
-        'private_key' => 'TEST-3448849932020678-092817-f2101495af54d88467ec560ab9d3cf04__LD_LA__-275561712',
+        'private_key' => 'TEST-1468273673739017-031220-54c238c506d6d8427a07e72661af1368__LA_LD__-307532101',
     ],
 
     'mercadopago_basic' => [

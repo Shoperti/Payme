@@ -125,7 +125,20 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
         $response['topic'] = Arr::get($options, 'topic');
 
-        return $this->respond($response);
+        return $this->respond($response, $rawResponse->getStatusCode());
+    }
+
+    /**
+     * Check if it's a successful response.
+     *
+     * @param array $response
+     * @param int   $code
+     *
+     * @return bool
+     */
+    protected function isSuccess($response, $code)
+    {
+        return null === Arr::get($response, 'error');
     }
 
     /**
