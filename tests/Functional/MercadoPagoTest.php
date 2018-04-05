@@ -15,16 +15,12 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPago\Charges::class, $gateway->charges());
     }
 
-    private function paymentTest($methodId, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)
+    private function paymentTest($payload, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = $gateway ?: PayMe::make($this->credentials['mercadopago']);
 
-        $order = $this->getOrderPayload([
-            'card' => [
-                'brand' => $methodId,
-            ],
-        ]);
+        $order = $this->getOrderPayload($payload ?: []);
 
         $payload = $order['payload'];
         $amount = $order['total'];
@@ -59,22 +55,36 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
             $this->getOrderPayload()['payload']
         );
 
-        return $this->paymentTest('master', $token, true, 'approved', 'credit_card');
-    }
+        $payload = [
+            'card' => [
+                'brand' => 'master',
+            ],
+        ];
 
-    /** @test */
-    public function it_should_succeed_to_create_a_charge_with_atm()
-    {
-        $data = $this->paymentTest('banamex', null, true, 'pending', 'atm')[0];
-
-        $this->assertArrayHasKey('transaction_details', $data);
-        $this->assertArrayHasKey('external_resource_url', $data['transaction_details']);
+        return $this->paymentTest($payload, $token, true, 'approved', 'credit_card');
     }
 
     /** @test */
     public function it_should_succeed_to_create_a_charge_with_ticket()
     {
-        $data = $this->paymentTest('oxxo', null, true, 'pending', 'ticket')[0];
+        $payload = [
+            'days_to_expire' => 3,
+        ];
+
+        $paymentResult = $this->paymentTest($payload, 'oxxo', true, 'pending', 'ticket');
+        $data = $paymentResult[0];
+
+        $this->assertArrayHasKey('transaction_details', $data);
+        $this->assertArrayHasKey('external_resource_url', $data['transaction_details']);
+        $this->assertNotNull($data['date_of_expiration']);
+
+        return $paymentResult;
+    }
+
+    /** @test */
+    public function it_should_succeed_to_create_a_charge_with_atm()
+    {
+        $data = $this->paymentTest(null, 'banamex', true, 'pending', 'atm')[0];
 
         $this->assertArrayHasKey('transaction_details', $data);
         $this->assertArrayHasKey('external_resource_url', $data['transaction_details']);
@@ -83,7 +93,13 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_a_token()
     {
-        $response = $this->paymentTest('master', 'invalid_token', false)[2];
+        $payload = [
+            'card' => [
+                'brand' => 'master',
+            ],
+        ];
+
+        $response = $this->paymentTest($payload, 'invalid_token', false)[2];
 
         $this->assertSame('Card Token not found', $response->message());
     }
@@ -94,7 +110,13 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = PayMe::make(array_merge($this->credentials['mercadopago'], ['private_key' => 'invalid_key']));
 
-        $response = $this->paymentTest('master', 'invalid_token', false, null, null, $gateway)[2];
+        $payload = [
+            'card' => [
+                'brand' => 'master',
+            ],
+        ];
+
+        $response = $this->paymentTest($payload, 'invalid_token', false, null, null, $gateway)[2];
 
         $this->assertSame('Malformed access_token: invalid_key', $response->message());
     }
@@ -124,7 +146,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
 
     /**
      * @test
-     * @depends it_should_succeed_to_charge_a_token_with_params
+     * @depends it_should_succeed_to_create_a_charge_with_ticket
      *
      * @param array $dataAndAmount
      */
@@ -137,7 +159,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $options = ['type' => 'payment'];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->events()->find($chargeData['id'], $options);
+        $response = $gateway->events()->find($chargeData['id']);
 
         $data = $response->data();
 
