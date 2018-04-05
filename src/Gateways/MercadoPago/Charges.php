@@ -89,7 +89,7 @@ class Charges extends AbstractApi implements ChargeInterface
             $params['payment_method_id'] = $payment;
 
             if (isset($options['days_to_expire']) && ctype_digit((string) $options['days_to_expire'])) {
-                $daysToExpire = (int) $options['days_to_expire'];
+                $daysToExpire = $options['days_to_expire'];
                 $expirationDate = date('Y-m-d', strtotime("+{$daysToExpire} days")).'T00:00:00.000-00:00';
 
                 $params['date_of_expiration'] = $expirationDate;
