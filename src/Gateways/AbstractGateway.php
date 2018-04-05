@@ -131,7 +131,7 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
-     * Accept the amount of money in base unit and returns cants or base unit.
+     * Accept the amount of money in base unit and returns cents or base unit.
      *
      * @param int|float $money
      *
@@ -149,7 +149,7 @@ abstract class AbstractGateway implements GatewayInterface
             throw new InvalidArgumentException('Money amount must be a positive number.');
         }
 
-        if ($this->getMoneyFormat() == 'cents') {
+        if ($this->getMoneyFormat() === 'cents') {
             return number_format($money, 0, '', '');
         }
 
