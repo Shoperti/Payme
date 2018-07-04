@@ -75,6 +75,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params['order_id'] = Arr::get($options, 'reference');
         $params['order_name'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['order_price'] = $this->gateway->amount($money);
+        $params['currency'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
 
         return $params;
     }
