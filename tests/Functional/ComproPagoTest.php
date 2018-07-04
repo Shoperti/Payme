@@ -7,10 +7,6 @@ use Shoperti\PayMe\PayMe;
 class ComproPagoTest extends AbstractFunctionalTestCase
 {
     protected $gateway;
-    protected $options = [
-        'email' => 'john@doe.com',
-        'name'  => 'John Doe',
-    ];
 
     public function setUp()
     {
@@ -20,56 +16,137 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
-    public function it_should_create_a_new_conekta_gateway()
+    public function it_should_create_a_new_gateway()
     {
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway', $this->gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\ComproPago\Charges', $this->gateway->charges());
+        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\ComproPago\ComproPagoGateway::class, $this->gateway->getGateway());
+        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\ComproPago\Charges::class, $this->gateway->charges());
     }
 
     /** @test */
-    public function it_should_succeed_to_charge_a_token()
+    public function it_should_fail_to_generate_a_payment_with_invalid_access_key()
     {
-        $charge = $this->gateway->charges()->create(1000, 'oxxo', $this->options);
+        $orderData = $this->getOrderPayload();
+
+        /** @var \Shoperti\PayMe\PayMe $gateway */
+        $gateway = PayMe::make(array_merge($this->credentials['compro_pago'], ['private_key' => 'invalid_key']));
+
+        $charge = $gateway->charges()->create($orderData['total'], 'oxxo', $orderData['payload']);
+
+        $this->assertFalse($charge->success());
+    }
+
+    /** @test */
+    public function it_should_succeed_to_generate_a_payment_with_min_data()
+    {
+        $orderData = $this->getOrderPayload();
+        $payload = [
+            'email' => $orderData['payload']['email'],
+            'name'  => 'John Doe',
+        ];
+
+        $charge = $this->gateway->charges()->create($orderData['total'], 'oxxo', $payload);
 
         $this->assertTrue($charge->success());
     }
 
     /** @test */
-    public function it_should_succeed_to_charge_a_token_with_params()
+    public function it_should_succeed_to_generate_a_payment()
     {
-        $reference = 'order_1';
+        $orderData = $this->getOrderPayload();
 
-        $charge = $this->gateway->charges()->create(1000, 'oxxo', $this->options + [
-            'reference' => $reference,
-        ]);
+        $charge = $this->gateway->charges()->create($orderData['total'], 'oxxo', $orderData['payload']);
 
         $response = $charge->data();
 
         $this->assertTrue($charge->success());
-        $this->assertSame($reference, $response['order_info']['order_id']);
+        $this->assertSame($orderData['payload']['reference'], $response['order_info']['order_id']);
+
+        return $charge;
     }
 
-    /** @test */
-    public function it_should_fail_with_invalid_access_key()
+    /**
+     * @test
+     * @depends it_should_succeed_to_generate_a_payment
+     *
+     * @param array $charge
+     */
+    public function it_should_retrieve_an_event($charge)
     {
-        $gateway = PayMe::make(array_merge($this->credentials['compro_pago'], ['private_key' => 'invalid_key']));
-
-        $charge = $gateway->charges()->create(1000, 'oxxo', $this->options);
-
-        $this->assertSame('Credenciales incorrectas. Por favor ingresar un usuario y contraseña válida.', $charge->message());
-    }
-
-    /** @test */
-    public function it_can_retrieve_a_single_event()
-    {
-        $amount = 1500;
-
-        $charge = $this->gateway->charges()->create($amount, 'oxxo', $this->options);
-
         $event = $this->gateway->events()->find($charge->reference());
 
         $response = $event->data();
+        $chargeResponse = $charge->data();
 
-        $this->assertEquals($amount / 100, $response['amount']);
+        $this->assertTrue($event->success());
+        $this->assertEquals($chargeResponse['amount'], $response['amount']);
+    }
+
+    /** @test */
+    public function it_should_create_a_webhook()
+    {
+        $payload = [
+            'url' => 'https://httpbin.org/post?rand='.rand(0, getrandmax()),
+        ];
+
+        /** @var \Shoperti\PayMe\Contracts\WebhookInterface $hooksManager */
+        $hooksManager = $this->gateway->webhooks();
+
+        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
+        $response = $hooksManager->create($payload);
+
+        $data = $response->data();
+
+        $this->assertSame($payload['url'], $data['url']);
+
+        return $data;
+    }
+
+    /**
+     * @test
+     * @depends it_should_create_a_webhook
+     *
+     * @param array $dataAndAmount
+     */
+    public function it_should_get_all_webhooks($data)
+    {
+        /** @var \Shoperti\PayMe\Contracts\WebhookInterface $hooksManager */
+        $hooksManager = $this->gateway->webhooks();
+
+        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
+        $response = $hooksManager->all();
+
+        $items = [];
+        foreach ($response as $responseItem) {
+            $items[] = $responseItem->data()['id'];
+        }
+
+        $this->assertGreaterThan(0, count($items));
+        $this->assertContains($data['id'], $items);
+
+        return $items;
+    }
+
+    /**
+     * @test
+     * @depends it_should_get_all_webhooks
+     *
+     * @param array $ids
+     */
+    public function it_should_delete_webhooks($ids)
+    {
+        /** @var \Shoperti\PayMe\Contracts\WebhookInterface $hooksManager */
+        $hooksManager = $this->gateway->webhooks();
+
+        foreach ($ids as $id) {
+            $response = $hooksManager->delete($id);
+            $this->assertSame($id, $response->data()['id']);
+        }
+    }
+
+    protected function getOrderPayload(array $customData = [])
+    {
+        $microtime = str_replace('.', '', ''.microtime(true));
+
+        return parent::getOrderPayload(['email' => "customer$microtime@example.com"]);
     }
 }

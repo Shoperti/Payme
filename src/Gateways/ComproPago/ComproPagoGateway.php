@@ -86,8 +86,6 @@ class ComproPagoGateway extends AbstractGateway
      */
     public function commit($method, $url, $params = [], $options = [])
     {
-        $success = false;
-
         $request = [
             'exceptions'      => false,
             'timeout'         => '80',
@@ -112,21 +110,21 @@ class ComproPagoGateway extends AbstractGateway
             $response = $this->responseError($rawResponse->getBody());
         }
 
-        return $this->respond($success, $response);
+        return $this->respond($response);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool  $success
      * @param array $response
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($success, $response)
+    protected function respond($response)
     {
         if (!isset($response[0])) {
-            $success = !(array_key_exists('type', $response) && $response['type'] == 'error');
+            $success = !(array_key_exists('type', $response) && $response['type'] == 'error')
+                && !(array_key_exists('status', $response) && $response['status'] == 'error');
 
             return $this->mapResponse($success, $response);
         }
@@ -134,7 +132,8 @@ class ComproPagoGateway extends AbstractGateway
         $responses = [];
 
         foreach ($response as $responds) {
-            $success = !(array_key_exists('type', $response) && $response['type'] == 'error');
+            $success = !(array_key_exists('type', $response) && $response['type'] == 'error')
+                && !(array_key_exists('status', $response) && $response['status'] == 'error');
 
             $responses[] = $this->mapResponse($success, $responds);
         }
@@ -210,7 +209,7 @@ class ComproPagoGateway extends AbstractGateway
      *
      * @param array $response
      *
-     * @return \Shoperti\PayMe\Status
+     * @return \Shoperti\PayMe\Status|null
      */
     protected function getStatus($response)
     {
@@ -228,7 +227,6 @@ class ComproPagoGateway extends AbstractGateway
             case 'pending':
             case 'charge.pending':
                 return new Status('pending');
-                break;
             case 'success':
             case 'charge.success':
                 return new Status('paid');

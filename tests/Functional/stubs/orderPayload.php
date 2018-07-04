@@ -5,8 +5,8 @@ return [
     'payload' => [
         'device_id'   => 'test',
         'application' => 'PayMe_cart',
-        'return_url'  => 'http://google.com',
-        'cancel_url'  => 'http://google.com',
+        'return_url'  => 'http://example.com',
+        'cancel_url'  => 'http://example.com',
 
         'reference'   => 'order_'.time().rand(10000, 99999),
         'description' => 'Awesome Store',

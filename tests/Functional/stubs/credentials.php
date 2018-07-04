@@ -7,8 +7,8 @@ return [
 
     'compro_pago' => [
         'driver'      => 'compro_pago',
-        'private_key' => 'sk_test_75c7b279365b4449d',
-        'public_key'  => 'pk_test_613ed49349849c194',
+        'private_key' => 'sk_test_9c95e149614142822f',
+        'public_key'  => 'pk_test_638e8b14112423a086',
     ],
 
     'conekta' => [
