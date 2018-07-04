@@ -59,12 +59,18 @@ class Charges extends AbstractApi implements ChargeInterface
     public function refund($amount, $reference, array $options = [])
     {
         $params = [];
-        $params['amount'] = $this->gateway->amount($amount);
-        $params = $this->addLineItems($params, $options);
+
+        if ($amount !== null) {
+            $params['amount'] = $this->gateway->amount($amount);
+        }
+
+        if (array_key_exists('reason', $options)) {
+            $params['reason'] = $options['reason'];
+        }
 
         $url = sprintf($this->gateway->buildUrlFromString('orders').'/%s/refund', $reference);
 
-        return $this->gateway->commit('post', $url, $options);
+        return $this->gateway->commit('post', $url, $params);
     }
 
     /**

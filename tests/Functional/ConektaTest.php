@@ -170,7 +170,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -188,7 +188,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -212,7 +212,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -236,7 +236,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -259,39 +259,48 @@ class ConektaTest extends AbstractFunctionalTestCase
      * @test
      * @depends it_should_succeed_to_charge_an_order_with_card_token
      */
-    public function it_should_succeed_to_refund_a_charge($response)
+    public function it_should_succeed_to_fully_refund_a_charge($prevResponse)
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
-        $charge = $gateway->charges()->refund(9900, $response['id'], [
-            'currency'   => 'MXN',
-            'reason'     => 'requested_by_client',
-            'line_items' => [
-                [
-                    'name'        => 'Box of Cohiba S1s',
-                    'description' => 'Imported From Mex.',
-                    'unit_price'  => 4900,
-                    'quantity'    => 1,
-                    'sku'         => 'cohb_s1',
-                ],
-                [
-                    'name'        => 'Basic Toothpicks',
-                    'description' => 'Wooden',
-                    'unit_price'  => 500,
-                    'quantity'    => 10,
-                    'sku'         => 'tooth_r3',
-                ],
-            ],
+        $refund = $gateway->charges()->refund(null, $prevResponse['id'], [
+            'currency' => 'MXN',
+            'reason'   => 'requested_by_client',
         ]);
 
-        $response = $charge->data();
+        $response = $refund->data();
 
-        $this->assertTrue($charge->success());
-        // previous test created a charge for 99.00
+        $this->assertTrue($refund->success());
         $this->assertSame(9900, $response['amount_refunded']);
 
-        $this->assertSame($charge->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
-        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
+        $this->assertSame($refund->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
+        $this->assertSame($refund->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
+    }
+
+    /**
+     * @test
+     * @depends it_should_succeed_to_charge_an_order_with_card_token
+     */
+    public function it_should_succeed_to_partially_refund_a_charge()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+        $order = $this->getOrderPayload();
+
+        $charge = $gateway->charges()->create($order['total'], 'tok_test_visa_4242', $order['payload']);
+        $prevResponse = $charge->data();
+
+        $refund = $gateway->charges()->refund(5000, $prevResponse['id'], [
+            'currency' => 'MXN',
+            'reason'   => 'requested_by_client',
+        ]);
+
+        $response = $refund->data();
+
+        $this->assertTrue($refund->success());
+        $this->assertSame(5000, $response['amount_refunded']);
+
+        $this->assertSame($refund->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
+        $this->assertSame($refund->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
     }
 
     /** @test */
