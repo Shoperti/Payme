@@ -216,7 +216,7 @@ class ConektaGateway extends AbstractGateway
             return $type;
         }
 
-        switch (Arr::get($rawResponse, 'status')) {
+        switch (Arr::get($rawResponse, 'payment_status')) {
             case 'partially_refunded':
             case 'refunded':
                 return 'refund';
@@ -235,11 +235,11 @@ class ConektaGateway extends AbstractGateway
      */
     protected function getReferences($response, $type)
     {
-        if ($type == 'order') {
+        if (in_array($type, ['order', 'refund'])) {
             $charges = $response['charges']['data'];
             $charge = end($charges);
 
-            if (Arr::get($response, 'amount_refunded')) {
+            if ($type === 'refund') {
                 $refunds = $charge['refunds']['data'];
                 $refund = end($refunds);
 

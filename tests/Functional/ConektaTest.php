@@ -271,8 +271,8 @@ class ConektaTest extends AbstractFunctionalTestCase
         $response = $refund->data();
 
         $this->assertTrue($refund->success());
+        $this->assertSame('refund', $refund->type());
         $this->assertSame(9900, $response['amount_refunded']);
-
         $this->assertSame($refund->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
         $this->assertSame($refund->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
     }
@@ -297,8 +297,8 @@ class ConektaTest extends AbstractFunctionalTestCase
         $response = $refund->data();
 
         $this->assertTrue($refund->success());
+        $this->assertSame('refund', $refund->type());
         $this->assertSame(5000, $response['amount_refunded']);
-
         $this->assertSame($refund->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
         $this->assertSame($refund->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
     }
