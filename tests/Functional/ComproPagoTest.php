@@ -116,7 +116,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
         $response = $hooksManager->all();
 
         $items = [];
-        foreach($response as $responseItem) {
+        foreach ($response as $responseItem) {
             $items[] = $responseItem->data()['id'];
         }
 
