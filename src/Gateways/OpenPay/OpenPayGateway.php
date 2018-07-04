@@ -181,10 +181,10 @@ class OpenPayGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        $type = Arr::get($response, 'transaction_type');
+        $type = $this->getType($response);
 
         list($reference, $authorization) = $success
-            ? [Arr::get($response, 'id'), $this->getAuthorization($response)]
+            ? $this->getReferences($response, $type)
             : [Arr::get($response, 'request_id'), null];
 
         $message = $success
@@ -202,6 +202,41 @@ class OpenPayGateway extends AbstractGateway
             'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
+    }
+
+    /**
+     * Get the transaction type.
+     *
+     * @param array $rawResponse
+     *
+     * @return string|null
+     */
+    protected function getType($rawResponse)
+    {
+        if (array_key_exists('refund', $rawResponse)) {
+            return 'refund';
+        }
+
+        return Arr::get($rawResponse, 'transaction_type');
+    }
+
+    /**
+     * Get the transaction reference and auth code.
+     *
+     * @param array       $response
+     * @param string|null $type
+     *
+     * @return array
+     */
+    protected function getReferences($response, $type)
+    {
+        if ($type === 'refund') {
+            $response = $response['refund'];
+        }
+
+        $id = Arr::get($response, 'id');
+
+        return [$id, $this->getAuthorization($response)];
     }
 
     /**

@@ -46,9 +46,9 @@ class OpenPayTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
 
-        $amount = 1234;
-
-        $payload = $this->getPayload();
+        $order = $this->getOrderPayload();
+        $amount = $order['total'];
+        $payload = $order['payload'];
 
         $method = 'store';
 
@@ -58,9 +58,11 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('store', $data['method']);
         $this->assertSame('in_progress', $data['status']);
+        $this->assertSame('charge', $response->type());
+        $this->assertSame($data['id'], $response->reference());
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);
@@ -72,9 +74,9 @@ class OpenPayTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
         $openPayPayMe = PayMe::make($this->credentials['open_pay']);
 
-        $amount = 1234;
-
-        $payload = $this->getPayload();
+        $order = $this->getOrderPayload();
+        $amount = $order['total'];
+        $payload = $order['payload'];
 
         $method = 'bank_account';
 
@@ -84,9 +86,11 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('bank_account', $data['method']);
         $this->assertSame('in_progress', $data['status']);
+        $this->assertSame('charge', $response->type());
+        $this->assertSame($data['id'], $response->reference());
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);
@@ -100,9 +104,9 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
         $cardNumber = '4242424242424242';
 
-        $amount = 1234;
-
-        $payload = $this->getPayload();
+        $order = $this->getOrderPayload();
+        $amount = $order['total'];
+        $payload = $order['payload'];
 
         $token = $this->getToken($this->credentials['open_pay'], $cardNumber, $payload);
 
@@ -112,9 +116,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('card', $data['method']);
         $this->assertSame('completed', $data['status']);
+        $this->assertSame('charge', $response->type());
+        $this->assertSame($data['id'], $response->reference());
+        $this->assertSame($data['authorization'], $response->authorization());
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);
@@ -164,8 +171,10 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        // previous test creates a charge of 1000
-        $this->assertSame($openPayPayMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
+        $this->assertSame('refund', $response->type());
+        $this->assertSame($response['refund']['id'], $response->reference());
+        $this->assertSame($response['refund']['authorization'], $response->authorization());
+        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
     }
 
     /** @test */
@@ -218,59 +227,6 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $openPayHooks->delete($data['id']);
 
         $this->assertSame($data['url'], $webhook->data()['url']);
-    }
-
-    /**
-     * Gets a request payload array.
-     *
-     * @return array
-     */
-    private function getPayload()
-    {
-        return [
-            'reference'        => 'order_'.time().rand(10000, 99999),
-            'device_id'        => 'test',
-            'application'      => 'PayMe_cart',
-            'description'      => 'Awesome Store',
-            'currency'         => 'MXN',
-            'return_url'       => 'http://google.com',
-            'cancel_url'       => 'http://google.com',
-            'name'             => 'Juan Pérez',
-            'first_name'       => 'Juan',
-            'last_name'        => 'Pérez',
-            'email'            => 'customer1@mail.com',
-            'phone'            => $this->generatePhoneNumber(),
-            'discount'         => 0,
-            'discount_concept' => null,
-            'line_items'       => [
-                [
-                    'name'        => 'Zapato dama modelo TOLDA 24 Negro',
-                    'description' => 'Zapato dama modelo TOLDA 24 Negro',
-                    'unit_price'  => 14000,
-                    'quantity'    => 2,
-                    'sku'         => 'TOLDAA',
-                ],
-            ],
-            'billing_address' => [
-                'address1' => 'calle falsa 123',
-                'address2' => 'Colonia',
-                'city'     => 'delegación',
-                'country'  => 'MX',
-                'state'    => 'Ciudad de México',
-                'zip'      => '12345',
-            ],
-            'shipping_address' => [
-                'address1' => 'calle falsa 123',
-                'address2' => 'Colonia',
-                'city'     => 'delegación',
-                'country'  => 'MX',
-                'state'    => 'Ciudad de México',
-                'zip'      => '12345',
-                'price'    => 10000,
-                'carrier'  => 'shoperti',
-                'service'  => 'pending',
-            ],
-        ];
     }
 
     /**
