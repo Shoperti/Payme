@@ -52,4 +52,10 @@ return [
         'client_secret' => '4Ca4PGM5AgvIeIUBFXxO9n0Ki858a6KA',
         'test'          => true,
     ],
+
+    'sr_pago' => [
+        'driver'      => 'sr_pago',
+        'public_key'  => 'pk_dev_5c07190bc412cT9?!R',
+        'private_key' => '562492dd-403b-4c55-ba4f-0bbe4dcab174',
+    ],
 ];
