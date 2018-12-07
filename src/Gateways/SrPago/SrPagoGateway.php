@@ -12,14 +12,14 @@ class SrPagoGateway extends AbstractGateway
      *
      * @var string
      */
-    protected $endpoint  = 'https://api.srpago.com'; 
+    protected $endpoint  = 'https://api.srpago.com/v1'; 
 
     /**
      * Sandbox endpoint
      *
      * @var string
      */
-    protected $sandboxEndpoint = 'https://sandbox-api.srpago.com';
+    protected $sandboxEndpoint = 'https://sandbox-api.srpago.com/v1';
 
     /**
      * Gateway display name.
@@ -42,6 +42,9 @@ class SrPagoGateway extends AbstractGateway
      */
     protected $connectionTokenExpiration;
 
+    protected $applicationKey;
+    protected $applicationSecret;
+
     /**
      * Undocumented function
      *
@@ -50,6 +53,11 @@ class SrPagoGateway extends AbstractGateway
     public function __construct(array $config)
     {
         Arr::requires($config, ['private_key']);
+        Arr::requires($config, ['secret_key']);
+
+        $this->applicationKey = Arr::get($config, 'private_key');
+
+        $this->applicationSecret = Arr::get($config, 'secret_key');
 
         parent::__construct($config);
     }
@@ -62,17 +70,27 @@ class SrPagoGateway extends AbstractGateway
     public function loginApplication()
     {
         $request = [
+            'auth' => [
+                $this->applicationKey,
+                $this->applicationSecret,
+            ],
             'headers' => [
                 'Content-Type'  => 'application/json',
                 'Accept'        => 'application/json',
-                'Authorization' => $this->applicationKey.':'.$this->applicationSecret,
             ],
+            'json'  => [
+                'application_bundle' => '',
+            ]
         ];
 
-        $raw = $this->getHttpClient()->post($this->getRequestUrl().'/v1/auth/login/application', $request);
+        $url = $this->getRequestUrl().'/auth/login/application';
+
+        $response = $this->getHttpClient()->post($url, $request);
+        $response = json_decode($response->getBody());
+
+        $this->connectionToken = $response->connection->token;
         
-        print_r($raw);
-        exit();
+        return $response;
     }
 
     public function commit($method, $url, $params = [], $options = [])
@@ -89,8 +107,8 @@ class SrPagoGateway extends AbstractGateway
         $statusCode = $raw->getStatusCode();
 
         $response = $statusCode == 200
-            ? $this->parseResponse($rawResponse->getBody())
-            : $this->responseError($rawResponse->getBody(), $statusCode);
+            ? $this->parseResponse($raw->getBody())
+            : $this->responseError($raw->getBody(), $statusCode);
 
         return $this->respond($response);
     }
