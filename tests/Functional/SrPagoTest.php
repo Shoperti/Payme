@@ -28,15 +28,34 @@ class SrPagoTest extends AbstractFunctionalTestCase
         $gateway = PayMe::make($this->credentials['sr_pago'])->getGateway();
 
         $response = $gateway->loginApplication();
-
         $this->assertNotNull($gateway->getConnectionToken());
     }
 
+
     /** @test */
-    public function it_should_succeed_to_charge_an_order_with_valid_token()
+    public function it_gets_a_valid_test_token()
     {
         $gateway = PayMe::make($this->credentials['sr_pago']);
 
-        $gateway->charges()->create(10.00, '');
+        $token = $gateway->getGateway()->getValidTestToken();
+
+        $this->assertEquals('tok_', substr($token, 0, 4));
+
+        return $token;
     }
+
+    /** 
+     * @test 
+     */
+    public function it_should_succeed_to_charge_an_order_with_valid_token()
+   {
+        $gateway = PayMe::make($this->credentials['sr_pago']);
+
+        $payload = include __DIR__.'/stubs/orderPayload.php';
+
+        $response = $gateway->charges()->create(1000, 'tok_dev_5c0ed0306bb77', $payload['payload']);
+
+        print_r($response);
+    }
+
 }

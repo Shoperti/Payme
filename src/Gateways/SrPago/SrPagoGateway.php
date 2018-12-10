@@ -4,6 +4,9 @@ namespace Shoperti\PayMe\Gateways\SrPago;
 
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Support\Arr;
+use Shoperti\PayMe\Response;
+use Shoperti\PayMe\Status;
+use Shoperti\PayMe\ErrorCode;
 
 class SrPagoGateway extends AbstractGateway
 {
@@ -36,27 +39,32 @@ class SrPagoGateway extends AbstractGateway
     protected $connectionToken;
 
     /**
-     * The  date time connection expiration
+     * The  date time connection token expiration
      *
      * @var string
      */
-    protected $connectionTokenExpiration;
-
-    protected $applicationKey;
-    protected $applicationSecret;
+    protected $tokenExpiration;
 
     /**
-     * Undocumented function
+     * Sr Pago application key
      *
-     * @return void
+     * @var string
      */
+    protected $applicationKey;
+
+    /**
+     * Sr Pago secret key
+     *
+     * @var string
+     */
+    protected $applicationSecret;
+
     public function __construct(array $config)
     {
         Arr::requires($config, ['private_key']);
         Arr::requires($config, ['secret_key']);
 
         $this->applicationKey = Arr::get($config, 'private_key');
-
         $this->applicationSecret = Arr::get($config, 'secret_key');
 
         parent::__construct($config);
@@ -67,7 +75,7 @@ class SrPagoGateway extends AbstractGateway
      *
      * @return void
      */
-    public function loginApplication()
+    public function loginApplication($applicationBundle = '')
     {
         $request = [
             'auth' => [
@@ -79,7 +87,7 @@ class SrPagoGateway extends AbstractGateway
                 'Accept'        => 'application/json',
             ],
             'json'  => [
-                'application_bundle' => '',
+                'application_bundle' => $applicationBundle,
             ]
         ];
 
@@ -93,15 +101,35 @@ class SrPagoGateway extends AbstractGateway
         return $response;
     }
 
+    /**
+     * Commit an http request
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $params
+     * @param array $options
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
     public function commit($method, $url, $params = [], $options = [])
     {
+        if (empty($this->connectionToken)) {
+            $this->loginApplication();
+        }
+        
         $request = [
+            'exceptions'      => false,
+            'timeout'         => '80',
+            'connect_timeout' => '30',
             'headers'   => [
                 'Content-Type'  => 'application/json',
                 'Accept'        => 'application/json',
                 'Authorization' => 'Bearer '.$this->connectionToken,
             ],
         ];
+
+        if (!empty($params)) {
+            $request[$method === 'get' ? 'query' : 'json'] = $params;
+        }
 
         $raw = $this->getHttpClient()->{$method}($url, $request);
         $statusCode = $raw->getStatusCode();
@@ -118,8 +146,76 @@ class SrPagoGateway extends AbstractGateway
         return $this->sandboxEndpoint;
     }
 
+
+    public function getConnectionToken()
+    {
+        return $this->connectionToken;
+    }
+
+    public function getApplicationKey()
+    {
+        return $this->applicationKey;
+    }
+
     /**
-     * Map an HTTP response to transaction object.
+     * Parse JSON response to array.
+     *
+     * @param string $body
+     *
+     * @return array|null
+     */
+    protected function parseResponse($body)
+    {
+        return json_decode($body, true);
+    }
+
+    /**
+     * Get error response from server or fallback to general error.
+     *
+     * @param string $body
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    protected function responseError($body, $httpCode)
+    {
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
+    }
+
+    /**
+     * Default JSON response.
+     *
+     * @param string $rawResponse
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    public function jsonError($rawResponse, $httpCode)
+    {
+        $msg = 'API Response not valid.';
+        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
+
+        return [
+            'message_to_purchaser' => $msg,
+        ];
+    }
+
+    /**
+     * Single response.
+     *
+     * @param array $response
+     *
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    protected function respond($response)
+    {
+        $success = Arr::get($response, 'success');
+
+        return $this->mapResponse($success, $response);
+    }
+
+    /**
+     * Map HTTP response to transaction object.
      *
      * @param bool  $success
      * @param array $response
@@ -128,11 +224,124 @@ class SrPagoGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        return;
+        // $reference = Arr::get($response['result']['recipe'], );
+        $authorization = Arr::get($response['result'], 'autorization_code');
+        // $message       = Arr::get($response['']);
+        $type          = Arr::get($response['result'], 'method');
+        $transaction   = Arr::get($response['result'], 'transaction');
+
+        if ($success) {
+            $message = 'Transaction approved';
+        } else {
+            $message = Arr::get($response['error'], 'message');
+        }
+
+        return (new Response())->setRaw($response)->map([
+            'isRedirect'    => false,
+            'success'       => $success,
+            'reference'     => $transaction,
+            'message'       => $message,
+            'test'          => false,
+            'authorization' => $authorization,
+            'status'        => $success ? $this->getStatus(Arr::get($response['result'], 'status', 'N')) : new Status('failed'),
+            'errorCode'     => $success ? null : $this->getErrorCode($response),
+            'type'          => $type,
+        ]);
     }
 
-    public function getConnectionToken()
+    /**
+     * Get the transaction type.
+     *
+     * @param array $rawResponse
+     *
+     * @return string
+     */
+    protected function getType($rawResponse)
     {
-        return $this->connectionToken;
+        if ($type = Arr::get($rawResponse, 'type')) {
+            return $type;
+        }
+
+        switch (Arr::get($rawResponse, 'payment_status')) {
+            case 'partially_refunded':
+            case 'refunded':
+                return 'refund';
+        }
+
+        return Arr::get($rawResponse, 'object');
+    }
+
+    /**
+     * Map SrPago response to error code object.
+     *
+     * @param array $response
+     *
+     * @return \Shoperti\PayMe\ErrorCode
+     */
+    protected function getErrorCode($response)
+    {
+        $code = Arr::get($response['error'], 'code', 'PaymentException');
+        if (!isset($codeMap[$code])) {
+            $code = 'PaymentException';
+        }
+
+        $codeMap = [
+            'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
+            'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption  
+            'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
+            'SuspectedFraudException'     => 'suspected_fraud',      // System detected transaction as fraud
+            'InvalidTransactionException' => 'processing_error',     // Transaction started but not processed due to internal rules
+            'PaymentException'            => 'card_declined',        // Transaction was rejected by bank
+            'SwitchException'             => 'processing_error',     // There's already a transaction with the same order id
+            'InternalErrorException'      => 'card_declined',        // Sr pago is not available to process transactions
+            'InvalidCardException'        => 'card_declined',         // Card already exists 
+        ];
+
+        return new ErrorCode($codeMap[$code]);
+    }
+
+    /**
+     * Map Conekta response to status object.
+     *
+     * @param string $status
+     *
+     * @return \Shoperti\PayMe\Status
+     */
+    protected function getStatus($status)
+    {
+        switch ($status) {
+            case 'pending_payment':
+                return new Status('pending');
+            case 'paid':
+            case 'refunded':
+            case 'partially_refunded':
+            case 'paused':
+            case 'active':
+            case 'canceled':
+                return new Status($status);
+            case 'in_trial':
+                return new Status('trial');
+        }
+    }
+
+    /**
+     * Return a valid token used for testing
+     *
+     * @return string
+     */
+    public function getValidTestToken()
+    {
+        $card = [
+            'cardholder_name' => 'FSMO',
+            'number'          => '4711121111111114',
+            'cvv'             => '123',
+            'expiration'      => (new \DateTime('+1 year'))->format('ym'),
+        ];
+
+        $params = Encryption::encryptParametersWithString($card);
+
+        $raw = $this->commit('post', $this->getRequestUrl().'/token', $params);
+
+        return $raw->data()['result']['token'];
     }
 }
