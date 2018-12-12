@@ -22,9 +22,8 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = [];
 
         $params = $this->addPayment($params, $amount, $payment, $options);
+        
         $params = Encryption::encryptParametersWithString($params);
-        print_r(json_encode($params));
-        die();
         $params = $this->addMetadata($params, $amount, $options);
 
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('payment/card'), $params);
@@ -39,7 +38,7 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function complete($options = [])
     {
-
+        return;
     }
 
     /**
@@ -53,23 +52,23 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function refund($amount, $reference, array $options = []) 
     {
-
+        return;
     }
 
     /**
-     * Undocumented function
+     * Add payment array param
      *
-     * @param [type] $params
-     * @param [type] $amount
-     * @param [type] $options
-     * @return void
+     * @param array $params
+     * @param float $amount
+     * @param array $options
+     * @return array
      */
     protected function addPayment($params, $amount,  $payment, $options)
     {
         return array_merge($params, [
             'payment' => [
                 'external' => [
-                    'transaction' => Arr::get($options, 'reference'),
+                    'transaction'     => Arr::get($options, 'reference'),
                     'application_key' => $this->gateway->getApplicationKey(),
                 ],
                 'reference' => [
@@ -80,13 +79,11 @@ class Charges extends AbstractApi implements ChargeInterface
                     'amount'   => $this->gateway->amount($amount),
                     'currency' => Arr::get($options, 'currency', $this->gateway->getCurrency()),
                 ],
-                'origin' => [
-                    "device" => "A007-23",
-                    "ip" => "187.188.104.19",
-                    "location" => [
-                        "latitude" => "19.003408",
-                        "longitude" =>  "-98.267280"
-                    ],
+                'origin'    => [
+                    'location' => [
+                        'latitude' => Arr::get($options, 'latitude', '0.00000'),
+                        'latitude' => Arr::get($options, 'longitude', '0.00000'),
+                    ]
                 ],
             ],
             'recurrent' => $payment,
@@ -108,25 +105,32 @@ class Charges extends AbstractApi implements ChargeInterface
                 'orderMessage' => Arr::get($options, 'orderMessage'),
                 'billing'      => [
                     'billingEmailAddress'  => Arr::get($billing, 'email', ''),
-                    'billingFirstName-D'   => Arr::get($billing, 'first_name', ''),
-                    'billingMiddleName-D'  => Arr::get($billing, 'middle_name', ''),  
-                    'billingLastName-D'    => Arr::get($billing, 'last_name', ''),
+                    'billingFirstName-D'   => Arr::get($options, 'first_name', ''),
+                    'billingMiddleName-D'  => Arr::get($options, 'middle_name', ''),  
+                    'billingLastName-D'    => Arr::get($options, 'last_name', ''),
                     'billingAddress-D'     => Arr::get($billing, 'address1', ''),
                     'billingAddress2-D'    => Arr::get($billing, 'address2', ''),
-                    'billingPhoneNumber-D' => Arr::get($billing, 'phone'),
+                    'billingPhoneNumber-D' => Arr::get($options, 'phone'),
                 ],
                 'shipping'      => [
-                    'billingEmailAddress'  => Arr::get($shipping, 'email', ''),
-                    'billingFirstName-D'   => Arr::get($shipping, 'first_name', ''),
-                    'billingMiddleName-D'  => Arr::get($shipping, 'middle_name', ''),  
-                    'billingLastName-D'    => Arr::get($shipping, 'last_name', ''),
-                    'billingAddress-D'     => Arr::get($shipping, 'address1', ''),
-                    'billingAddress2-D'    => Arr::get($shipping, 'address2', ''),
-                    'billingPhoneNumber-D' => Arr::get($shipping, 'phone'),
+                    'shippingFirstName-D'   => Arr::get($options, 'first_name', ''),
+                    'shippingMiddleName-D'  => Arr::get($options, 'middle_name', ''),  
+                    'shippingLastName-D'    => Arr::get($options, 'last_name', ''),
+                    'shippingEmailAddress'  => Arr::get($options, 'email', ''),
+                    'shippingAddress'       => Arr::get($shipping, 'address1', ''),
+                    'shippingAddress2'      => Arr::get($shipping, 'address2', ''),
+                    'shippingCity'          => Arr::get($shipping, 'city', ''),
+                    'shippingState'         => Arr::get($shipping, 'state', ''),
+                    'shippingPostalCode'    => Arr::get($shipping, 'zip', ''),
+                    'shippingCountry'       => Arr::get($shipping, 'country', ' '),
+                    'shippingMethod'        => Arr::get($shipping, 'method', ''), 
+                    'shippingDeadline'      => Arr::get($shipping, 'deadline', ''),
+                    'shippingPhoneNumber'   => Arr::get($options, 'phone'),
                 ],
                 'items' => [
                     'item' => $this->addItems($params, $options),
-                ]
+                ],
+              
             ],
         ]);
     }

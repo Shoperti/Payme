@@ -133,7 +133,7 @@ class SrPagoGateway extends AbstractGateway
 
         $raw = $this->getHttpClient()->{$method}($url, $request);
         $statusCode = $raw->getStatusCode();
-
+        
         $response = $statusCode == 200
             ? $this->parseResponse($raw->getBody())
             : $this->responseError($raw->getBody(), $statusCode);
@@ -224,10 +224,8 @@ class SrPagoGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        // $reference = Arr::get($response['result']['recipe'], );
         $authorization = Arr::get($response['result'], 'autorization_code');
-        // $message       = Arr::get($response['']);
-        $type          = Arr::get($response['result'], 'method');
+        $type          = $this->getType($response);
         $transaction   = Arr::get($response['result'], 'transaction');
 
         if ($success) {
@@ -258,17 +256,7 @@ class SrPagoGateway extends AbstractGateway
      */
     protected function getType($rawResponse)
     {
-        if ($type = Arr::get($rawResponse, 'type')) {
-            return $type;
-        }
-
-        switch (Arr::get($rawResponse, 'payment_status')) {
-            case 'partially_refunded':
-            case 'refunded':
-                return 'refund';
-        }
-
-        return Arr::get($rawResponse, 'object');
+        return Arr::get($rawResponse['result'], 'method');
     }
 
     /**
@@ -294,14 +282,15 @@ class SrPagoGateway extends AbstractGateway
             'PaymentException'            => 'card_declined',        // Transaction was rejected by bank
             'SwitchException'             => 'processing_error',     // There's already a transaction with the same order id
             'InternalErrorException'      => 'card_declined',        // Sr pago is not available to process transactions
-            'InvalidCardException'        => 'card_declined',         // Card already exists 
+            'InvalidCardException'        => 'card_declined',        // Card already exists 
+            'TokenAlreadyUsedException'   => 'card_declined',        // Token has already been used
         ];
 
         return new ErrorCode($codeMap[$code]);
     }
 
     /**
-     * Map Conekta response to status object.
+     * Map SrPago response to status object.
      *
      * @param string $status
      *
@@ -309,18 +298,11 @@ class SrPagoGateway extends AbstractGateway
      */
     protected function getStatus($status)
     {
-        switch ($status) {
-            case 'pending_payment':
+        switch (strtolower($status)) {
+            case 'n':
                 return new Status('pending');
-            case 'paid':
-            case 'refunded':
-            case 'partially_refunded':
-            case 'paused':
-            case 'active':
-            case 'canceled':
-                return new Status($status);
-            case 'in_trial':
-                return new Status('trial');
+            case 'c':
+                return new Status('authorized');
         }
     }
 
@@ -329,19 +311,32 @@ class SrPagoGateway extends AbstractGateway
      *
      * @return string
      */
-    public function getValidTestToken()
+    public function getValidTestToken($attributes = [])
     {
-        $card = [
+        $card = array_merge([
             'cardholder_name' => 'FSMO',
-            'number'          => '4711121111111114',
+            'number'          => '4242424242424242',
             'cvv'             => '123',
             'expiration'      => (new \DateTime('+1 year'))->format('ym'),
-        ];
+        ], $attributes);
 
         $params = Encryption::encryptParametersWithString($card);
 
-        $raw = $this->commit('post', $this->getRequestUrl().'/token', $params);
+        if (empty($this->connectionToken)) {
+            $this->loginApplication();
+        }
 
-        return $raw->data()['result']['token'];
+        $raw = $this->getHttpClient()->post($this->getRequestUrl().'/token', [
+            'headers' => [
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+                'Authorization' => 'Bearer '.$this->connectionToken,
+            ],
+            'json' => $params,
+        ]);
+
+        $response = $this->parseResponse($raw->getBody());
+
+        return $response['result']['token'];
     }
 }

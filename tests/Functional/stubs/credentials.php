@@ -55,8 +55,8 @@ return [
 
     'sr_pago' => [
         'driver'      => 'sr_pago',
-        'public_key'  => 'pk_dev_5c07190bc412cT9?!R',
-        'private_key' => '562492dd-403b-4c55-ba4f-0bbe4dcab174',
-        'secret_key'  => 'bbd(*9!xcLRg',
+        'public_key'  => 'pk_dev_5c116ef2cd8a4RVeVg',
+        'private_key' => '90185108-0b35-42a6-938a-a38c1e712603',
+        'secret_key'  => '4MIJKM=OcrUN',
     ],
 ];
