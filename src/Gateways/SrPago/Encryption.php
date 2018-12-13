@@ -1,24 +1,21 @@
 <?php
 
 /**
- *
- * Sr. Pago (https://srpago.com)
+ * Sr. Pago (https://srpago.com).
  *
  * @link      https://api.srpago.com
+ *
  * @copyright Copyright (c) 2016 SR PAGO
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
- * @package   SrPago\Util
  */
 
 namespace Shoperti\PayMe\Gateways\SrPago;
 
 /**
- * Class Encryption
- *
- * @package SrPago\Util
+ * Class Encryption.
  */
-class Encryption  {
-
+class Encryption
+{
     const SRPAGO_RSA_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAv0utLFjwHQk+1aLjxl9t
 Ojvt/qFD1HfMFzjYa4d3iFKrQtvxaWM/B/6ltPn6+Pez+dOd59zFmzNHg33h8S0p
@@ -38,12 +35,13 @@ M8SmGGsTo3V0L+Ni9bNJHa8CAwEAAQ==
     const CHARACTERS = '0123456789abcdef';
 
     /**
-     *
      * @param string $parametersJson
+     *
      * @return array
      */
-    public static function encryptParametersWithString($parametersJson){
-        if(!is_string($parametersJson)){
+    public static function encryptParametersWithString($parametersJson)
+    {
+        if (!is_string($parametersJson)) {
             $parametersJson = json_encode($parametersJson);
         }
 
@@ -54,20 +52,21 @@ M8SmGGsTo3V0L+Ni9bNJHa8CAwEAAQ==
         $key = base64_encode($resultKey);
 
         if (version_compare(PHP_VERSION, '7.1.0', '>=')) {
-        	$resultData = openssl_encrypt($parametersJson, 'AES-256-ECB', $randomKey32, OPENSSL_RAW_DATA);
+            $resultData = openssl_encrypt($parametersJson, 'AES-256-ECB', $randomKey32, OPENSSL_RAW_DATA);
         } else {
-        	$resultData = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $randomKey32, $parametersJson, MCRYPT_MODE_ECB);
+            $resultData = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $randomKey32, $parametersJson, MCRYPT_MODE_ECB);
         }
 
         $data = base64_encode($resultData);
-        return array('key'=>$key,'data'=>$data);
+
+        return ['key'=>$key, 'data'=>$data];
     }
 
-   /**
-    *
-    * @param int $length
-    * @return string
-    */
+    /**
+     * @param int $length
+     *
+     * @return string
+     */
     protected static function generateRandomString($length)
     {
         $characters = static::CHARACTERS;
@@ -77,15 +76,17 @@ M8SmGGsTo3V0L+Ni9bNJHa8CAwEAAQ==
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
+
         return $randomString;
     }
 
     protected static function encrypt($plaintext, $key)
     {
-        $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
+        $ivlen = openssl_cipher_iv_length($cipher = 'AES-128-CBC');
         $iv = openssl_random_pseudo_bytes($ivlen);
         $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $key, OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $ciphertext_raw, $key, true);
+
         return $iv.$hmac.$ciphertext_raw;
     }
 }

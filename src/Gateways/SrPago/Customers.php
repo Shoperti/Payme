@@ -15,7 +15,7 @@ class Customers extends AbstractApi implements CustomerInterface
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($customer) 
+    public function find($customer)
     {
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString('customer/'.$customer));
     }
@@ -34,7 +34,7 @@ class Customers extends AbstractApi implements CustomerInterface
             'email' => Arr::get($attributes, 'email'),
         ];
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customer'), $params); 
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customer'), $params);
     }
 
     /**
@@ -56,12 +56,12 @@ class Customers extends AbstractApi implements CustomerInterface
     }
 
     /**
-     * Associate a card to a customer
+     * Associate a card to a customer.
      *
      * @param string $customer
      * @param string $token
-     * 
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function addCard($customer, $token)
     {
@@ -70,19 +70,19 @@ class Customers extends AbstractApi implements CustomerInterface
         ];
 
         return $this->gateway->commit(
-                'post', 
-                $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'), 
+                'post',
+                $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'),
                 $params
             );
     }
 
     /**
-     * Associate a card to a customer
+     * Associate a card to a customer.
      *
      * @param string $customer
      * @param string $token
-     * 
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function delete($customer)
     {

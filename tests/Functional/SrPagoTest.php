@@ -2,18 +2,12 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\SrPago\Encryption;
 use Shoperti\PayMe\Gateways\SrPago\SrPagoGateway;
+use Shoperti\PayMe\PayMe;
 
 class SrPagoTest extends AbstractFunctionalTestCase
 {
-    /**
-     * SrPago gateway
-     *
-     * @var 
-     */
-    protected $gateway;
-
     /** @test */
     public function it_creates_a_sr_pago_instance()
     {
@@ -36,30 +30,29 @@ class SrPagoTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['sr_pago']);
 
-        $token = $gateway->getGateway()->getValidTestToken();
+        $token = $this->getValidTestToken();
 
-        $this->assertEquals('tok_', substr($token, 0, 4));
+        $this->assertStringStartsWith('tok_', $token);
     }
 
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_valid_token()
-   {
+    {
         $gateway = PayMe::make($this->credentials['sr_pago']);
 
-        $order   = include __DIR__.'/stubs/orderPayload.php';
-        $amount  = $order['total'];
-        $payload = $order['payload'];
+        $payload = $this->getOrderPayload();
+        $token = $this->getValidTestToken();
 
-        $token = $gateway->getGateway()->getValidTestToken();
-
-        $charge = $gateway->charges()->create($amount, $token, $payload);
+        $charge = $gateway->charges()->create($payload['total'], $token, $payload['payload']);
 
         $response = $charge->data();
 
         $this->assertTrue($charge->success());
         $this->assertEquals('CARD', $charge->type());
         $this->assertEquals($charge->reference(), $response['result']['transaction']);
+        $this->assertStringStartsWith('order_', $charge->reference());
         $this->assertEquals($charge->authorization(), $response['result']['recipe']['authorization_code']);
+        $this->assertEquals('Transaction approved', $charge->message());
     }
 
     /** @test */
@@ -67,17 +60,15 @@ class SrPagoTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['sr_pago']);
 
-        $order   = include __DIR__.'/stubs/orderPayload.php';
-        $amount  = $order['total'];
-        $payload = $order['payload'];
+        $payload = $this->getOrderPayload();
 
-        $token = $gateway->getGateway()->getValidTestToken([
-            'number' => '4111111111111137'
+        $token = $this->getValidTestToken([
+            'number' => '4111111111111137',
         ]);
 
-        $charge = $gateway->charges()->create($amount, $token, $payload);
+        $charge = $gateway->charges()->create($payload['total'], $token, $payload['payload']);
 
-        $response = $charge->data(); 
+        $response = $charge->data();
 
         $this->assertFalse($charge->success());
         $this->assertNotNull($charge->message);
@@ -97,15 +88,15 @@ class SrPagoTest extends AbstractFunctionalTestCase
 
         $response = $customer->data();
 
-        $this->assertEquals('cus_', substr($response['result']['id'], 0, 4));
+        $this->assertStringStartsWith('cus_', $response['result']['id']);
         $this->assertSame('FSM', $response['result']['name']);
         $this->assertSame('example@example.com', $response['result']['email']);
 
         return $response;
     }
 
-    /** 
-     * @test 
+    /**
+     * @test
      * @depends it_should_succeed_to_create_a_new_customer
      * */
     public function it_should_update_customer_information($data)
@@ -126,15 +117,15 @@ class SrPagoTest extends AbstractFunctionalTestCase
         return $response;
     }
 
-    /** 
-     * @test 
+    /**
+     * @test
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_add_card_to_a_customer($data)
     {
         $gateway = PayMe::make($this->credentials['sr_pago']);
 
-        $token = $gateway->getGateway()->getValidTestToken([
+        $token = $this->getValidTestToken([
             'cardholder_name' => 'Jon Doe',
             'number'          => '4242424242424242',
             'cvv'             => '123',
@@ -144,14 +135,14 @@ class SrPagoTest extends AbstractFunctionalTestCase
 
         $response = $customer->data();
 
-        $this->assertSame('crd_', substr($response['result']['token'], 0, 4));
+        $this->assertStringStartsWith('crd_', $response['result']['token']);
         $this->assertSame('Jon Doe', $response['result']['holder_name']);
         $this->assertSame('VISA', $response['result']['type']);
-        $this->assertSame('4242', substr($response['result']['number'], 0, 4));
+        $this->assertStringStartsWith('4242', $response['result']['number']);
     }
 
-    /** 
-     * @test 
+    /**
+     * @test
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_find_a_customer($data)
@@ -165,8 +156,8 @@ class SrPagoTest extends AbstractFunctionalTestCase
         $this->assertEquals($response['result']['id'], $data['result']['id']);
     }
 
-    /** 
-     * @test 
+    /**
+     * @test
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_delete_a_customer($data)
@@ -179,5 +170,61 @@ class SrPagoTest extends AbstractFunctionalTestCase
 
         $this->assertTrue($customer->success());
         $this->assertSame($data['result']['id'], $response['result']['id']);
+    }
+
+    /**
+     * Return a valid token used for testing.
+     *
+     * @return string
+     */
+    private function getValidTestToken($attributes = [])
+    {
+        $gateway = PayMe::make($this->credentials['sr_pago'])->getGateway();
+
+        $card = array_merge([
+            'cardholder_name' => 'FSMO',
+            'number'          => '4242424242424242',
+            'cvv'             => '123',
+            'expiration'      => (new \DateTime('+1 year'))->format('ym'),
+        ], $attributes);
+
+        $params = Encryption::encryptParametersWithString($card);
+
+        if (empty($gateway->getConnectionToken())) {
+            $gateway->loginApplication();
+        }
+
+        $response = (new \GuzzleHttp\Client())->post('https://sandbox-api.srpago.com/v1/token', [
+            'headers' => [
+                'Authorization' => 'Bearer '.$gateway->getConnectionToken(),
+                'Content-Type'  => 'application/json',
+                'User-Agent'    => 'OpenPay PayMeBindings',
+            ],
+            'json' => $params,
+        ]);
+
+        return json_decode($response->getBody())->result->token;
+    }
+
+    /**
+     * @test
+     * @expectedException BadMethodCallException
+     */
+    public function it_throws_charge_complete_method_call()
+    {
+        $gateway = PayMe::make($this->credentials['sr_pago']);
+
+        $gateway->charges()->complete();
+    }
+
+    /**
+     * @test
+     * @expectedException BadMethodCallException
+     */
+    public function it_throws_charge_refund_method_call()
+    {
+        $gateway = PayMe::make($this->credentials['sr_pago']);
+
+        $gateway->charges()->refund(1000, 'ref');
     }
 }

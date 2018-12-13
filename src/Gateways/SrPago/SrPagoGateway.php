@@ -2,23 +2,23 @@
 
 namespace Shoperti\PayMe\Gateways\SrPago;
 
+use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
-use Shoperti\PayMe\Support\Arr;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
-use Shoperti\PayMe\ErrorCode;
+use Shoperti\PayMe\Support\Arr;
 
 class SrPagoGateway extends AbstractGateway
 {
     /**
-     * Production endpoint
+     * Production endpoint.
      *
      * @var string
      */
-    protected $endpoint  = 'https://api.srpago.com/v1'; 
+    protected $endpoint = 'https://api.srpago.com/v1';
 
     /**
-     * Sandbox endpoint
+     * Sandbox endpoint.
      *
      * @var string
      */
@@ -32,32 +32,39 @@ class SrPagoGateway extends AbstractGateway
     protected $displayName = 'srpago';
 
     /**
-     * API connection token
+     * API connection token.
      *
      * @var string
      */
     protected $connectionToken;
 
     /**
-     * The  date time connection token expiration
+     * The date time connection token expiration.
      *
      * @var string
      */
     protected $tokenExpiration;
 
     /**
-     * Sr Pago application key
+     * Sr Pago application key.
      *
      * @var string
      */
     protected $applicationKey;
 
     /**
-     * Sr Pago secret key
+     * Sr Pago secret key.
      *
      * @var string
      */
     protected $applicationSecret;
+
+    /**
+     * Whether requests are test.
+     *
+     * @var bool
+     */
+    protected $isTest;
 
     public function __construct(array $config)
     {
@@ -66,16 +73,17 @@ class SrPagoGateway extends AbstractGateway
 
         $this->applicationKey = Arr::get($config, 'private_key');
         $this->applicationSecret = Arr::get($config, 'secret_key');
+        $this->isTest = Arr::get($config, 'test', false);
 
         parent::__construct($config);
     }
 
     /**
-     * Logs with the application
+     * Log in with the application.
      *
-     * @return void
+     * @return string
      */
-    public function loginApplication($applicationBundle = '')
+    public function loginApplication()
     {
         $request = [
             'auth' => [
@@ -87,8 +95,8 @@ class SrPagoGateway extends AbstractGateway
                 'Accept'        => 'application/json',
             ],
             'json'  => [
-                'application_bundle' => $applicationBundle,
-            ]
+                'application_bundle' => '',
+            ],
         ];
 
         $url = $this->getRequestUrl().'/auth/login/application';
@@ -97,17 +105,18 @@ class SrPagoGateway extends AbstractGateway
         $response = json_decode($response->getBody());
 
         $this->connectionToken = $response->connection->token;
-        
-        return $response;
+
+        return $this->connectionToken;
     }
 
     /**
-     * Commit an http request
+     * Commit an http request.
      *
      * @param string $method
      * @param string $url
-     * @param array $params
-     * @param array $options
+     * @param array  $params
+     * @param array  $options
+     *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function commit($method, $url, $params = [], $options = [])
@@ -115,12 +124,12 @@ class SrPagoGateway extends AbstractGateway
         if (empty($this->connectionToken)) {
             $this->loginApplication();
         }
-        
+
         $request = [
             'exceptions'      => false,
             'timeout'         => '80',
             'connect_timeout' => '30',
-            'headers'   => [
+            'headers'         => [
                 'Content-Type'  => 'application/json',
                 'Accept'        => 'application/json',
                 'Authorization' => 'Bearer '.$this->connectionToken,
@@ -133,7 +142,7 @@ class SrPagoGateway extends AbstractGateway
 
         $raw = $this->getHttpClient()->{$method}($url, $request);
         $statusCode = $raw->getStatusCode();
-        
+
         $response = $statusCode == 200
             ? $this->parseResponse($raw->getBody())
             : $this->responseError($raw->getBody(), $statusCode);
@@ -141,13 +150,18 @@ class SrPagoGateway extends AbstractGateway
         return $this->respond($response);
     }
 
+    /**
+     * Get the request url.
+     *
+     * @return string
+     */
     protected function getRequestUrl()
-    {   
-        return $this->sandboxEndpoint;
+    {
+        return $this->isTest ? $this->sandboxEndpoint : $this->endpoint;
     }
 
     /**
-     * Get auth connection token 
+     * Get auth connection token.
      *
      * @return string
      */
@@ -157,7 +171,7 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
-     * Get the key for the application
+     * Get the key for the application.
      *
      * @return string
      */
@@ -233,9 +247,9 @@ class SrPagoGateway extends AbstractGateway
      */
     public function mapResponse($success, $response)
     {
-        $authorization = Arr::get($response['result'], 'autorization_code');
-        $type          = $this->getType($response);
-        $transaction   = Arr::get($response['result'], 'transaction');
+        $authorization = Arr::get($response['result']['recipe'], 'authorization_code');
+        $type = $this->getType($response);
+        $transaction = Arr::get($response['result'], 'transaction');
 
         if ($success) {
             $message = 'Transaction approved';
@@ -248,9 +262,9 @@ class SrPagoGateway extends AbstractGateway
             'success'       => $success,
             'reference'     => $transaction,
             'message'       => $message,
-            'test'          => false,
+            'test'          => $this->isTest,
             'authorization' => $authorization,
-            'status'        => $success ? $this->getStatus(Arr::get($response['result'], 'status', 'N')) : new Status('failed'),
+            'status'        => $success ? $this->getStatus(Arr::get($response['result']['recipe'], 'status', 'N')) : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
@@ -284,14 +298,14 @@ class SrPagoGateway extends AbstractGateway
 
         $codeMap = [
             'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
-            'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption  
+            'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption
             'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
             'SuspectedFraudException'     => 'suspected_fraud',      // System detected transaction as fraud
             'InvalidTransactionException' => 'processing_error',     // Transaction started but not processed due to internal rules
             'PaymentException'            => 'card_declined',        // Transaction was rejected by bank
             'SwitchException'             => 'processing_error',     // There's already a transaction with the same order id
             'InternalErrorException'      => 'card_declined',        // Sr pago is not available to process transactions
-            'InvalidCardException'        => 'card_declined',        // Card already exists 
+            'InvalidCardException'        => 'card_declined',        // Card already exists
             'TokenAlreadyUsedException'   => 'card_declined',        // Token has already been used
         ];
 
@@ -313,39 +327,5 @@ class SrPagoGateway extends AbstractGateway
             case 'c':
                 return new Status('authorized');
         }
-    }
-
-    /**
-     * Return a valid token used for testing
-     *
-     * @return string
-     */
-    public function getValidTestToken($attributes = [])
-    {
-        $card = array_merge([
-            'cardholder_name' => 'FSMO',
-            'number'          => '4242424242424242',
-            'cvv'             => '123',
-            'expiration'      => (new \DateTime('+1 year'))->format('ym'),
-        ], $attributes);
-
-        $params = Encryption::encryptParametersWithString($card);
-
-        if (empty($this->connectionToken)) {
-            $this->loginApplication();
-        }
-
-        $raw = $this->getHttpClient()->post($this->getRequestUrl().'/token', [
-            'headers' => [
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
-                'Authorization' => 'Bearer '.$this->connectionToken,
-            ],
-            'json' => $params,
-        ]);
-
-        $response = $this->parseResponse($raw->getBody());
-
-        return $response['result']['token'];
     }
 }

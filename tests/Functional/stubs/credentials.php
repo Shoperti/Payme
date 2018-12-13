@@ -58,5 +58,6 @@ return [
         'public_key'  => 'pk_dev_5c116ef2cd8a4RVeVg',
         'private_key' => '90185108-0b35-42a6-938a-a38c1e712603',
         'secret_key'  => '4MIJKM=OcrUN',
+        'test'        => true,
     ],
 ];
