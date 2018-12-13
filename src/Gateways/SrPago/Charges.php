@@ -80,9 +80,10 @@ class Charges extends AbstractApi implements ChargeInterface
                     'currency' => Arr::get($options, 'currency', $this->gateway->getCurrency()),
                 ],
                 'origin'    => [
+                    'ip'    => Arr::get($options, 'ip_address', '127.0.0.1'),
                     'location' => [
-                        'latitude' => Arr::get($options, 'latitude', '0.00000'),
-                        'latitude' => Arr::get($options, 'longitude', '0.00000'),
+                        'latitude'  => Arr::get($options, 'latitude', '0.00000'),
+                        'longitude' => Arr::get($options, 'longitude', '0.00000'),
                     ]
                 ],
             ],
@@ -114,7 +115,6 @@ class Charges extends AbstractApi implements ChargeInterface
                 ],
                 'shipping'      => [
                     'shippingFirstName-D'   => Arr::get($options, 'first_name', ''),
-                    'shippingMiddleName-D'  => Arr::get($options, 'middle_name', ''),  
                     'shippingLastName-D'    => Arr::get($options, 'last_name', ''),
                     'shippingEmailAddress'  => Arr::get($options, 'email', ''),
                     'shippingAddress'       => Arr::get($shipping, 'address1', ''),
@@ -123,9 +123,25 @@ class Charges extends AbstractApi implements ChargeInterface
                     'shippingState'         => Arr::get($shipping, 'state', ''),
                     'shippingPostalCode'    => Arr::get($shipping, 'zip', ''),
                     'shippingCountry'       => Arr::get($shipping, 'country', ' '),
-                    'shippingMethod'        => Arr::get($shipping, 'method', ''), 
-                    'shippingDeadline'      => Arr::get($shipping, 'deadline', ''),
                     'shippingPhoneNumber'   => Arr::get($options, 'phone'),
+                ],
+                'member' => [
+                    'memberLoggedIn'        => 'Si',
+                    'memberId'              => Arr::get($options, 'user_id', ''),  
+                    'memberFullName'        => Arr::get($options, 'first_name', '').' '.Arr::get($options, 'last_name', ''),
+                    'memberFirstName'       => Arr::get($options, 'first_name', ''),
+                    'memberMiddleName'      => Arr::get($options, 'middle_name', ''),
+                    'memberLastName'        => Arr::get($options, 'last_name', ''),
+                    'memberEmailAddress'    => Arr::get($options, 'email', ''),
+                    'memberAddressLine1'    => Arr::get($shipping, 'address1', ''),
+                    'memberAddressLine2'    => Arr::get($shipping, 'address2', ''),
+                    'memberCity'            => Arr::get($shipping, 'city', ''),
+                    'memberState'           => Arr::get($shipping, 'state', ''),
+                    'memberCountry'         => Arr::get($shipping, 'country', ''),
+                    'memberPostalCode'      => Arr::get($shipping, 'zip', ''),
+                    'latitude'              => Arr::get($options, 'latitude', '0.00000'),
+                    'longitude'             => Arr::get($options, 'latitude', '0.00000'),
+                    'memberPhone'           => Arr::get($options, 'phone'),
                 ],
                 'items' => [
                     'item' => $this->addItems($params, $options),
@@ -152,10 +168,7 @@ class Charges extends AbstractApi implements ChargeInterface
                     'itemDescription'     => Arr::get($item, 'description'),
                     'itemPrice'           => $this->gateway->amount(Arr::get($item, 'unit_price')),
                     'itemQuantity'        => (string) Arr::get($item, 'quantity', 1),
-                    'itemMeasurementUnit' => Arr::get($item, 'measurementUnit'),
                     'itemBrandName'       => Arr::get($item, 'brandName'),
-                    'itemCategory'        => Arr::get($item, 'category'),
-                    'itemTax'             => Arr::get($item, 'tax'),
                 ];
             }
         }

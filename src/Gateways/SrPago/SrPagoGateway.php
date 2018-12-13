@@ -146,12 +146,21 @@ class SrPagoGateway extends AbstractGateway
         return $this->sandboxEndpoint;
     }
 
-
+    /**
+     * Get auth connection token 
+     *
+     * @return string
+     */
     public function getConnectionToken()
     {
         return $this->connectionToken;
     }
 
+    /**
+     * Get the key for the application
+     *
+     * @return string
+     */
     public function getApplicationKey()
     {
         return $this->applicationKey;
