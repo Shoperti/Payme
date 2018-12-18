@@ -264,7 +264,7 @@ class SrPagoGateway extends AbstractGateway
             'message'       => $message,
             'test'          => $this->isTest,
             'authorization' => $authorization,
-            'status'        => $success ? $this->getStatus(Arr::get($response['result']['recipe'], 'status', 'N')) : new Status('failed'),
+            'status'        => $success ? new Status('authorized') : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
@@ -310,22 +310,5 @@ class SrPagoGateway extends AbstractGateway
         ];
 
         return new ErrorCode($codeMap[$code]);
-    }
-
-    /**
-     * Map SrPago response to status object.
-     *
-     * @param string $status
-     *
-     * @return \Shoperti\PayMe\Status
-     */
-    protected function getStatus($status)
-    {
-        switch (strtolower($status)) {
-            case 'n':
-                return new Status('pending');
-            case 'c':
-                return new Status('authorized');
-        }
     }
 }

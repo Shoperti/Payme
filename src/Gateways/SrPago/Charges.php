@@ -123,6 +123,10 @@ class Charges extends AbstractApi implements ChargeInterface
                     'billingAddress-D'     => Arr::get($billing, 'address1', ''),
                     'billingAddress2-D'    => Arr::get($billing, 'address2', ''),
                     'billingPhoneNumber-D' => Arr::get($options, 'phone'),
+                    'billingCity-D'        => Arr::get($billing, 'city', ''),
+                    'billingState-D'       => Arr::get($billing, 'state', ''),
+                    'billingPostalCode-D'  => Arr::get($billing, 'zip', ''),
+                    'billingCountry-D'     => Arr::get($billing, 'country', ''),
                 ],
                 'shipping'      => [
                     'shippingFirstName'     => Arr::get($options, 'first_name', ''),

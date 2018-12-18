@@ -77,10 +77,9 @@ class Customers extends AbstractApi implements CustomerInterface
     }
 
     /**
-     * Associate a card to a customer.
+     * Delete a customer.
      *
      * @param string $customer
-     * @param string $token
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
