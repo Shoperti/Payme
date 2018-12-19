@@ -40,6 +40,7 @@ class ErrorCode
         'config_error',
         'insufficient_funds',
         'suspected_fraud',
+        'invalid_encryption',
     ];
 
     /**
