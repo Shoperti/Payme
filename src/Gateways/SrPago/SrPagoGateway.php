@@ -2,18 +2,18 @@
 
 namespace Shoperti\PayMe\Gateways\SrPago;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Client as GuzzleClient;
 
 class SrPagoGateway extends AbstractGateway
 {
@@ -74,11 +74,11 @@ class SrPagoGateway extends AbstractGateway
     protected $isTest;
 
     /**
-     * Map of possible error codes
-     * 
+     * Map of possible error codes.
+     *
      * @var array
      */
-    protected $errorCodeMap =  [
+    protected $errorCodeMap = [
         'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
         'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption
         'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
@@ -114,12 +114,12 @@ class SrPagoGateway extends AbstractGateway
 
         $stack->push(Middleware::retry(function ($retries, RequestInterface $request, ResponseInterface $response = null, TransferException $exception = null) {
             $parsed = $this->parseResponse($response->getBody());
-            
+
             return $retries < 3 && (
-                $exception instanceof ConnectException && 
-                $response->getStatusCode() >= 500 && 
+                $exception instanceof ConnectException &&
+                $response->getStatusCode() >= 500 &&
                 isset($parsed['error']['code']) &&
-                !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))   
+                !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))
             );
         }, function ($retries) {
             return (int) pow(2, $retries) * 1000;
