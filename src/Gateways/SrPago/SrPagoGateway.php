@@ -7,6 +7,13 @@ use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Client as GuzzleClient;
 
 class SrPagoGateway extends AbstractGateway
 {
@@ -66,6 +73,24 @@ class SrPagoGateway extends AbstractGateway
      */
     protected $isTest;
 
+    /**
+     * Map of possible error codes
+     * 
+     * @var array
+     */
+    protected $errorCodeMap =  [
+        'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
+        'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption
+        'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
+        'SuspectedFraudException'     => 'suspected_fraud',      // System detected transaction as fraud
+        'InvalidTransactionException' => 'processing_error',     // Transaction started but not processed due to internal rules
+        'PaymentException'            => 'card_declined',        // Transaction was rejected by bank
+        'SwitchException'             => 'processing_error',     // There's already a transaction with the same order id
+        'InternalErrorException'      => 'card_declined',        // Sr pago is not available to process transactions
+        'InvalidCardException'        => 'card_declined',        // Card already exists
+        'TokenAlreadyUsedException'   => 'card_declined',        // Token has already been used
+    ];
+
     public function __construct(array $config)
     {
         Arr::requires($config, ['private_key']);
@@ -76,6 +101,31 @@ class SrPagoGateway extends AbstractGateway
         $this->isTest = Arr::get($config, 'test', false);
 
         parent::__construct($config);
+    }
+
+    /**
+     * Get a fresh instance of the Guzzle HTTP client.
+     *
+     * @return \GuzzleHttp\Client
+     */
+    protected function getHttpClient()
+    {
+        $stack = HandlerStack::create();
+
+        $stack->push(Middleware::retry(function ($retries, RequestInterface $request, ResponseInterface $response = null, TransferException $exception = null) {
+            $parsed = $this->parseResponse($response->getBody());
+            
+            return $retries < 3 && (
+                $exception instanceof ConnectException && 
+                $response->getStatusCode() >= 500 && 
+                isset($parsed['error']['code']) &&
+                !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))   
+            );
+        }, function ($retries) {
+            return (int) pow(2, $retries) * 1000;
+        }));
+
+        return new GuzzleClient(['handler' => $stack]);
     }
 
     /**
@@ -292,23 +342,10 @@ class SrPagoGateway extends AbstractGateway
     protected function getErrorCode($response)
     {
         $code = Arr::get($response['error'], 'code', 'PaymentException');
-        if (!isset($codeMap[$code])) {
+        if (!isset($this->errorCodeMap[$code])) {
             $code = 'PaymentException';
         }
 
-        $codeMap = [
-            'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
-            'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption
-            'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
-            'SuspectedFraudException'     => 'suspected_fraud',      // System detected transaction as fraud
-            'InvalidTransactionException' => 'processing_error',     // Transaction started but not processed due to internal rules
-            'PaymentException'            => 'card_declined',        // Transaction was rejected by bank
-            'SwitchException'             => 'processing_error',     // There's already a transaction with the same order id
-            'InternalErrorException'      => 'card_declined',        // Sr pago is not available to process transactions
-            'InvalidCardException'        => 'card_declined',        // Card already exists
-            'TokenAlreadyUsedException'   => 'card_declined',        // Token has already been used
-        ];
-
-        return new ErrorCode($codeMap[$code]);
+        return new ErrorCode($this->errorCodeMap[$code]);
     }
 }

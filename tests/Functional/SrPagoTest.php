@@ -63,7 +63,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
         $payload = $this->getOrderPayload();
 
         $token = $this->getValidTestToken([
-            'number' => '4111111111111137',
+            'number' => '5504174401458735',
         ]);
 
         $charge = $gateway->charges()->create($payload['total'], $token, $payload['payload']);
@@ -72,6 +72,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($charge->success());
         $this->assertNotNull($charge->message);
+        $this->assertEquals('InvalidCardException', $charge['error']['code']);
         $this->assertEquals('card_declined', $charge->errorCode);
         $this->assertEquals('failed', $charge->status);
     }
