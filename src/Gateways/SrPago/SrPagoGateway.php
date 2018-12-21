@@ -115,11 +115,13 @@ class SrPagoGateway extends AbstractGateway
         $stack->push(Middleware::retry(function ($retries, RequestInterface $request, ResponseInterface $response = null, TransferException $exception = null) {
             $parsed = $this->parseResponse($response->getBody());
 
-            return $retries < 3 && (
-                $exception instanceof ConnectException ||
-                $response->getStatusCode() >= 500 &&
-                isset($parsed['error']['code']) &&
-                !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))
+            // Be aware that this gateway validation error responses may be an HTTP 500 code.
+            return $retries < 3 && ($exception instanceof ConnectException ||
+                (
+                    $response->getStatusCode() >= 500 &&
+                    isset($parsed['error']['code']) &&
+                    !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))
+                )
             );
         }, function ($retries) {
             return (int) pow(2, $retries) * 1000;
