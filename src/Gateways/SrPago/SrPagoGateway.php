@@ -116,7 +116,7 @@ class SrPagoGateway extends AbstractGateway
             $parsed = $this->parseResponse($response->getBody());
 
             return $retries < 3 && (
-                $exception instanceof ConnectException &&
+                $exception instanceof ConnectException ||
                 $response->getStatusCode() >= 500 &&
                 isset($parsed['error']['code']) &&
                 !in_array($parsed['error']['code'], array_keys($this->errorCodeMap))
