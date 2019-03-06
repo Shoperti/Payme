@@ -138,7 +138,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
      */
     protected function isSuccess($response, $code)
     {
-        if ($code < 200 || 299 < $code) {
+        if ($code !== 200 && $code !== 201) {
             return false;
         }
 
