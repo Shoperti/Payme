@@ -33,7 +33,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
-        $this->assertContains('https://www.mercadopago.com/mlm/checkout/start', $charge->authorization());
+        $this->assertContains('.mercadopago.com/mlm/checkout/', $charge->authorization());
     }
 
     /** @test */
@@ -41,9 +41,9 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     {
         $order = $this->getOrderPayload();
         $payload = $order['payload'];
-        $amount = $order['total'];
+        $amount = $order['total'] / 2;
 
-        $charge = $this->gateway->charges()->create((int) ($amount / 2), 'regular_payment', $payload);
+        $charge = $this->gateway->charges()->create((int) ($amount), 'regular_payment', $payload);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());

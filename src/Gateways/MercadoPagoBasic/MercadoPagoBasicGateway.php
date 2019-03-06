@@ -138,7 +138,21 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
      */
     protected function isSuccess($response, $code)
     {
-        return null === Arr::get($response, 'error');
+        if ($code !== 200 && $code !== 201) {
+            return false;
+        }
+
+        if (isset($response['error'])) {
+            return false;
+        }
+
+        if (isset($response['payments'])) {
+            $lastPayment = Arr::last($response['payments']);
+
+            return Arr::get($lastPayment, 'status') === 'approved';
+        }
+
+        return true;
     }
 
     /**
@@ -158,6 +172,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         }
 
         $rawResponse = $response;
+        $test = $this->config['test'];
 
         unset($rawResponse['isRedirect']);
         unset($rawResponse['topic']);
@@ -168,8 +183,8 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
                 'success'         => $response['isRedirect'] ? false : $success,
                 'reference'       => $success ? Arr::get($response, 'id') : null,
                 'message'         => 'Redirect',
-                'test'            => $this->config['test'],
-                'authorization'   => $success ? Arr::get($response, 'init_point') : null,
+                'test'            => $test,
+                'authorization'   => $success ? Arr::get($response, $test ? 'sandbox_init_point' : 'init_point') : null,
                 'status'          => $success ? new Status('pending') : new Status('failed'),
                 'errorCode'       => $success ? null : $this->getErrorCode($response),
                 'type'            => null,
@@ -181,7 +196,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'success'         => $success,
             'reference'       => $success ? $this->getReference($response) : null,
             'message'         => $success ? 'Transaction approved' : null,
-            'test'            => $this->config['test'],
+            'test'            => $test,
             'authorization'   => $success ? Arr::get($response, 'id') : null,
             'status'          => $success ? $this->getStatus($response) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response),
@@ -204,7 +219,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return Arr::get($response, 'preference_id');
         }
 
-        $lastPayment = end($payments);
+        $lastPayment = Arry::last($payments);
 
         return Arr::get($lastPayment, 'id');
     }
