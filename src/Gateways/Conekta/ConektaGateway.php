@@ -237,11 +237,11 @@ class ConektaGateway extends AbstractGateway
     {
         if (in_array($type, ['order', 'refund'])) {
             $charges = $response['charges']['data'];
-            $charge = Arr::last($charges);
+            $charge = end($charges);
 
             if ($type === 'refund') {
                 $refunds = $charge['refunds']['data'];
-                $refund = Arr::last($refunds);
+                $refund = end($refunds);
 
                 return [$refund['id'], $refund['auth_code']];
             }
@@ -279,7 +279,7 @@ class ConektaGateway extends AbstractGateway
 
         if (isset($response['charges'])) {
             $charges = $response['charges']['data'];
-            $charge = Arr::last($charges);
+            $charge = end($charges);
             $paymentMethod = $charge['payment_method'];
 
             if (isset($paymentMethod['auth_code'])) {
