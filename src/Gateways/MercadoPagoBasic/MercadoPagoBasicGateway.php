@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
-use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
@@ -147,12 +146,25 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         }
 
         if (isset($response['payments'])) {
-            $lastPayment = Arr::last($response['payments']);
-
-            return Arr::get($lastPayment, 'status') === 'approved';
+            return $this->getPaymentStatus($response) === 'approved';
         }
 
         return true;
+    }
+
+    /**
+     * Get the status from the last payment.
+     *
+     * @param array $response
+     *
+     * @return string
+     */
+    protected function getPaymentStatus($response)
+    {
+        $lastPayment = Arr::last($response['payments']);
+
+        // on testing at least, payments may be empty
+        return $lastPayment ? Arr::get($lastPayment, 'status', 'other') : 'no_payment';
     }
 
     /**
@@ -195,13 +207,33 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'isRedirect'      => false,
             'success'         => $success,
             'reference'       => $success ? $this->getReference($response) : null,
-            'message'         => $success ? 'Transaction approved' : null,
+            'message'         => $success ? 'Transaction approved' : $this->getMessage($rawResponse),
             'test'            => $test,
             'authorization'   => $success ? Arr::get($response, 'id') : null,
             'status'          => $success ? $this->getStatus($response) : new Status('failed'),
             'errorCode'       => $success ? null : $this->getErrorCode($response),
             'type'            => Arr::get($response, 'topic'),
         ]);
+    }
+
+    /**
+     * Get the message from the response.
+     *
+     * @param array $rawResponse
+     *
+     * @return string|null
+     */
+    protected function getMessage($rawResponse)
+    {
+        if ($message = Arr::get($rawResponse, 'message')) {
+            return $message;
+        }
+
+        if (isset($rawResponse['payments'])) {
+            if ($message = $this->getPaymentStatus($rawResponse)) {
+                return $message;
+            }
+        }
     }
 
     /**
@@ -219,7 +251,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return Arr::get($response, 'preference_id');
         }
 
-        $lastPayment = Arry::last($payments);
+        $lastPayment = Arr::last($payments);
 
         return Arr::get($lastPayment, 'id');
     }
