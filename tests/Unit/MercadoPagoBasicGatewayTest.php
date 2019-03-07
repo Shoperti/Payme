@@ -17,7 +17,6 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_approved_payment()
     {
-
         $response = $this->gateway->generateResponseFromRawResponse($this->getApprovedPayment());
 
         $this->assertTrue($response->success());
