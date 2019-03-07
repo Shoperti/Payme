@@ -234,8 +234,6 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
                 return $message;
             }
         }
-
-        return null;
     }
 
     /**
