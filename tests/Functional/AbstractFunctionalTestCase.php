@@ -13,7 +13,7 @@ abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
 
     protected function getOrderPayload(array $customData = [])
     {
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = include dirname(__DIR__).'/stubs/orderPayload.php';
 
         $order['payload'] = array_merge($order['payload'], $customData);
 

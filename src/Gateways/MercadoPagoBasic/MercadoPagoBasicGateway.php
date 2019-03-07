@@ -251,7 +251,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return Arr::get($response, 'preference_id');
         }
 
-        $lastPayment = Arry::last($payments);
+        $lastPayment = Arr::last($payments);
 
         return Arr::get($lastPayment, 'id');
     }
