@@ -26,6 +26,19 @@ class Arr
     }
 
     /**
+     * Get the last array item.
+     *
+     * @param array $array
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public static function last($array, $default = null)
+    {
+        return !empty($array) ? array_values(array_slice($array, -1))[0] : $default;
+    }
+
+    /**
      * Check the array contains the required keys.
      *
      * @param string[] $options
