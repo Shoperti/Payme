@@ -146,7 +146,13 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         }
 
         if (isset($response['payments'])) {
-            return $this->getPaymentStatus($response) === 'approved';
+            $validStatuses = [
+                'approved',
+                'in_process',
+                'pending',
+            ];
+
+            return in_array($this->getPaymentStatus($response), $validStatuses);
         }
 
         return true;
@@ -163,6 +169,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     {
         $lastPayment = Arr::last($response['payments']);
 
+        // approved, in_process, pending, rejected, cancelled
         // on testing at least, payments may be empty
         return $lastPayment ? Arr::get($lastPayment, 'status', 'other') : 'no_payment';
     }

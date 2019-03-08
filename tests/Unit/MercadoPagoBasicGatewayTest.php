@@ -20,6 +20,27 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getApprovedPayment());
 
         $this->assertTrue($response->success());
+        $this->assertEquals('paid', $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
+    /** @test */
+    public function it_should_parse_a_pending_payment()
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($this->getPendingPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertEquals('pending', $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
+    /** @test */
+    public function it_should_parse_an_in_process_payment()
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($this->getInProcessPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertEquals('pending', $response->status());
         $this->assertSame('Transaction approved', $response->message());
     }
 
@@ -29,21 +50,34 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getRejectedPayment());
 
         $this->assertFalse($response->success());
+        $this->assertEquals('failed', $response->status());
         $this->assertSame('rejected', $response->message());
+    }
+
+    /** @test */
+    public function it_should_parse_a_cancelled_payment()
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($this->getCancelledPayment());
+
+        $this->assertFalse($response->success());
+        $this->assertEquals('failed', $response->status());
+        $this->assertSame('cancelled', $response->message());
     }
 
     private function getApprovedPayment()
     {
         return [
-            'id'       => 987654321,
-            'status'   => 'closed',
-            'site_id'  => 'MLM',
-            'payments' => [
+            'id'         => 987654321,
+            'status'     => 'closed',
+            'site_id'    => 'MLM',
+            'sponsor_id' => 268939999,
+            'payments'   => [
                 [
                     'id'                 => 4444444444,
                     'transaction_amount' => 4725,
                     'total_paid_amount'  => 4725,
                     'shipping_cost'      => 0,
+                    'currency_id'        => 'MXN',
                     'status'             => 'approved',
                     'status_detail'      => 'accredited',
                     'operation_type'     => 'regular_payment',
@@ -53,21 +87,93 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
                     'amount_refunded'    => 0,
                 ],
             ],
-            'paid_amount'     => 4725,
-            'refunded_amount' => 0,
-            'shipping_cost'   => 0,
-            'cancelled'       => false,
-            'total_amount'    => 180,
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_1',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_1',
+            'total_amount'       => 4725,
+        ];
+    }
+
+    private function getPendingPayment()
+    {
+        return [
+            'id'         => 958693479,
+            'status'     => 'closed',
+            'site_id'    => 'MLM',
+            'sponsor_id' => 268939658,
+            'payments'   => [
+                [
+                    'id'                 => 4479863061,
+                    'transaction_amount' => 180,
+                    'total_paid_amount'  => 180,
+                    'shipping_cost'      => 0,
+                    'currency_id'        => 'MXN',
+                    'status'             => 'pending',
+                    'status_detail'      => 'pending_waiting_payment',
+                    'operation_type'     => 'regular_payment',
+                    'date_approved'      => null,
+                    'date_created'       => '2019-02-01T00:26:19.000-04:00',
+                    'last_modified'      => '2019-02-01T00:26:19.000-04:00',
+                    'amount_refunded'    => 0,
+                ],
+            ],
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_2',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_2',
+            'total_amount'       => 180,
+        ];
+    }
+
+    private function getInProcessPayment()
+    {
+        return [
+            'id'         => 987654321,
+            'status'     => 'closed',
+            'site_id'    => 'MLM',
+            'sponsor_id' => 268939999,
+            'payments'   => [
+                [
+                    'id'                 => 4569892341,
+                    'transaction_amount' => 1234,
+                    'total_paid_amount'  => 1234,
+                    'shipping_cost'      => 0,
+                    'currency_id'        => 'MXN',
+                    'status'             => 'in_process',
+                    'status_detail'      => 'pending_review_manual',
+                    'operation_type'     => 'regular_payment',
+                    'date_approved'      => null,
+                    'date_created'       => '2019-03-07T01:59:42.000-04:00',
+                    'last_modified'      => '2019-03-07T01:59:42.000-04:00',
+                    'amount_refunded'    => 0,
+                ],
+            ],
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_3',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_3',
+            'total_amount'       => 1234,
         ];
     }
 
     private function getRejectedPayment()
     {
         return [
-            'id'       => 987654321,
-            'status'   => 'closed',
-            'site_id'  => 'MLM',
-            'payments' => [
+            'id'         => 987654321,
+            'status'     => 'closed',
+            'site_id'    => 'MLM',
+            'sponsor_id' => 268939999,
+            'payments'   => [
                 [
                     'id'                 => 3620198092,
                     'transaction_amount' => 1148,
@@ -83,11 +189,48 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
                     'amount_refunded'    => 0,
                 ],
             ],
-            'paid_amount'     => 0,
-            'refunded_amount' => 0,
-            'shipping_cost'   => 0,
-            'cancelled'       => false,
-            'total_amount'    => 1148,
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_4',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_4',
+            'total_amount'       => 1148,
+        ];
+    }
+
+    private function getCancelledPayment()
+    {
+        return [
+            'id'             => 958693479,
+            'status'         => 'closed',
+            'site_id'        => 'MLM',
+            'sponsor_id'     => 268939658,
+            'payments'       => [
+                [
+                    'id'                 => 4479863061,
+                    'transaction_amount' => 180,
+                    'total_paid_amount'  => 180,
+                    'shipping_cost'      => 0,
+                    'currency_id'        => 'MXN',
+                    'status'             => 'cancelled',
+                    'status_detail'      => 'expired',
+                    'operation_type'     => 'regular_payment',
+                    'date_approved'      => null,
+                    'date_created'       => '2019-02-01T00:26:19.000-04:00',
+                    'last_modified'      => '2019-03-03T00:30:08.000-04:00',
+                    'amount_refunded'    => 0,
+                ],
+            ],
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_5',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_5',
+            'total_amount'       => 180,
         ];
     }
 }
