@@ -190,6 +190,10 @@ class ConektaGateway extends AbstractGateway
             ? !(Arr::get($response['data'], 'livemode', true))
             : !(Arr::get($response, 'livemode', true));
 
+        if ($type === 'refund') {
+            $rawResponse['amount_refunded'] = $this->getRefundAmount($rawResponse);
+        }
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'    => false,
             'success'       => $success,
@@ -226,6 +230,21 @@ class ConektaGateway extends AbstractGateway
     }
 
     /**
+     * Get the last refund amount.
+     *
+     * @param array $response
+     *
+     * @return int
+     */
+    protected function getRefundAmount($response)
+    {
+        $lastCharge = Arr::last($response['charges']['data']);
+        $lastRefund = Arr::last($lastCharge['refunds']['data']);
+
+        return abs($lastRefund['amount']);
+    }
+
+    /**
      * Get the transaction reference and auth code.
      *
      * @param array  $response
@@ -237,11 +256,11 @@ class ConektaGateway extends AbstractGateway
     {
         if (in_array($type, ['order', 'refund'])) {
             $charges = $response['charges']['data'];
-            $charge = end($charges);
+            $charge = Arr::last($charges);
 
             if ($type === 'refund') {
                 $refunds = $charge['refunds']['data'];
-                $refund = end($refunds);
+                $refund = Arr::last($refunds);
 
                 return [$refund['id'], $refund['auth_code']];
             }
@@ -279,7 +298,7 @@ class ConektaGateway extends AbstractGateway
 
         if (isset($response['charges'])) {
             $charges = $response['charges']['data'];
-            $charge = end($charges);
+            $charge = Arr::last($charges);
             $paymentMethod = $charge['payment_method'];
 
             if (isset($paymentMethod['auth_code'])) {
@@ -328,16 +347,23 @@ class ConektaGateway extends AbstractGateway
         $code = isset($response['details']) ? $response['details'][0]['code'] : null;
 
         switch ($code) {
+            case 'conekta.errors.processing.bank.declined':
             case 'conekta.errors.processing.bank_bindings.declined':
                 return new ErrorCode('card_declined');
+
+            case 'conekta.errors.processing.bank.insufficient_funds':
             case 'conekta.errors.processing.bank_bindings.insufficient_funds':
                 return new ErrorCode('insufficient_funds');
+
             case 'conekta.errors.processing.charge.card_payment.suspicious_behaviour':
                 return new ErrorCode('suspected_fraud');
+
             case 'conekta.errors.parameter_validation.expiration_date.expired':
                 return new ErrorCode('invalid_expiry_date');
+
             case 'conekta.errors.parameter_validation.card.number':
                 return new ErrorCode('invalid_number');
+
             case 'conekta.errors.parameter_validation.card.cvc':
                 return new ErrorCode('invalid_cvc');
         }
