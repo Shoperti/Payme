@@ -64,6 +64,16 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $this->assertSame('cancelled', $response->message());
     }
 
+    /** @test */
+    public function it_should_parse_an_empty_payment()
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($this->getEmptyPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertEquals('pending', $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
     private function getApprovedPayment()
     {
         return [
@@ -231,6 +241,25 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
             'additional_info'    => null,
             'notification_url'   => 'https://shopname.com/callback/gtw_5',
             'total_amount'       => 180,
+        ];
+    }
+
+    private function getEmptyPayment()
+    {
+        return [
+            'id'                 => 984963276,
+            'status'             => 'opened',
+            'site_id'            => 'MLM',
+            'sponsor_id'         => null,
+            'payments'           => [],
+            'paid_amount'        => 0,
+            'refunded_amount'    => 0,
+            'shipping_cost'      => 0,
+            'cancelled'          => false,
+            'external_reference' => 'ord_6',
+            'additional_info'    => null,
+            'notification_url'   => 'https://shopname.com/callback/gtw_6',
+            'total_amount'       => 200,
         ];
     }
 }

@@ -57,6 +57,17 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     protected $oauthToken = null;
 
     /**
+     * The statuses considered as a success on payment responses.
+     *
+     * @var array
+     */
+    protected $successPaymentStatuses = [
+        'approved',
+        'in_process',
+        'pending',
+    ];
+
+    /**
      * Inject the configuration for a Gateway.
      *
      * @param string[] $config
@@ -145,14 +156,8 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return false;
         }
 
-        if (isset($response['payments'])) {
-            $validStatuses = [
-                'approved',
-                'in_process',
-                'pending',
-            ];
-
-            return in_array($this->getPaymentStatus($response), $validStatuses);
+        if (!empty(Arr::get($response, 'payments'))) {
+            return in_array($this->getPaymentStatus($response), $this->successPaymentStatuses);
         }
 
         return true;
@@ -236,7 +241,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             return $message;
         }
 
-        if (isset($rawResponse['payments'])) {
+        if (!empty(Arr::get($rawResponse, 'payments'))) {
             if ($message = $this->getPaymentStatus($rawResponse)) {
                 return $message;
             }
@@ -274,8 +279,8 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     {
         $payments = Arr::get($response, 'payments');
 
-        if (!$payments) {
-            return parent::getStatus($response);
+        if (empty($payments)) {
+            return new Status('pending');
         }
 
         $newResponse = $response;
