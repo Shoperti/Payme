@@ -8,7 +8,7 @@ abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->credentials = require __DIR__.'/stubs/credentials.php';
+        $this->credentials = require dirname(__DIR__).'/stubs/credentials.php';
     }
 
     protected function getOrderPayload(array $customData = [])

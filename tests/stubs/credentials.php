@@ -20,6 +20,18 @@ return [
         'driver' => 'manual',
     ],
 
+    'mercadopago' => [
+        'driver'      => 'mercado_pago',
+        'private_key' => 'TEST-1468273673739017-031220-54c238c506d6d8427a07e72661af1368__LA_LD__-307532101',
+    ],
+
+    'mercadopago_basic' => [
+        'driver'        => 'mercado_pago_basic',
+        'client_id'     => '3448849932020678',
+        'client_secret' => '4Ca4PGM5AgvIeIUBFXxO9n0Ki858a6KA',
+        'test'          => true,
+    ],
+
     'open_pay' => [
         'driver'      => 'open_pay',
         'id'          => 'mygwhzzmbmrlcn0eu7b5',
@@ -36,28 +48,16 @@ return [
         'test'      => true,
     ],
 
-    'stripe' => [
-        'driver'      => 'stripe',
-        'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
-    ],
-
-    'mercadopago' => [
-        'driver'      => 'mercado_pago',
-        'private_key' => 'TEST-1468273673739017-031220-54c238c506d6d8427a07e72661af1368__LA_LD__-307532101',
-    ],
-
-    'mercadopago_basic' => [
-        'driver'        => 'mercado_pago_basic',
-        'client_id'     => '3448849932020678',
-        'client_secret' => '4Ca4PGM5AgvIeIUBFXxO9n0Ki858a6KA',
-        'test'          => true,
-    ],
-
     'sr_pago' => [
         'driver'      => 'sr_pago',
         'public_key'  => 'pk_dev_5c116ef2cd8a4RVeVg',
         'private_key' => '90185108-0b35-42a6-938a-a38c1e712603',
         'secret_key'  => '4MIJKM=OcrUN',
         'test'        => true,
+    ],
+
+    'stripe' => [
+        'driver'      => 'stripe',
+        'private_key' => 'sk_test_3OD4TdKSIOhDOL2146JJcC79',
     ],
 ];

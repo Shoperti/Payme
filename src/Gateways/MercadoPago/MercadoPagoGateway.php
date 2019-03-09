@@ -130,7 +130,7 @@ class MercadoPagoGateway extends AbstractGateway
     {
         if (isset($response[0])) {
             foreach ($response as $responseItem) {
-                $responses[] = $this->respond($responseItem);
+                $responses[] = $this->respond($responseItem, $code);
             }
 
             return $responses;
