@@ -184,6 +184,24 @@ class ConektaTest extends AbstractFunctionalTestCase
     }
 
     /** @test */
+    public function it_should_fail_to_charge_an_order_with_insufficient_funds_token()
+    {
+        $gateway = PayMe::make($this->credentials['conekta']);
+
+        $order = $this->getOrderPayload();
+        $total = $order['total'];
+        $payload = $order['payload'];
+
+        $charge = $gateway->charges()->create($total, 'tok_test_insufficient_funds', $payload);
+
+        $response = $charge->data();
+
+        $this->assertFalse($charge->success());
+        $this->assertEquals('insufficient_funds', $charge->errorCode);
+        $this->assertEquals('error', $response['object']);
+    }
+
+    /** @test */
     public function it_should_succeed_to_generate_a_charge_with_oxxo()
     {
         $gateway = PayMe::make($this->credentials['conekta']);
@@ -308,7 +326,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make(array_merge($this->credentials['conekta'], ['private_key' => 'invalid_key']));
 
-        $charge = $gateway->charges()->create(1000, 'tok_test_card_declined');
+        $charge = $gateway->charges()->create(1000, 'tok_test_visa_4242');
 
         $this->assertSame($charge->message(), 'Acceso no autorizado.');
     }
