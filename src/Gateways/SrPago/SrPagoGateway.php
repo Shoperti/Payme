@@ -79,7 +79,7 @@ class SrPagoGateway extends AbstractGateway
      * @var array
      */
     protected $errorCodeMap = [
-        'InvalidParamException'       => 'invalid_param',        // Malformed JSON, invalid fields, not required fields
+        'InvalidParamException'       => 'config_error',        // Malformed JSON, invalid fields, not required fields
         'InvalidEncryptionException'  => 'invalid_encryption',   // Incorrect data encryption
         'PaymentFilterException'      => 'processing_error',     // System detected supicious elements
         'SuspectedFraudException'     => 'suspected_fraud',      // System detected transaction as fraud
