@@ -2,6 +2,8 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
+use Shoperti\PayMe\PayMe;
+
 abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
 {
     protected $credentials;
@@ -9,6 +11,11 @@ abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->credentials = require dirname(__DIR__).'/stubs/credentials.php';
+    }
+
+    protected function getPayMe(array $overrides = [])
+    {
+        return PayMe::make(array_merge($this->credentials[$this->gatewayKey], $overrides));
     }
 
     protected function getOrderPayload(array $customData = [])

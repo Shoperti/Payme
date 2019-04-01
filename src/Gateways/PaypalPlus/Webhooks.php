@@ -1,6 +1,6 @@
 <?php
 
-namespace Shoperti\PayMe\Gateways\Conekta;
+namespace Shoperti\PayMe\Gateways\PaypalPlus;
 
 use InvalidArgumentException;
 use Shoperti\PayMe\Contracts\WebhookInterface;
@@ -8,9 +8,11 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the conekta events class.
+ * This is the Paypal plus webhooks class.
  *
- * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ * @see https://developer.paypal.com/docs/api/webhooks/v1/
+ *
+ * @author Arturo Rodríguez <arturo.rodriguez@dinkbit.com>
  */
 class Webhooks extends AbstractApi implements WebhookInterface
 {
@@ -23,7 +25,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
      */
     public function all($params = [])
     {
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('webhooks'));
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('notifications/webhooks'), [], $params);
     }
 
     /**
@@ -40,7 +42,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
             throw new InvalidArgumentException('We need an id');
         }
 
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('webhooks/'.$id));
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
     }
 
     /**
@@ -52,7 +54,13 @@ class Webhooks extends AbstractApi implements WebhookInterface
      */
     public function create($params = [])
     {
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('webhooks'), $params);
+        if (!array_key_exists('event_types', $params)) {
+            $params['event_types'] = [[
+                'name' => '*',
+            ]];
+        }
+
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('notifications/webhooks'), $params);
     }
 
     /**
@@ -70,7 +78,8 @@ class Webhooks extends AbstractApi implements WebhookInterface
             throw new InvalidArgumentException('We need an id');
         }
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('webhooks/'.$id), $params);
+        // json_patch required
+        return $this->gateway->commit('patch', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
     }
 
     /**
@@ -83,6 +92,6 @@ class Webhooks extends AbstractApi implements WebhookInterface
      */
     public function delete($id, $params = [])
     {
-        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('webhooks/'.$id));
+        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
     }
 }
