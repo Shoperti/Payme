@@ -48,6 +48,13 @@ return [
         'test'      => true,
     ],
 
+    'paypal_plus' => [
+        'driver'        => 'paypal_plus',
+        'client_id'     => 'Adryv3iwPsxATMSAZU0sMZX7fFdqEE-F4VydJgYaiIcYU5WT5B80FxlYXD4RCtkWhZB1TfJQNhqoaPE5',
+        'client_secret' => 'EJ2KaA0ihBHMKsMPWdXAUTbV4uJb-w2HzjiQQaHABq1wZOejtZj0uZh1OizAM5L9R6tocayGCk2HbzQP',
+        'test'          => true,
+    ],
+
     'sr_pago' => [
         'driver'      => 'sr_pago',
         'public_key'  => 'pk_dev_5c116ef2cd8a4RVeVg',

@@ -269,22 +269,4 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
         return $response['id'];
     }
-
-    /**
-     * Generates a random phone digits string.
-     *
-     * @param int $digits
-     *
-     * @return string
-     */
-    private function generatePhoneNumber($digits = 10)
-    {
-        $phoneNumber = '';
-
-        for ($i = 0; $i < $digits; $i++) {
-            $phoneNumber .= rand(0, 9);
-        }
-
-        return $phoneNumber;
-    }
 }
