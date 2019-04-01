@@ -282,15 +282,13 @@ class PaypalPlusGateway extends AbstractGateway
     protected function getType($response)
     {
         if (!$response) {
-            return null;
+            return;
         }
 
         if (array_key_exists('intent', $response)) {
             // 'sale' for payment request / execute
             return $response['intent'];
         }
-
-        return null;
     }
 
     /**
