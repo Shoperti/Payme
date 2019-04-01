@@ -4,10 +4,15 @@
 [![StyleCI](https://styleci.io/repos/24345061/shield?style=flat)](https://styleci.io/repos/24345061)
 
 Supported Gateways:
-* Conekta
-* Stripe
+* Bogus
 * ComproPago
-* Paypal Express
+* Conekta
+* Manual
+* MercadoPago
+* OpenPay
+* Paypal Express / Plus
+* Sr Pago
+* Stripe
 
 ## Installation
 
@@ -21,16 +26,18 @@ Begin by installing this package through Composer. Edit your project's `composer
 
 Next, update Composer from the Terminal:
 
-	composer update
+```sh
+composer update
+```
 
 ### Examples
 
 ```php
 // Create a new PayMe instance choosing the driver
 $config = [
-	'driver'      => 'stripe',
-	'private_key' => 'secret_key',
-	'public_key'  => 'public_key',
+    'driver'      => 'stripe',
+    'private_key' => 'secret_key',
+    'public_key'  => 'public_key',
 ];
 
 $payme = new Shoperti\PayMe\PayMe($config);
@@ -61,6 +68,8 @@ if (!$response->success()) {
 
 return 'Hurray!';
 ```
+
+See the [tests](/tests) for more examples.
 
 If you are looking for the old API we still have branch [1.0](https://github.com/Shoperti/Payme/tree/1.0)
 

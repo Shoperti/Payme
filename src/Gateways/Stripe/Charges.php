@@ -16,6 +16,19 @@ use Shoperti\PayMe\Support\Helper;
 class Charges extends AbstractApi implements ChargeInterface
 {
     /**
+     * Request a charge creation.
+     *
+     * @param int|float $amount
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function request($amount, $options = [])
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
      * Create a charge.
      *
      * @param int|float $amount

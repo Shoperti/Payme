@@ -216,7 +216,7 @@ class PaypalExpressGateway extends AbstractGateway
 
             return (new Response())->setRaw($rawResponse)->map([
                 'isRedirect'      => false,
-                'success'         => $success ? true : false,
+                'success'         => $success,
                 'reference'       => $success ? Arr::get($response, 'invoice') : false,
                 'message'         => $success ? 'VERIFIED' : 'INVALID',
                 'test'            => $this->config['test'],

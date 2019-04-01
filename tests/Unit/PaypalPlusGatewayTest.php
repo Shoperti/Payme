@@ -1,0 +1,99 @@
+<?php
+
+namespace Shoperti\Tests\PayMe\Unit;
+
+use Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway;
+
+class PaypalPlusGatewayTest extends AbstractTestCase
+{
+    /** @var PaypalPlusTestGateway */
+    private $gateway = null;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->gateway = new PaypalPlusTestGateway($this->credentials['paypal_plus']);
+    }
+
+    /** @test */
+    public function it_should_parse_an_approved_payment()
+    {
+        $response = $this->gateway->getParsedResponse($this->getApprovedPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertSame('paid', (string) $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
+    /** @test */
+    public function it_should_parse_a_pending_payment()
+    {
+        $response = $this->gateway->getParsedResponse($this->getPendingPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertSame('pending', (string) $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
+    /** @test */
+    public function it_should_parse_a_rejected_payment()
+    {
+        $response = $this->gateway->getParsedResponse($this->getDeniedPayment());
+
+        $this->assertFalse($response->success());
+        $this->assertSame('failed', (string) $response->status());
+    }
+
+    private function getApprovedPayment()
+    {
+        return [
+            'id'           => 'PAY-4D905294SK041703DLH32GIA',
+            'intent'       => 'sale',
+            'state'        => 'approved',                   // ignore
+            'cart'         => '755335510M315821L',
+            'transactions' => [
+                [
+                    'related_resources' => [
+                        [
+                            'sale' => [
+                                'id'     => '60016985HM514502U',
+                                'state'  => 'completed',            // the one we care about
+                                'amount' => [
+                                    'total'    => '522.00',
+                                    'currency' => 'MXN',
+                                    'details'  => [
+                                        'subtotal' => '522.00',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function getPendingPayment()
+    {
+        $payload = $this->getApprovedPayment();
+        $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'pending';
+
+        return $payload;
+    }
+
+    private function getDeniedPayment()
+    {
+        $payload = $this->getApprovedPayment();
+        $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'denied';
+
+        return $payload;
+    }
+}
+
+class PaypalPlusTestGateway extends PaypalPlusGateway
+{
+    public function getParsedResponse($response)
+    {
+        return $this->mapResponse($response, 200);
+    }
+}

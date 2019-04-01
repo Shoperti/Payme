@@ -6,6 +6,7 @@ use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
 
 class MercadoPagoBasicGatewayTest extends AbstractTestCase
 {
+    /** @var MercadoPagoBasicTestGateway */
     private $gateway = null;
 
     public function setUp()
@@ -17,7 +18,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_approved_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getApprovedPayment());
+        $response = $this->gateway->getParsedResponse($this->getApprovedPayment());
 
         $this->assertTrue($response->success());
         $this->assertEquals('paid', $response->status());
@@ -27,7 +28,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_a_pending_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getPendingPayment());
+        $response = $this->gateway->getParsedResponse($this->getPendingPayment());
 
         $this->assertTrue($response->success());
         $this->assertEquals('pending', $response->status());
@@ -37,7 +38,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_in_process_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getInProcessPayment());
+        $response = $this->gateway->getParsedResponse($this->getInProcessPayment());
 
         $this->assertTrue($response->success());
         $this->assertEquals('pending', $response->status());
@@ -47,7 +48,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_a_rejected_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getRejectedPayment());
+        $response = $this->gateway->getParsedResponse($this->getRejectedPayment());
 
         $this->assertFalse($response->success());
         $this->assertEquals('failed', $response->status());
@@ -57,7 +58,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_a_cancelled_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getCancelledPayment());
+        $response = $this->gateway->getParsedResponse($this->getCancelledPayment());
 
         $this->assertFalse($response->success());
         $this->assertEquals('failed', $response->status());
@@ -67,7 +68,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_empty_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getEmptyPayment());
+        $response = $this->gateway->getParsedResponse($this->getEmptyPayment());
 
         $this->assertTrue($response->success());
         $this->assertEquals('pending', $response->status());
@@ -266,7 +267,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
 
 class MercadoPagoBasicTestGateway extends MercadoPagoBasicGateway
 {
-    public function generateResponseFromRawResponse($response)
+    public function getParsedResponse($response)
     {
         $response['isRedirect'] = false;
         $response['topic'] = '';

@@ -5,8 +5,8 @@ return [
     'payload' => [
         'device_id'   => 'test',
         'application' => 'PayMe_cart',
-        'return_url'  => 'http://example.com',
-        'cancel_url'  => 'http://example.com',
+        'return_url'  => 'http://example.com/return',
+        'cancel_url'  => 'http://example.com/cancel',
 
         'reference'   => 'order_'.time().rand(10000, 99999),
         'description' => 'Awesome Store',
@@ -51,7 +51,7 @@ return [
             'city'     => 'Wanaque',
             'country'  => 'US',
             'state'    => 'NJ',
-            'zip'      => '01085',
+            'zip'      => '07465',
             'price'    => 0,
             'carrier'  => 'payme',
             'service'  => 'pending',

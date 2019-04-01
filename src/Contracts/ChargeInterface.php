@@ -10,6 +10,16 @@ namespace Shoperti\PayMe\Contracts;
 interface ChargeInterface
 {
     /**
+     * Request a charge creation.
+     *
+     * @param int|float $amount
+     * @param string[]  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function request($amount, $options = []);
+
+    /**
      * Create a charge.
      *
      * @param int|float $amount
