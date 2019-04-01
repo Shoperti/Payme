@@ -1,23 +1,23 @@
 <?php
 
 return [
-    'total'   => 9900,
+    'total'   => 14900,
     'payload' => [
-        'device_id'   => 'test',
-        'application' => 'PayMe_cart',
-        'return_url'  => 'http://example.com',
-        'cancel_url'  => 'http://example.com',
-
-        'reference'   => 'order_'.time().rand(10000, 99999),
-        'description' => 'Awesome Store',
-        'currency'    => 'MXN',
-
-        'name'       => 'François Hollande',
-        'first_name' => 'François',
-        'last_name'  => 'Hollande',
-        'phone'      => '+5215511223344',
-        'email'      => 'customer@example.com',
-        'line_items' => [
+        'device_id'      => 'test',
+        'application'    => 'PayMe_cart',
+        'description'    => 'Awesome Store',
+        'return_url'     => 'http://example.com/return',
+        'notify_url'     => 'http://example.com/notify',
+        'cancel_url'     => 'http://example.com/cancel',
+        'enabled_brands' => [],
+        'reference'      => 'order_'.time().rand(10000, 99999),
+        'currency'       => 'MXN',
+        'name'           => 'François Hollande',
+        'first_name'     => 'François',
+        'last_name'      => 'Hollande',
+        'email'          => 'customer@example.com',
+        'phone'          => '+5215511223344',
+        'line_items'     => [
             [
                 'name'        => 'Box of Cohiba S1s',
                 'description' => 'Imported From Mex.',
@@ -34,9 +34,9 @@ return [
             ],
         ],
         'discount'         => 100,
-        'discount_type'    => 'coupon',
         'discount_code'    => null,
         'discount_concept' => null,
+        'discount_type'    => 'coupon', // coupon, shipping
         'billing_address'  => [
             'address1' => 'Rio Missisipi #123',
             'address2' => 'Paris',
@@ -51,8 +51,8 @@ return [
             'city'     => 'Wanaque',
             'country'  => 'US',
             'state'    => 'NJ',
-            'zip'      => '01085',
-            'price'    => 0,
+            'zip'      => '07465',
+            'price'    => 5000,
             'carrier'  => 'payme',
             'service'  => 'pending',
         ],

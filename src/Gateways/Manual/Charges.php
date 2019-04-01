@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\Manual;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Status;
