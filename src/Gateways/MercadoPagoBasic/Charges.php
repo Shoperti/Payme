@@ -2,7 +2,6 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
-use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
