@@ -33,7 +33,7 @@ class Arr
      *
      * @return mixed
      */
-    public static function last($array, $default = null)
+    public static function last(array $array, $default = null)
     {
         return !empty($array) ? array_values(array_slice($array, -1))[0] : $default;
     }

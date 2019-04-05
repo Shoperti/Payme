@@ -57,17 +57,6 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     protected $oauthToken = null;
 
     /**
-     * The statuses considered as a success on payment responses.
-     *
-     * @var array
-     */
-    protected $successPaymentStatuses = [
-        'approved',
-        'in_process',
-        'pending',
-    ];
-
-    /**
      * Inject the configuration for a Gateway.
      *
      * @param string[] $config
@@ -222,7 +211,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'message'         => $success ? 'Transaction approved' : $this->getMessage($rawResponse),
             'test'            => $test,
             'authorization'   => $success ? Arr::get($response, 'id') : null,
-            'status'          => $success ? $this->getStatus($response) : new Status('failed'),
+            'status'          => $this->getStatus($response),
             'errorCode'       => $success ? null : $this->getErrorCode($response),
             'type'            => Arr::get($response, 'topic'),
         ]);
