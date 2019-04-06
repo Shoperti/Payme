@@ -51,6 +51,21 @@ class MercadoPagoGateway extends AbstractGateway
     protected $apiVersion = 'v1';
 
     /**
+     * The statuses considered as a success on payment responses.
+     *
+     * @var array
+     */
+    protected $successPaymentStatuses = [
+        'pending',  // atm
+        'in_process',
+        'in_meditation',
+        'approved',
+        'authorized',
+        'refunded',
+        'charged_back',
+    ];
+
+    /**
      * Inject the configuration for a Gateway.
      *
      * @param string[] $config
@@ -149,13 +164,7 @@ class MercadoPagoGateway extends AbstractGateway
      */
     protected function isSuccess($response, $code)
     {
-        if (in_array(Arr::get($response, 'status'), [
-            'pending',  // atm
-            'approved',
-            'authorized',
-            'refunded',
-            'charged_back',
-        ])) {
+        if (in_array(Arr::get($response, 'status'), $this->successPaymentStatuses)) {
             return true;
         }
 
@@ -204,7 +213,7 @@ class MercadoPagoGateway extends AbstractGateway
             'message'       => $message,
             'test'          => array_key_exists('live_mode', $response) ? !$response['live_mode'] : false,
             'authorization' => $authorization,
-            'status'        => $success ? $this->getStatus($response) : new Status('failed'),
+            'status'        => $this->getStatus($response),
             'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
@@ -219,7 +228,8 @@ class MercadoPagoGateway extends AbstractGateway
      */
     protected function getStatus(array $response)
     {
-        switch ($status = Arr::get($response, 'status', 'paid')) {
+        // https://www.mercadopago.com.mx/developers/en/reference/payments/resource/
+        switch ($status = Arr::get($response, 'status', '')) {
             case 'authorized':
             case 'refunded':
             case 'partially_refunded':
@@ -234,7 +244,7 @@ class MercadoPagoGateway extends AbstractGateway
             case 'cancelled':
                 return new Status('canceled');
             case 'rejected':
-                return new Status('failed');
+                return new Status('declined');
             default:
                 return new Status('pending');
         }
@@ -410,7 +420,9 @@ class MercadoPagoGateway extends AbstractGateway
             $code = '';
         }
 
-        $message = Arr::get($codeMap, $code);
+        $message = $code === 'accredited'
+            ? !empty($values['statement_descriptor']) ? Arr::get($codeMap, $code) : 'Transaction approved'
+            : Arr::get($codeMap, $code);
 
         $message = $message
             ? str_replace(array_keys($values), array_values($values), $message)

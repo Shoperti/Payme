@@ -20,7 +20,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getApprovedPayment());
 
         $this->assertTrue($response->success());
-        $this->assertEquals('paid', $response->status());
+        $this->assertSame('paid', (string) $response->status());
         $this->assertSame('Transaction approved', $response->message());
     }
 
@@ -30,7 +30,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getPendingPayment());
 
         $this->assertTrue($response->success());
-        $this->assertEquals('pending', $response->status());
+        $this->assertSame('pending', (string) $response->status());
         $this->assertSame('Transaction approved', $response->message());
     }
 
@@ -40,7 +40,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getInProcessPayment());
 
         $this->assertTrue($response->success());
-        $this->assertEquals('pending', $response->status());
+        $this->assertSame('pending', (string) $response->status());
         $this->assertSame('Transaction approved', $response->message());
     }
 
@@ -50,7 +50,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getRejectedPayment());
 
         $this->assertFalse($response->success());
-        $this->assertEquals('failed', $response->status());
+        $this->assertSame('declined', (string) $response->status());
         $this->assertSame('rejected', $response->message());
     }
 
@@ -60,7 +60,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getCancelledPayment());
 
         $this->assertFalse($response->success());
-        $this->assertEquals('failed', $response->status());
+        $this->assertSame('canceled', (string) $response->status());
         $this->assertSame('cancelled', $response->message());
     }
 
@@ -70,7 +70,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         $response = $this->gateway->generateResponseFromRawResponse($this->getEmptyPayment());
 
         $this->assertTrue($response->success());
-        $this->assertEquals('pending', $response->status());
+        $this->assertSame('pending', (string) $response->status());
         $this->assertSame('Transaction approved', $response->message());
     }
 
@@ -269,7 +269,6 @@ class MercadoPagoBasicTestGateway extends MercadoPagoBasicGateway
     public function generateResponseFromRawResponse($response)
     {
         $response['isRedirect'] = false;
-        $response['topic'] = '';
 
         return $this->respond($response, 200);
     }
