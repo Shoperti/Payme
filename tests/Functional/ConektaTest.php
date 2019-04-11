@@ -22,10 +22,12 @@ class ConektaTest extends AbstractFunctionalTestCase
     {
         $gateway = PayMe::make($this->credentials['conekta']);
 
+        $phone = '+525511223344';
+
         $customer = $gateway->customers()->create([
             'name'  => 'Jimmi Hendrix',
             'email' => 'jimmihendrix21@gmail.com',
-            'phone' => '+525511223344',
+            'phone' => $phone,
             'card'  => 'tok_test_visa_4242',
         ]);
 
@@ -34,7 +36,7 @@ class ConektaTest extends AbstractFunctionalTestCase
         $this->assertTrue($customer->success());
         $this->assertequals('Jimmi Hendrix', $response['name']);
         $this->assertequals('jimmihendrix21@gmail.com', $response['email']);
-        $this->assertequals('+525511223344', $response['phone']);
+        $this->assertequals($phone, $response['phone']);
         $this->assertArrayHasKey('payment_sources', $response);
 
         return $response;
@@ -290,7 +292,7 @@ class ConektaTest extends AbstractFunctionalTestCase
 
         $this->assertTrue($refund->success());
         $this->assertSame('refund', $refund->type());
-        $this->assertSame(9900, $response['amount_refunded']);
+        $this->assertSame($prevResponse['amount'], $response['amount_refunded']);
         $this->assertSame($refund->reference(), $response['charges']['data'][0]['refunds']['data'][0]['id']);
         $this->assertSame($refund->authorization(), $response['charges']['data'][0]['refunds']['data'][0]['auth_code']);
     }

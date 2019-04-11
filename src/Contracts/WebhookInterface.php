@@ -10,23 +10,26 @@ namespace Shoperti\PayMe\Contracts;
 interface WebhookInterface
 {
     /**
-     * Find all webhooks.
+     * Get all webhooks.
+     *
+     * @param array $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all();
+    public function all($params = []);
 
     /**
-     * Find an webhook by its id.
+     * Find a webhook by its id.
      *
      * @param int|string|null $id
+     * @param array           $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null);
+    public function find($id = null, $params = []);
 
     /**
-     * Create an webhook.
+     * Create a webhook.
      *
      * @param array $params
      *
@@ -35,7 +38,7 @@ interface WebhookInterface
     public function create($params = []);
 
     /**
-     * Update an webhook.
+     * Update a webhook.
      *
      * @param array $params
      *
@@ -44,11 +47,12 @@ interface WebhookInterface
     public function update($params = []);
 
     /**
-     * Delete an webhook.
+     * Delete a webhook.
      *
      * @param int|string $id
+     * @param array      $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function delete($id);
+    public function delete($id, $params = []);
 }

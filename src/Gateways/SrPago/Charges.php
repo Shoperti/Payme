@@ -61,6 +61,7 @@ class Charges extends AbstractApi implements ChargeInterface
      *
      * @param array $params
      * @param float $amount
+     * @param mixed $payment
      * @param array $options
      *
      * @return array

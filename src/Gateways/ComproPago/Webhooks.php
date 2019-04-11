@@ -15,23 +15,26 @@ use Shoperti\PayMe\Support\Arr;
 class Webhooks extends AbstractApi implements WebhookInterface
 {
     /**
-     * Find all events.
+     * Get all webhooks.
+     *
+     * @param array $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all()
+    public function all($params = [])
     {
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString('webhooks/stores'));
     }
 
     /**
-     * Find an event by its id.
+     * Find a webhook by its id.
      *
      * @param int|string $id
+     * @param array      $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null)
+    public function find($id = null, $params = [])
     {
         if (!$id) {
             throw new InvalidArgumentException('We need an id');
@@ -41,7 +44,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
     }
 
     /**
-     * Create an webhook.
+     * Create a webhook.
      *
      * @param array $params
      *
@@ -53,7 +56,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
     }
 
     /**
-     * Update an webhook.
+     * Update a webhook.
      *
      * @param array $params
      *
@@ -71,13 +74,14 @@ class Webhooks extends AbstractApi implements WebhookInterface
     }
 
     /**
-     * Delete an webhook.
+     * Delete a webhook.
      *
      * @param int|string $id
+     * @param array      $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function delete($id)
+    public function delete($id, $params = [])
     {
         return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('webhooks/stores/'.$id));
     }

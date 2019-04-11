@@ -156,7 +156,6 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $gateway = PayMe::make($this->credentials['mercadopago']);
 
         $chargeData = $dataAndAmount[0];
-        $options = ['type' => 'payment'];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->events()->find($chargeData['id']);
