@@ -65,7 +65,7 @@ class PaypalPlusGatewayTest extends AbstractTestCase
     /**
      * @see https://developer.paypal.com/docs/api/payments/v1/#payment_execute
      * @see https://developer.paypal.com/docs/api/payments/v1/#definition-sale
-    */
+     */
     private function getApprovedPayment()
     {
         return [
