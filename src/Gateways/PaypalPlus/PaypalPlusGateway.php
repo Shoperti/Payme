@@ -73,6 +73,8 @@ class PaypalPlusGateway extends AbstractGateway
         'completed',
         'pending',
         'created',
+        'refunded',
+        'partially_refunded',
     ];
 
     /**

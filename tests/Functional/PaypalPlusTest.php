@@ -86,6 +86,7 @@ class PaypalPlusTest extends AbstractFunctionalTestCase
         $this->assertSame('pending', (string) $response->status());
         $this->assertEmpty($response->errorCode());
         $this->assertSame($data['intent'], $response->type());
+        $this->assertSame('sale', $response->type());
     }
 
     /**

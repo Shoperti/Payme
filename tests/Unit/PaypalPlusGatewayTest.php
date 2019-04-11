@@ -44,6 +44,28 @@ class PaypalPlusGatewayTest extends AbstractTestCase
         $this->assertSame('declined', (string) $response->status());
     }
 
+    /** @test */
+    public function it_should_parse_a_refunded_payment()
+    {
+        $response = $this->gateway->getParsedResponse($this->getRefundedPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertSame('refunded', (string) $response->status());
+    }
+
+    /** @test */
+    public function it_should_parse_a_partially_refunded_payment()
+    {
+        $response = $this->gateway->getParsedResponse($this->getPartiallyRefundedPayment());
+
+        $this->assertTrue($response->success());
+        $this->assertSame('partially_refunded', (string) $response->status());
+    }
+
+    /**
+     * @see https://developer.paypal.com/docs/api/payments/v1/#payment_execute
+     * @see https://developer.paypal.com/docs/api/payments/v1/#definition-sale
+    */
     private function getApprovedPayment()
     {
         return [
@@ -85,6 +107,22 @@ class PaypalPlusGatewayTest extends AbstractTestCase
     {
         $payload = $this->getApprovedPayment();
         $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'denied';
+
+        return $payload;
+    }
+
+    private function getRefundedPayment()
+    {
+        $payload = $this->getApprovedPayment();
+        $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'refunded';
+
+        return $payload;
+    }
+
+    private function getPartiallyRefundedPayment()
+    {
+        $payload = $this->getApprovedPayment();
+        $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'partially_refunded';
 
         return $payload;
     }
