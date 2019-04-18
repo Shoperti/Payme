@@ -37,7 +37,7 @@ class Events extends AbstractApi implements EventInterface
         $topic = Arr::get($options, 'topic');
 
         if ($topic == 'payment') {
-            $response = $this->gateway->commit('get', $this->gateway->buildUrlFromString('collections/notifications').'/'.$id);
+            $response = $this->gateway->commit('get', $this->gateway->buildUrlFromString('v1/payments').'/'.$id);
 
             if (!$response->success()) {
                 return $response;
@@ -45,7 +45,8 @@ class Events extends AbstractApi implements EventInterface
 
             $responseData = $response->data();
 
-            $id = Arr::get($responseData, 'merchant_order_id');
+            $order = Arr::get($responseData, 'order', []);
+            $id = Arr::get($order, 'id');
         }
 
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString('merchant_orders').'/'.$id, [], $options);
