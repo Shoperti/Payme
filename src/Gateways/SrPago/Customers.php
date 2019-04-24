@@ -56,6 +56,33 @@ class Customers extends AbstractApi implements CustomerInterface
     }
 
     /**
+     * Delete a customer.
+     *
+     * @param string $customer
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function delete($customer)
+    {
+        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customer/'.$customer));
+    }
+
+    /**
+     * List cards of customer
+     *
+     * @param string $customer
+     * 
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
+     */
+    public function cards($customer)
+    {
+        return $this->gateway->commit(
+            'get',
+            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards')
+        ); 
+    }
+
+    /**
      * Associate a card to a customer.
      *
      * @param string $customer
@@ -70,21 +97,25 @@ class Customers extends AbstractApi implements CustomerInterface
         ];
 
         return $this->gateway->commit(
-                'post',
-                $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'),
-                $params
-            );
+            'post',
+            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards'),
+            $params
+        );
     }
 
     /**
-     * Delete a customer.
+     * Delete a card of the customer
      *
      * @param string $customer
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     * @param string $token
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
      */
-    public function delete($customer)
+    public function deleteCard($customer, $token)
     {
-        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('customer/'.$customer));
+        return $this->gateway->commit(
+            'delete',
+            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards/' . $token)
+        );
     }
+
 }

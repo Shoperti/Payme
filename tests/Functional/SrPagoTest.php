@@ -140,6 +140,44 @@ class SrPagoTest extends AbstractFunctionalTestCase
         $this->assertSame('Jon Doe', $response['result']['holder_name']);
         $this->assertSame('VISA', $response['result']['type']);
         $this->assertStringStartsWith('4242', $response['result']['number']);
+
+        return ['customer' => $data['result'], 'card' => $response['result']];
+    }
+
+    /**
+     * @test
+     * @depends it_should_add_card_to_a_customer
+     */
+    public function it_should_list_customer_cards($data)
+    {
+        $gateway = PayMe::make($this->credentials['sr_pago']);
+
+        $cards = $gateway->customers()->cards($data['customer']['id']);
+
+        $response = $cards->data();
+
+        $this->assertNotEmpty($response['result'][0]);
+        $this->assertSame('Jon Doe', $response['result'][0]['holder_name']);
+        $this->assertSame('VISA', $response['result'][0]['type']);
+        $this->assertStringStartsWith('4242', $response['result'][0]['number']);
+    }
+
+    /**
+     * @test
+     * @depends it_should_add_card_to_a_customer
+     */
+    public function it_should_delete_a_card_of_a_customer($data)
+    {
+        $gateway = PayMe::make($this->credentials['sr_pago']);
+
+        $response = $gateway->customers()->deleteCard($data['customer']['id'], $data['card']['token']);
+        $this->assertTrue($response['success']);
+
+        $cards = $gateway->customers()->cards($data['customer']['id']);
+        $response = $cards->data();
+        
+        $this->assertTrue($response['success']);
+        $this->assertArrayNotHasKey(0, $response['result']);
     }
 
     /**
