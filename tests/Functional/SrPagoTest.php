@@ -175,7 +175,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
 
         $cards = $gateway->customers()->cards($data['customer']['id']);
         $response = $cards->data();
-        
+
         $this->assertTrue($response['success']);
         $this->assertArrayNotHasKey(0, $response['result']);
     }

@@ -68,18 +68,18 @@ class Customers extends AbstractApi implements CustomerInterface
     }
 
     /**
-     * List cards of customer
+     * List cards of customer.
      *
      * @param string $customer
-     * 
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function cards($customer)
     {
         return $this->gateway->commit(
             'get',
-            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards')
-        ); 
+            $this->gateway->buildUrlFromString('customer/'.$customer.'/cards')
+        );
     }
 
     /**
@@ -98,24 +98,24 @@ class Customers extends AbstractApi implements CustomerInterface
 
         return $this->gateway->commit(
             'post',
-            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards'),
+            $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'),
             $params
         );
     }
 
     /**
-     * Delete a card of the customer
+     * Delete a card of the customer.
      *
      * @param string $customer
      * @param string $token
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface     
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
     public function deleteCard($customer, $token)
     {
         return $this->gateway->commit(
             'delete',
-            $this->gateway->buildUrlFromString('customer/' . $customer . '/cards/' . $token)
+            $this->gateway->buildUrlFromString('customer/'.$customer.'/cards/'.$token)
         );
     }
-
 }
