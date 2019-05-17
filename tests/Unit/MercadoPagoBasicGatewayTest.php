@@ -4,6 +4,9 @@ namespace Shoperti\Tests\PayMe\Unit;
 
 use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
 
+/**
+ * Tests responses from https://api.mercadopago.com/merchant_orders/$id?access_token=$token.
+ */
 class MercadoPagoBasicGatewayTest extends AbstractTestCase
 {
     /** @var MercadoPagoBasicTestGateway */
