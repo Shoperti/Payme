@@ -33,6 +33,14 @@ class Events extends AbstractApi implements EventInterface
      */
     public function find($id, array $options = [])
     {
+        if (empty($options)) {
+            return $this->gateway->commit(
+                'post',
+                $this->gateway->buildUrlFromString(''),
+                ['METHOD' => 'GetTransactionDetails', 'TRANSACTIONID' => $id]
+            );
+        }
+
         $test = $this->gateway->getConfig()['test'];
 
         foreach ($options as $key => $value) {
