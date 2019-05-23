@@ -229,7 +229,7 @@ class PaypalExpressGateway extends AbstractGateway
 
         $message = $success
             ? Arr::get($response, 'ACK', 'Transaction approved')
-            : Arr::get($response, 'L_LONGMESSAGE0', Arr::get($response, 'L_ERRORCODE0'));
+            : Arr::get($response, 'L_LONGMESSAGE0', Arr::get($response, 'L_ERRORCODE0', 'Misc. error'));
 
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
