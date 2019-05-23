@@ -227,11 +227,15 @@ class PaypalExpressGateway extends AbstractGateway
             ]);
         }
 
+        $message = $success
+            ? Arr::get($response, 'ACK', 'Transaction approved')
+            : Arr::get($response, 'L_LONGMESSAGE0', Arr::get($response, 'L_ERRORCODE0', 'Misc. error'));
+
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
             'success'         => $response['isRedirect'] ? false : $success,
             'reference'       => $success ? $this->getReference($response, $response['isRedirect']) : false,
-            'message'         => $success ? Arr::get($response, 'ACK', 'Transaction approved') : $response['L_LONGMESSAGE0'],
+            'message'         => $message,
             'test'            => $this->config['test'],
             'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
             'status'          => $success ? $this->getStatus($response, $response['isRedirect']) : new Status('failed'),
