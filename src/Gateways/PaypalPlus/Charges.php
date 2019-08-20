@@ -200,6 +200,23 @@ class Charges extends AbstractApi implements ChargeInterface
     }
 
     /**
+     * Get a charge.
+     *
+     * @param string $id
+     * @param array  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function get($id, $options = [])
+    {
+        return $this->gateway->commit(
+            'get',
+            $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
+            ['token' => Arr::get($options, 'token')]
+        );
+    }
+
+    /**
      * Complete a charge.
      *
      * @param string[] $options

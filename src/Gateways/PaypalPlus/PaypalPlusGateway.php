@@ -283,7 +283,7 @@ class PaypalPlusGateway extends AbstractGateway
             unset($response['is_redirect']);
         }
 
-        // Payment request / execute response
+        // Payment request/execute/get response
         $type = $this->getType($response);
         $state = $this->getSuccessAndStatus($response, $statusCode, $type, $isRedirect);
         $success = $state['success'];
@@ -319,7 +319,7 @@ class PaypalPlusGateway extends AbstractGateway
         }
 
         if (array_key_exists('intent', $response)) {
-            // 'sale' for payment request / execute
+            // 'sale' for payment request/execute/get
             return $response['intent'];
         }
 
