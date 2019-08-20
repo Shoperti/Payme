@@ -45,6 +45,7 @@ class Charges extends AbstractApi implements ChargeInterface
     {
         throw new BadMethodCallException();
     }
+
     /**
      * Complete a charge.
      *
