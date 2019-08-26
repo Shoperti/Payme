@@ -33,7 +33,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
-        $this->assertContains('.mercadopago.com/mlm/checkout/', $charge->authorization());
+        $this->assertRegExp('#https://.*\.mercadopago\.com.+/checkout/#', $charge->authorization());
     }
 
     /** @test */

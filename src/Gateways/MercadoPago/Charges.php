@@ -39,6 +39,19 @@ class Charges extends AbstractApi implements ChargeInterface
     }
 
     /**
+     * Get a charge.
+     *
+     * @param string $id
+     * @param array  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function get($id, $options = [])
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
      * Complete a charge.
      *
      * @param string[] $options

@@ -21,6 +21,16 @@ interface ChargeInterface
     public function create($amount, $payment, $options = []);
 
     /**
+     * Get a charge.
+     *
+     * @param string $id
+     * @param array  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function get($id, $options = []);
+
+    /**
      * Complete a charge.
      *
      * @param string[] $options

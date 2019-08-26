@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
+use BadMethodCallException;
 use Shoperti\PayMe\Contracts\ChargeInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
@@ -34,6 +35,19 @@ class Charges extends AbstractApi implements ChargeInterface
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('checkout/preferences'), $params, [
             'isRedirect' => true,
         ]);
+    }
+
+    /**
+     * Get a charge.
+     *
+     * @param string $id
+     * @param array  $options
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function get($id, $options = [])
+    {
+        throw new BadMethodCallException();
     }
 
     /**
