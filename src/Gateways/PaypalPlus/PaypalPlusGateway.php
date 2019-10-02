@@ -358,8 +358,11 @@ class PaypalPlusGateway extends AbstractGateway
             $transaction = Arr::last($response['transactions']);
             $resource = Arr::last($transaction['related_resources']);
 
-            // if there is no payment resource save general state
-            $state = $resource ? $resource['sale']['state'] : $response['state'];
+            if ($resource) {
+                $state = isset($resource['sale']) ? Arr::get($resource['sale'], 'state') : null;
+            } else {
+                $state = Arr::get($response, 'state');
+            }
 
             $reference = $resource ? $resource['sale']['id'] : $response['id'];
             $authorization = $resource ? $response['id'] : null;
