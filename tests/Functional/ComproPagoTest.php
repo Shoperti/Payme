@@ -30,7 +30,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = PayMe::make(array_merge($this->credentials['compro_pago'], ['private_key' => 'invalid_key']));
 
-        $charge = $gateway->charges()->create($orderData['total'], 'oxxo', $orderData['payload']);
+        $charge = $gateway->charges()->create($orderData['total'], 'seven_eleven', $orderData['payload']);
 
         $this->assertFalse($charge->success());
     }
@@ -44,7 +44,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
             'name'  => 'John Doe',
         ];
 
-        $charge = $this->gateway->charges()->create($orderData['total'], 'oxxo', $payload);
+        $charge = $this->gateway->charges()->create($orderData['total'], 'seven_eleven', $payload);
 
         $this->assertTrue($charge->success());
     }
@@ -54,7 +54,7 @@ class ComproPagoTest extends AbstractFunctionalTestCase
     {
         $orderData = $this->getOrderPayload();
 
-        $charge = $this->gateway->charges()->create($orderData['total'], 'oxxo', $orderData['payload']);
+        $charge = $this->gateway->charges()->create($orderData['total'], 'seven_eleven', $orderData['payload']);
 
         $response = $charge->data();
 
