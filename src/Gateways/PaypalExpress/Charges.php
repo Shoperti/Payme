@@ -187,7 +187,15 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addShippingAddress(array $params, array $options)
     {
-        if ($address = Arr::get($options, 'shipping_address')) {
+        if (!array_key_exists('shipping_address', $options)) {
+            return $params;
+        }
+
+        $address = $options['shipping_address'];
+
+        if (!$address) {
+            $params['NOSHIPPING'] = 1;
+        } elseif (is_array($address)) {
             $params['ADDROVERRIDE'] = 1;
             $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount(Arr::get($address, 'price', 0));
             $params['PAYMENTREQUEST_0_SHIPTOSTREET'] = Arr::get($address, 'address1');

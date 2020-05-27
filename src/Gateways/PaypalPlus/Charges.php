@@ -61,7 +61,8 @@ class Charges extends AbstractApi implements ChargeInterface
         return $this->gateway->commit(
             'post',
             $this->gateway->buildUrlFromString('payments/payment'),
-            $payload, $options
+            $payload,
+            $options
         );
     }
 
