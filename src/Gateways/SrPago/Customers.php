@@ -70,10 +70,10 @@ class Customers extends AbstractApi implements CustomerInterface
         ];
 
         return $this->gateway->commit(
-                'post',
-                $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'),
-                $params
-            );
+            'post',
+            $this->gateway->buildUrlFromString('customer/'.$customer.'/cards'),
+            $params
+        );
     }
 
     /**
