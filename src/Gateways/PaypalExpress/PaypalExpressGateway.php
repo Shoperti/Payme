@@ -144,8 +144,6 @@ class PaypalExpressGateway extends AbstractGateway
         $params['PWD'] = $this->config['password'];
         $params['SIGNATURE'] = $this->config['signature'];
 
-        $success = false;
-
         $request = [
             'exceptions'      => false,
             'timeout'         => '60',
@@ -171,20 +169,19 @@ class PaypalExpressGateway extends AbstractGateway
             $response = $this->responseError((string) $rawResponse->getBody());
         }
 
-        return $this->respond($success, $params, $response, $options);
+        return $this->respond($params, $response, $options);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool  $success
      * @param array $request
      * @param array $response
      * @param array $options
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($success, $request, $response, $options)
+    protected function respond($request, $response, $options)
     {
         $success = isset($response['ACK']) && in_array($response['ACK'], ['Success', 'SuccessWithWarning']);
 

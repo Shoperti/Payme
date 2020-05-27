@@ -187,15 +187,21 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     protected function addShippingAddress(array $params, array $options)
     {
-        if ($address = Arr::get($options, 'shipping_address')) {
-            $params['ADDROVERRIDE'] = 1;
-            $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount(Arr::get($address, 'price', 0));
-            $params['PAYMENTREQUEST_0_SHIPTOSTREET'] = Arr::get($address, 'address1');
-            $params['PAYMENTREQUEST_0_SHIPTOSTREET2'] = Arr::get($address, 'address2');
-            $params['PAYMENTREQUEST_0_SHIPTOCITY'] = Arr::get($address, 'city');
-            $params['PAYMENTREQUEST_0_SHIPTOSTATE'] = Arr::get($address, 'state');
-            $params['PAYMENTREQUEST_0_SHIPTOZIP'] = Arr::get($address, 'zip');
-            $params['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = Arr::get($address, 'country');
+        if (array_key_exists('shipping_address', $options)) {
+            $address = $options['shipping_address'];
+
+            if (empty($address)) {
+                $params['NOSHIPPING'] = 1;
+            } else {
+                $params['ADDROVERRIDE'] = 1;
+                $params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->gateway->amount(Arr::get($address, 'price', 0));
+                $params['PAYMENTREQUEST_0_SHIPTOSTREET'] = Arr::get($address, 'address1');
+                $params['PAYMENTREQUEST_0_SHIPTOSTREET2'] = Arr::get($address, 'address2');
+                $params['PAYMENTREQUEST_0_SHIPTOCITY'] = Arr::get($address, 'city');
+                $params['PAYMENTREQUEST_0_SHIPTOSTATE'] = Arr::get($address, 'state');
+                $params['PAYMENTREQUEST_0_SHIPTOZIP'] = Arr::get($address, 'zip');
+                $params['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = Arr::get($address, 'country');
+            }
         }
 
         return $params;
