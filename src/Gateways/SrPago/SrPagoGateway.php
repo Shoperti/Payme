@@ -116,7 +116,8 @@ class SrPagoGateway extends AbstractGateway
             $parsed = $this->parseResponse($response->getBody());
 
             // Be aware that this gateway validation error responses may be an HTTP 500 code.
-            return $retries < 3 && ($exception instanceof ConnectException ||
+            return $retries < 3 && (
+                $exception instanceof ConnectException ||
                 (
                     $response->getStatusCode() >= 500 &&
                     isset($parsed['error']['code']) &&

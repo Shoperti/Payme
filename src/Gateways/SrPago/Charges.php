@@ -159,10 +159,10 @@ class Charges extends AbstractApi implements ChargeInterface
                     'memberLoggedIn'        => Arr::get($options, 'logged_id', 'No'),
                     'memberId'              => Arr::get($options, 'user_id'),
                     'memberFullName'        => trim(
-                                                Arr::get($options, 'first_name', '').' '.
+                        Arr::get($options, 'first_name', '').' '.
                                                 (empty($options['middle_name']) ? '' : Arr::get($options, 'middle_name').' ').
                                                 Arr::get($options, 'last_name', '')
-                                            ),
+                    ),
                     'memberFirstName'       => Arr::get($options, 'first_name', ''),
                     'memberMiddleName'      => Arr::get($options, 'middle_name', ''),
                     'memberLastName'        => Arr::get($options, 'last_name', ''),
