@@ -224,9 +224,10 @@ class PaypalExpressGateway extends AbstractGateway
             ]);
         }
 
+        $error = Arr::get($response, 'L_ERRORCODE0');
         $message = $success
             ? Arr::get($response, 'ACK', 'Transaction approved')
-            : Arr::get($response, 'L_LONGMESSAGE0', Arr::get($response, 'L_ERRORCODE0', 'Misc. error'));
+            : Arr::get($response, 'L_LONGMESSAGE0', $error ?: 'Misc. error');
 
         return (new Response())->setRaw($rawResponse)->map([
             'isRedirect'      => $response['isRedirect'],
@@ -236,7 +237,7 @@ class PaypalExpressGateway extends AbstractGateway
             'test'            => $this->config['test'],
             'authorization'   => $this->getAuthorization($response, $success, $response['isRedirect']),
             'status'          => $success ? $this->getStatus($response, $response['isRedirect']) : new Status('failed'),
-            'errorCode'       => $success ? null : $this->getErrorCode($response['L_ERRORCODE0']),
+            'errorCode'       => $success ? null : $this->getErrorCode($error),
             'type'            => null,
         ]);
     }
@@ -349,7 +350,7 @@ class PaypalExpressGateway extends AbstractGateway
     /**
      * Map PayPalExpress response to error code object.
      *
-     * @param array $error
+     * @param string|null $error
      *
      * @return \Shoperti\PayMe\ErrorCode
      */
@@ -364,16 +365,15 @@ class PaypalExpressGateway extends AbstractGateway
             case '15002':
             case '11084':
                 return new ErrorCode('card_declined');
-                break;
+
             case '15004':
                 return new ErrorCode('incorrect_cvc');
-                break;
+
             case '10762':
                 return new ErrorCode('invalid_cvc');
-                break;
+
             default:
                 return new ErrorCode('config_error');
-                break;
         }
     }
 
