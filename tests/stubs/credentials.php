@@ -5,12 +5,6 @@ return [
         'driver' => 'bogus',
     ],
 
-    'compro_pago' => [
-        'driver'      => 'compro_pago',
-        'private_key' => 'sk_test_9c95e149614142822f',
-        'public_key'  => 'pk_test_638e8b14112423a086',
-    ],
-
     'conekta' => [
         'driver'      => 'conekta',
         'private_key' => 'key_TzsZY8UkWKDqKkfRbR9isA',
