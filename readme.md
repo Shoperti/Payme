@@ -5,7 +5,6 @@
 
 Supported Gateways:
 * Bogus
-* ComproPago
 * Conekta
 * Manual
 * MercadoPago
