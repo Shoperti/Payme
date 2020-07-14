@@ -6,60 +6,41 @@ use Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway;
 
 class PaypalPlusGatewayTest extends AbstractTestCase
 {
-    /** @var PaypalPlusTestGateway */
-    private $gateway = null;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->gateway = new PaypalPlusTestGateway($this->credentials['paypal_plus']);
-    }
+    protected $gatewayData = [
+        'class'                  => PaypalPlusGateway::class,
+        'config'                 => 'paypal_plus',
+        'innerMethod'            => 'mapResponse',
+        'innerMethodExtraParams' => [200],
+    ];
 
     /** @test */
     public function it_should_parse_an_approved_payment()
     {
-        $response = $this->gateway->getParsedResponse($this->getApprovedPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('paid', (string) $response->status());
-        $this->assertSame('Transaction approved', $response->message());
-    }
-
-    /** @test */
-    public function it_should_parse_a_pending_payment()
-    {
-        $response = $this->gateway->getParsedResponse($this->getPendingPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('pending', (string) $response->status());
-        $this->assertSame('Transaction approved', $response->message());
+        $this->approvedPaymentTest($this->getApprovedPayment());
     }
 
     /** @test */
     public function it_should_parse_a_denied_payment()
     {
-        $response = $this->gateway->getParsedResponse($this->getDeniedPayment());
+        $this->declinedPaymentTest($this->getDeniedPayment(), '');
+    }
 
-        $this->assertFalse($response->success());
-        $this->assertSame('declined', (string) $response->status());
+    /** @test */
+    public function it_should_parse_a_pending_payment()
+    {
+        $this->pendingPaymentTest($this->getPendingPayment());
     }
 
     /** @test */
     public function it_should_parse_a_refunded_payment()
     {
-        $response = $this->gateway->getParsedResponse($this->getRefundedPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('refunded', (string) $response->status());
+        $this->approvedRefundTest($this->getRefundedPayment(), 'Transaction approved');
     }
 
     /** @test */
     public function it_should_parse_a_partially_refunded_payment()
     {
-        $response = $this->gateway->getParsedResponse($this->getPartiallyRefundedPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('partially_refunded', (string) $response->status());
+        $this->approvedPartialRefundTest($this->getPartiallyRefundedPayment());
     }
 
     /**
@@ -125,13 +106,5 @@ class PaypalPlusGatewayTest extends AbstractTestCase
         $payload['transactions'][0]['related_resources'][0]['sale']['state'] = 'partially_refunded';
 
         return $payload;
-    }
-}
-
-class PaypalPlusTestGateway extends PaypalPlusGateway
-{
-    public function getParsedResponse($response)
-    {
-        return $this->mapResponse($response, 200);
     }
 }

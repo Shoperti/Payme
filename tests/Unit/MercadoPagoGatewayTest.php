@@ -6,102 +6,54 @@ use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 
 class MercadoPagoGatewayTest extends AbstractTestCase
 {
-    private $gateway = null;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->gateway = new MercadoPagoTestGateway($this->credentials['mercadopago']);
-    }
+    protected $gatewayData = [
+        'class'                  => MercadoPagoGateway::class,
+        'config'                 => 'mercadopago',
+        'innerMethodExtraParams' => [200],
+    ];
 
     /** @test */
     public function it_should_parse_an_approved_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getApprovedPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('paid', (string) $response->status());
-        $this->assertSame('Transaction approved', $response->message());
-    }
-
-    /** @test */
-    public function it_should_parse_an_authorized_payment()
-    {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getAuthorizedPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('authorized', (string) $response->status());
-        $this->assertSame('Transaction approved', $response->message());
-    }
-
-    /** @test */
-    public function it_should_parse_a_pending_payment()
-    {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getPendingPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('pending', (string) $response->status());
-        $this->assertSame('Transaction approved', $response->message());
-    }
-
-    /** @test */
-    public function it_should_parse_an_in_process_payment()
-    {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getInProcessPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('pending', (string) $response->status());
-        $this->assertSame('In process', $response->message());
-    }
-
-    /** @test */
-    public function it_should_parse_an_in_meditation_payment()
-    {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getInMeditationPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('pending', (string) $response->status());
-        $this->assertSame('In meditation', $response->message());
+        $this->approvedPaymentTest($this->getApprovedPayment());
     }
 
     /** @test */
     public function it_should_parse_a_rejected_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getRejectedPayment());
-
-        $this->assertFalse($response->success());
-        $this->assertSame('declined', (string) $response->status());
-        $this->assertSame('You must authorize card issuer to pay the amount to MercadoPago', $response->message());
+        $this->declinedPaymentTest($this->getDeclinedPayment(), 'You must authorize card issuer to pay the amount to MercadoPago');
     }
 
     /** @test */
-    public function it_should_parse_a_cancelled_payment()
+    public function it_should_parse_a_pending_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getCancelledPayment());
+        $this->pendingPaymentTest($this->getPendingPayment());
+        $this->pendingPaymentTest($this->getInProcessPayment(), 'In process');
+        $this->pendingPaymentTest($this->getInMeditationPayment(), 'In meditation');
+    }
 
-        $this->assertFalse($response->success());
-        $this->assertSame('canceled', (string) $response->status());
-        $this->assertSame('Cancelled', $response->message());
+    /** @test */
+    public function it_should_parse_an_authorized_payment()
+    {
+        $this->authorizedPaymentTest($this->getAuthorizedPayment());
     }
 
     /** @test */
     public function it_should_parse_a_refunded_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getRefundedPayment());
+        $this->approvedRefundTest($this->getRefundedPayment());
+    }
 
-        $this->assertTrue($response->success());
-        $this->assertSame('refunded', (string) $response->status());
-        $this->assertSame('Refunded', $response->message());
+    /** @test */
+    public function it_should_parse_a_cancelled_payment()
+    {
+        $this->canceledPaymentTest($this->getCancelledPayment(), 'Cancelled');
     }
 
     /** @test */
     public function it_should_parse_a_charged_back_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getChargedBackPayment());
-
-        $this->assertTrue($response->success());
-        $this->assertSame('charged_back', (string) $response->status());
-        $this->assertSame('Charged back', $response->message());
+        $this->chargeBackTest($this->getChargedBackPayment());
     }
 
     /** @test */
@@ -156,7 +108,7 @@ class MercadoPagoGatewayTest extends AbstractTestCase
         ];
     }
 
-    private function getRejectedPayment()
+    private function getDeclinedPayment()
     {
         return [
             'status'        => 'rejected',
@@ -193,13 +145,5 @@ class MercadoPagoGatewayTest extends AbstractTestCase
     {
         return [
         ];
-    }
-}
-
-class MercadoPagoTestGateway extends MercadoPagoGateway
-{
-    public function generateResponseFromRawResponse($response)
-    {
-        return $this->respond($response, 200);
     }
 }

@@ -169,19 +169,19 @@ class PaypalExpressGateway extends AbstractGateway
             $response = $this->responseError((string) $rawResponse->getBody());
         }
 
-        return $this->respond($params, $response, $options);
+        return $this->respond($response, $params, $options);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param array $request
      * @param array $response
+     * @param array $request
      * @param array $options
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($request, $response, $options)
+    protected function respond($response, $request, $options)
     {
         $success = isset($response['ACK']) && in_array($response['ACK'], ['Success', 'SuccessWithWarning']);
 
@@ -213,7 +213,7 @@ class PaypalExpressGateway extends AbstractGateway
 
             return (new Response())->setRaw($rawResponse)->map([
                 'isRedirect'      => false,
-                'success'         => $success ? true : false,
+                'success'         => $success,
                 'reference'       => $success ? Arr::get($response, 'invoice') : false,
                 'message'         => $success ? 'VERIFIED' : 'INVALID',
                 'test'            => $this->config['test'],
