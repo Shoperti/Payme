@@ -23,6 +23,7 @@ class PaypalExpressGatewayTest extends AbstractTestCase
         // on this gateway, a flag is set on the payload before calling the parse method
         $this->gateway->preprocessPayload = function ($response) {
             $response['isRedirect'] = false;
+
             return $response;
         };
     }

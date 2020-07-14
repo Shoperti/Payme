@@ -22,7 +22,7 @@ class ConektaGatewayTest extends AbstractTestCase
         return [
             'data' => [
                 'previous_attributes' => [],
-                'object' => [
+                'object'              => [
                     'amount'         => 233000,
                     'livemode'       => true,
                     'fee'            => 9460,
