@@ -4,7 +4,7 @@ namespace Shoperti\Tests\PayMe\Unit;
 
 use Shoperti\PayMe\Gateways\OpenPay\OpenPayGateway;
 
-class OpenPayGatewayTest extends AbstractTestCase
+class OpenPayTest extends AbstractTestCase
 {
     protected $gatewayData = [
         'class'  => OpenPayGateway::class,
