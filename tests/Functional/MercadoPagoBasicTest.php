@@ -2,25 +2,16 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\MercadoPagoBasic\Charges;
+use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
 
 class MercadoPagoBasicTest extends AbstractFunctionalTestCase
 {
-    protected $gateway;
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->gateway = PayMe::make($this->credentials['mercadopago_basic']);
-    }
-
-    /** @test */
-    public function it_should_create_a_new_mercadopago_basic_gateway()
-    {
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway::class, $this->gateway->getGateway());
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPagoBasic\Charges::class, $this->gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'mercadopago_basic',
+        'gateway' => MercadoPagoBasicGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_should_succeed_to_create_a_charge()
@@ -29,7 +20,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
         $payload = $order['payload'];
         $amount = $order['total'];
 
-        $charge = $this->gateway->charges()->create($amount, 'regular_payment', $payload);
+        $charge = $this->getPayMe()->charges()->create($amount, 'regular_payment', $payload);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
@@ -43,7 +34,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
         $payload = $order['payload'];
         $amount = $order['total'] / 2;
 
-        $charge = $this->gateway->charges()->create((int) ($amount), 'regular_payment', $payload);
+        $charge = $this->getPayMe()->charges()->create((int) ($amount), 'regular_payment', $payload);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());

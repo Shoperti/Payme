@@ -2,18 +2,16 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
+use Shoperti\PayMe\Gateways\PaypalPlus\Charges;
+use Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway;
+
 class PaypalPlusTest extends AbstractFunctionalTestCase
 {
-    protected $gatewayKey = 'paypal_plus';
-
-    /** @test */
-    public function it_should_create_a_new_gateway()
-    {
-        $gateway = $this->getPayMe();
-
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway::class, $gateway->getGateway());
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\PaypalPlus\Charges::class, $gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'paypal_plus',
+        'gateway' => PaypalPlusGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_should_fail_to_generate_a_token()

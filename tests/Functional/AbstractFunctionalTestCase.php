@@ -6,16 +6,31 @@ use Shoperti\PayMe\PayMe;
 
 abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $credentials;
+    protected $gatewayData = [
+        'gateway' => 'FQN of the gateway class',
+        'charges' => 'FQN of the gateway charges class',
+        'config'  => 'config key for credentials',
+    ];
 
-    public function setUp()
+    /** @test */
+    public function it_should_create_a_new_gateway()
     {
-        $this->credentials = require dirname(__DIR__).'/stubs/credentials.php';
+        $payMe = $this->getPayMe();
+
+        $this->assertInstanceOf($this->gatewayData['gateway'], $payMe->getGateway());
+        $this->assertInstanceOf($this->gatewayData['charges'], $payMe->charges());
     }
 
     protected function getPayMe(array $overrides = [])
     {
-        return PayMe::make(array_merge($this->credentials[$this->gatewayKey], $overrides));
+        return PayMe::make(array_merge($this->getCredentials(), $overrides));
+    }
+
+    protected function getCredentials()
+    {
+        $credentials = require dirname(__DIR__).'/stubs/credentials.php';
+
+        return $credentials[$this->gatewayData['config']];
     }
 
     protected function getOrderPayload(array $customData = [])

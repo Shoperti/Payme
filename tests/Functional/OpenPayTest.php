@@ -2,28 +2,22 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\OpenPay\Charges;
+use Shoperti\PayMe\Gateways\OpenPay\OpenPayGateway;
 
 class OpenPayTest extends AbstractFunctionalTestCase
 {
-    /** @test */
-    public function it_should_create_a_new_openpay_gateway()
-    {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
-
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\OpenPay\OpenPayGateway', $openPayPayMe->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\OpenPay\Charges', $openPayPayMe->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'open_pay',
+        'gateway' => OpenPayGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_should_fail_to_charge_a_token()
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
-
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->create(1000, 'tok_test_card_declined');
+        $response = $this->getPayMe()->charges()->create(1000, 'tok_test_card_declined');
 
         $this->assertFalse($response->success());
     }
@@ -31,11 +25,11 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_charging_with_invalid_access_key()
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make(array_merge($this->credentials['open_pay'], ['private_key' => 'invalid_key']));
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe(['private_key' => 'invalid_key']);
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->create(1000, 'tok_test_card_declined');
+        $response = $payMe->charges()->create(1000, 'tok_test_card_declined');
 
         $this->assertSame('The api key or merchant id are invalid', $response->message());
     }
@@ -43,8 +37,8 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_store_payment()
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe();
 
         $order = $this->getOrderPayload();
         $amount = $order['total'];
@@ -53,12 +47,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $method = 'store';
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->create($amount, $method, $payload);
+        $response = $payMe->charges()->create($amount, $method, $payload);
 
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('store', $data['method']);
         $this->assertSame('in_progress', $data['status']);
         $this->assertSame('charge', $response->type());
@@ -71,8 +65,8 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_bank_transfer()
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe();
 
         $order = $this->getOrderPayload();
         $amount = $order['total'];
@@ -81,12 +75,12 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $method = 'bank_account';
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->create($amount, $method, $payload);
+        $response = $payMe->charges()->create($amount, $method, $payload);
 
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('bank_account', $data['method']);
         $this->assertSame('in_progress', $data['status']);
         $this->assertSame('charge', $response->type());
@@ -99,8 +93,8 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_a_token_with_params()
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe();
 
         $cardNumber = '4242424242424242';
 
@@ -108,15 +102,15 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $amount = $order['total'];
         $payload = $order['payload'];
 
-        $token = $this->getToken($this->credentials['open_pay'], $cardNumber, $payload);
+        $token = $this->getToken($this->getCredentials(), $cardNumber, $payload);
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->create($amount, $token, $payload);
+        $response = $payMe->charges()->create($amount, $token, $payload);
 
         $data = $response->data();
 
         $this->assertTrue($response->success());
-        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('card', $data['method']);
         $this->assertSame('completed', $data['status']);
         $this->assertSame('charge', $response->type());
@@ -137,14 +131,11 @@ class OpenPayTest extends AbstractFunctionalTestCase
      */
     public function it_should_retrieve_a_single_event($dataAndAmount)
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
-
         $chargeData = $dataAndAmount[0];
         $options = ['event' => 'charge.succeeded'];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->events()->find($chargeData['id'], $options);
+        $response = $this->getPayMe()->events()->find($chargeData['id'], $options);
 
         $data = $response->data();
 
@@ -160,13 +151,13 @@ class OpenPayTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_refund_a_charge($responseAndAmount)
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['open_pay']);
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe();
 
         list($response, $amount) = $responseAndAmount;
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->refund($amount, $response['id']);
+        $response = $payMe->charges()->refund($amount, $response['id']);
 
         $data = $response->data();
 
@@ -174,7 +165,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $this->assertSame('refund', $response->type());
         $this->assertSame($response['refund']['id'], $response->reference());
         $this->assertSame($response['refund']['authorization'], $response->authorization());
-        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
+        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
     }
 
     /** @test */
@@ -182,7 +173,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
     {
         $url = 'https://httpbin.org/post';
 
-        $gateway = PayMe::make($this->credentials['open_pay']);
+        $gateway = $this->getPayMe();
 
         $payload = [
             'url'         => $url,

@@ -2,31 +2,22 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\PaypalExpress\Charges;
+use Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway;
 
 class PaypalExpressTest extends AbstractFunctionalTestCase
 {
-    protected $gateway;
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->gateway = PayMe::make($this->credentials['paypal']);
-    }
-
-    /** @test */
-    public function it_should_create_a_new_paypal_express_gateway()
-    {
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway', $this->gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\PaypalExpress\Charges', $this->gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'paypal',
+        'gateway' => PaypalExpressGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_should_succeed_to_create_a_charge()
     {
         $orderData = $this->getOrderPayload();
-        $charge = $this->gateway->charges()->create($orderData['total'], 'SetExpressCheckout', $orderData['payload']);
+        $charge = $this->getPayMe()->charges()->create($orderData['total'], 'SetExpressCheckout', $orderData['payload']);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
@@ -37,7 +28,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     public function it_should_fail_to_create_a_charge()
     {
         $orderData = $this->getOrderPayload();
-        $charge = $this->gateway->charges()->create($orderData['total'] - 100, 'SetExpressCheckout', $orderData['payload']);
+        $charge = $this->getPayMe()->charges()->create($orderData['total'] - 100, 'SetExpressCheckout', $orderData['payload']);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());
@@ -46,7 +37,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_validate_event()
     {
-        $event = $this->gateway->events()->find('txn_id', [
+        $event = $this->getPayMe()->events()->find('txn_id', [
             'payment_type'         => 'instant',
             'payment_date'         => 'Thu Sep 28 2017 22:16:01 GMT-0500 (CDT)',
             'payment_status'       => 'Completed',

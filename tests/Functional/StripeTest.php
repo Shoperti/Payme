@@ -2,32 +2,23 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\Stripe\Charges;
+use Shoperti\PayMe\Gateways\Stripe\StripeGateway;
 
 class StripeTest extends AbstractFunctionalTestCase
 {
-    protected $gateway;
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->gateway = PayMe::make($this->credentials['stripe']);
-    }
-
-    /** @test */
-    public function it_should_create_a_new_conekta_gateway()
-    {
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Stripe\StripeGateway', $this->gateway->getGateway());
-        $this->assertInstanceOf('Shoperti\PayMe\Gateways\Stripe\Charges', $this->gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'stripe',
+        'gateway' => StripeGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function is_should_succeed_to_charge_a_token()
     {
         $token = $this->createToken();
 
-        $charge = $this->gateway->charges()->create(1000, $token);
+        $charge = $this->getPayMe()->charges()->create(1000, $token);
 
         $this->assertTrue($charge->success());
     }
@@ -35,7 +26,7 @@ class StripeTest extends AbstractFunctionalTestCase
     /** @test */
     public function is_should_fail_to_charge_a_token()
     {
-        $charge = $this->gateway->charges()->create(1000, 'tok_test_card_declined');
+        $charge = $this->getPayMe()->charges()->create(1000, 'tok_test_card_declined');
 
         $this->assertFalse($charge->success());
     }
@@ -45,7 +36,7 @@ class StripeTest extends AbstractFunctionalTestCase
     {
         $token = $this->createToken();
 
-        $charge = $this->gateway->charges()->create(1000, $token, [
+        $charge = $this->getPayMe()->charges()->create(1000, $token, [
             'reference' => 'order_1',
         ]);
 
@@ -58,7 +49,7 @@ class StripeTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_sould_fail_with_invalid_access_key()
     {
-        $gateway = PayMe::make(array_merge($this->credentials['stripe'], ['private_key' => 'invalid_key']));
+        $gateway = $this->getPayMe(['private_key' => 'invalid_key']);
 
         $charge = $gateway->charges()->create(1000, 'tok_test_card_declined');
 
@@ -68,17 +59,17 @@ class StripeTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_can_retrieve_a_single_and_all_events()
     {
-        $events = $this->gateway->events()->all();
+        $events = $this->getPayMe()->events()->all();
 
         $this->assertNotEmpty($events[0]->data()['data']);
         $this->assertInternalType('array', $events[0]->data()['data']);
 
-        $event = $this->gateway->events()->find($events[0]->data()['id']);
+        $event = $this->getPayMe()->events()->find($events[0]->data()['id']);
     }
 
     protected function createToken(array $parameters = [])
     {
-        $customer = $this->gateway->customers()->create(array_merge([
+        $customer = $this->getPayMe()->customers()->create(array_merge([
             'email' => 'john@doe.com',
             'card'  => [
                 'exp_month' => 10,
