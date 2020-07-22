@@ -5,7 +5,6 @@ namespace Shoperti\Tests\PayMe\Functional;
 use Shoperti\PayMe\Gateways\SrPago\Charges;
 use Shoperti\PayMe\Gateways\SrPago\Encryption;
 use Shoperti\PayMe\Gateways\SrPago\SrPagoGateway;
-use Shoperti\PayMe\PayMe;
 
 class SrPagoTest extends AbstractFunctionalTestCase
 {
