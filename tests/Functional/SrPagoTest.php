@@ -2,24 +2,23 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
+use Shoperti\PayMe\Gateways\SrPago\Charges;
 use Shoperti\PayMe\Gateways\SrPago\Encryption;
 use Shoperti\PayMe\Gateways\SrPago\SrPagoGateway;
 use Shoperti\PayMe\PayMe;
 
 class SrPagoTest extends AbstractFunctionalTestCase
 {
-    /** @test */
-    public function it_creates_a_sr_pago_instance()
-    {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $this->assertInstanceOf(SrPagoGateway::class, $gateway->getGateway());
-    }
+    protected $gatewayData = [
+        'config'  => 'sr_pago',
+        'gateway' => SrPagoGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_authenticates_current_application()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago'])->getGateway();
+        $gateway = $this->getPayMe()->getGateway();
 
         $response = $gateway->loginApplication();
         $this->assertNotNull($gateway->getConnectionToken());
@@ -28,7 +27,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_gets_a_valid_test_token()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
+        $gateway = $this->getPayMe();
 
         $token = $this->getValidTestToken();
 
@@ -38,12 +37,10 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_valid_token()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
         $payload = $this->getOrderPayload();
         $token = $this->getValidTestToken();
 
-        $charge = $gateway->charges()->create($payload['total'], $token, $payload['payload']);
+        $charge = $this->getPayMe()->charges()->create($payload['total'], $token, $payload['payload']);
 
         $response = $charge->data();
 
@@ -58,15 +55,13 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_with_invalid_card()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
         $payload = $this->getOrderPayload();
 
         $token = $this->getValidTestToken([
             'number' => '5504174401458735',
         ]);
 
-        $charge = $gateway->charges()->create($payload['total'], $token, $payload['payload']);
+        $charge = $this->getPayMe()->charges()->create($payload['total'], $token, $payload['payload']);
 
         $response = $charge->data();
 
@@ -80,9 +75,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_create_a_new_customer()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $customer = $gateway->customers()->create([
+        $customer = $this->getPayMe()->customers()->create([
             'name'  => 'FSM',
             'email' => 'example@example.com',
         ]);
@@ -102,9 +95,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
      * */
     public function it_should_update_customer_information($data)
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $customer = $gateway->customers()->update($data['result']['id'], [
+        $customer = $this->getPayMe()->customers()->update($data['result']['id'], [
             'name'  => 'MSF',
             'email' => 'new@example.com',
         ]);
@@ -124,15 +115,13 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     public function it_should_add_card_to_a_customer($data)
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
         $token = $this->getValidTestToken([
             'cardholder_name' => 'Jon Doe',
             'number'          => '4242424242424242',
             'cvv'             => '123',
         ]);
 
-        $customer = $gateway->customers()->addCard($data['result']['id'], $token);
+        $customer = $this->getPayMe()->customers()->addCard($data['result']['id'], $token);
 
         $response = $customer->data();
 
@@ -148,9 +137,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     public function it_should_find_a_customer($data)
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $customer = $gateway->customers()->find($data['result']['id']);
+        $customer = $this->getPayMe()->customers()->find($data['result']['id']);
 
         $response = $customer->data();
 
@@ -163,9 +150,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     public function it_should_delete_a_customer($data)
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $customer = $gateway->customers()->delete($data['result']['id']);
+        $customer = $this->getPayMe()->customers()->delete($data['result']['id']);
 
         $response = $customer->data();
 
@@ -180,7 +165,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     private function getValidTestToken($attributes = [])
     {
-        $gateway = PayMe::make($this->credentials['sr_pago'])->getGateway();
+        $gateway = $this->getPayMe()->getGateway();
 
         $card = array_merge([
             'cardholder_name' => 'FSMO',
@@ -213,9 +198,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     public function it_throws_charge_complete_method_call()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $gateway->charges()->complete();
+        $this->getPayMe()->charges()->complete();
     }
 
     /**
@@ -224,8 +207,6 @@ class SrPagoTest extends AbstractFunctionalTestCase
      */
     public function it_throws_charge_refund_method_call()
     {
-        $gateway = PayMe::make($this->credentials['sr_pago']);
-
-        $gateway->charges()->refund(1000, 'ref');
+        $this->getPayMe()->charges()->refund(1000, 'ref');
     }
 }

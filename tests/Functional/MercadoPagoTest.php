@@ -2,23 +2,21 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\PayMe;
+use Shoperti\PayMe\Gateways\MercadoPago\Charges;
+use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 
 class MercadoPagoTest extends AbstractFunctionalTestCase
 {
-    /** @test */
-    public function it_should_create_a_new_mercadopago_gateway()
-    {
-        $gateway = PayMe::make($this->credentials['mercadopago']);
-
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway::class, $gateway->getGateway());
-        $this->assertInstanceOf(\Shoperti\PayMe\Gateways\MercadoPago\Charges::class, $gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'mercadopago',
+        'gateway' => MercadoPagoGateway::class,
+        'charges' => Charges::class,
+    ];
 
     private function paymentTest($payload, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = $gateway ?: PayMe::make($this->credentials['mercadopago']);
+        $gateway = $gateway ?: $this->getPayMe();
 
         $order = $this->getOrderPayload($payload ?: []);
 
@@ -50,7 +48,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $cardNumber = '5031755734530604';
 
         $token = $this->getToken(
-            $this->credentials['mercadopago'],
+            $this->getCredentials(),
             $cardNumber,
             $this->getOrderPayload()['payload']
         );
@@ -108,7 +106,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     public function it_should_fail_charging_with_invalid_access_key()
     {
         /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = PayMe::make(array_merge($this->credentials['mercadopago'], ['private_key' => 'invalid_key']));
+        $gateway = $this->getPayMe(['private_key' => 'invalid_key']);
 
         $payload = [
             'card' => [
@@ -129,19 +127,19 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_refund_a_charge($responseAndAmount)
     {
-        /** @var \Shoperti\PayMe\PayMe $openPayPayMe */
-        $openPayPayMe = PayMe::make($this->credentials['mercadopago']);
+        /** @var \Shoperti\PayMe\PayMe $payMe */
+        $payMe = $this->getPayMe();
 
         list($response, $amount) = $responseAndAmount;
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayPayMe->charges()->refund($amount, $response['id']);
+        $response = $payMe->charges()->refund($amount, $response['id']);
 
         $data = $response->data();
 
         $this->assertTrue($response->success());
 
-        $this->assertEquals($openPayPayMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
     }
 
     /**
@@ -152,13 +150,10 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
      */
     public function it_should_retrieve_a_single_event($dataAndAmount)
     {
-        /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = PayMe::make($this->credentials['mercadopago']);
-
         $chargeData = $dataAndAmount[0];
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->events()->find($chargeData['id']);
+        $response = $this->getPayMe()->events()->find($chargeData['id']);
 
         $data = $response->data();
 
@@ -169,11 +164,8 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_retrieve_the_account_info()
     {
-        /** @var \Shoperti\PayMe\PayMe $gateway */
-        $gateway = PayMe::make($this->credentials['mercadopago']);
-
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->account()->info();
+        $response = $this->getPayMe()->account()->info();
 
         $data = $response->data();
 

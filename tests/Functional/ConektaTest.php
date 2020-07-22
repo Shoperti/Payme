@@ -4,27 +4,21 @@ namespace Shoperti\Tests\PayMe\Functional;
 
 use Shoperti\PayMe\Gateways\Conekta\Charges;
 use Shoperti\PayMe\Gateways\Conekta\ConektaGateway;
-use Shoperti\PayMe\PayMe;
 
 class ConektaTest extends AbstractFunctionalTestCase
 {
-    /** @test */
-    public function it_should_create_a_new_conekta_gateway()
-    {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $this->assertInstanceOf(ConektaGateway::class, $gateway->getGateway());
-        $this->assertInstanceOf(Charges::class, $gateway->charges());
-    }
+    protected $gatewayData = [
+        'config'  => 'conekta',
+        'gateway' => ConektaGateway::class,
+        'charges' => Charges::class,
+    ];
 
     /** @test */
     public function it_should_create_a_new_customer()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $phone = '+525511223344';
 
-        $customer = $gateway->customers()->create([
+        $customer = $this->getPayMe()->customers()->create([
             'name'  => 'Jimmi Hendrix',
             'email' => 'jimmihendrix21@gmail.com',
             'phone' => $phone,
@@ -48,13 +42,12 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_charge_an_order_with_customer_token($data)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
+        $order = $this->getOrderPayload();
 
-        $order = include __DIR__.'/stubs/orderPayload.php';
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, $data['id'], $payload);
+        $charge = $this->getPayMe()->charges()->create($total, $data['id'], $payload);
 
         $response = $charge->data();
 
@@ -73,9 +66,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_find_a_customer($data)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $customer = $gateway->customers()->find($data['id']);
+        $customer = $this->getPayMe()->customers()->find($data['id']);
 
         $response = $customer->data();
 
@@ -92,9 +83,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_create_a_customer_card($data)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $card = $gateway->cards()->create('tok_test_mastercard_4444', [
+        $card = $this->getPayMe()->cards()->create('tok_test_mastercard_4444', [
             'customer' => $data['id'],
         ]);
 
@@ -116,11 +105,9 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_update_a_customer($data)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $newName = 'Alice Cooper';
 
-        $customer = $gateway->customers()->update($data['customer']['id'], [
+        $customer = $this->getPayMe()->customers()->update($data['customer']['id'], [
             'name'         => $newName,
             'default_card' => $data['card']['id'],
         ]);
@@ -140,9 +127,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_delete_a_customer_card($data)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $card = $gateway->cards()->delete($data['id'], [
+        $card = $this->getPayMe()->cards()->delete($data['id'], [
             'card_id' => $data['payment_sources']['data'][0]['id'],
         ]);
 
@@ -155,9 +140,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_incomplete_order()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $charge = $gateway->charges()->create(1000, 'unused_token');
+        $charge = $this->getPayMe()->charges()->create(1000, 'unused_token');
 
         $response = $charge->data();
 
@@ -170,13 +153,11 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_invalid_card_token()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, 'tok_test_card_declined', $payload);
+        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_card_declined', $payload);
 
         $response = $charge->data();
 
@@ -188,13 +169,11 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_insufficient_funds_token()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, 'tok_test_insufficient_funds', $payload);
+        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_insufficient_funds', $payload);
 
         $response = $charge->data();
 
@@ -206,13 +185,11 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_oxxo()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, 'oxxo_cash', $payload);
+        $charge = $this->getPayMe()->charges()->create($total, 'oxxo_cash', $payload);
 
         $response = $charge->data();
 
@@ -230,13 +207,11 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_spei()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, 'spei', $payload);
+        $charge = $this->getPayMe()->charges()->create($total, 'spei', $payload);
 
         $response = $charge->data();
 
@@ -254,13 +229,11 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_card_token()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
         $order = $this->getOrderPayload();
         $total = $order['total'];
         $payload = $order['payload'];
 
-        $charge = $gateway->charges()->create($total, 'tok_test_visa_4242', $payload);
+        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_visa_4242', $payload);
 
         $response = $charge->data();
 
@@ -281,9 +254,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_fully_refund_a_charge($prevResponse)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $refund = $gateway->charges()->refund(null, $prevResponse['id'], [
+        $refund = $this->getPayMe()->charges()->refund(null, $prevResponse['id'], [
             'currency' => 'MXN',
             'reason'   => 'requested_by_client',
         ]);
@@ -303,7 +274,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_partially_refund_a_charge()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
+        $gateway = $this->getPayMe();
         $order = $this->getOrderPayload();
 
         $charge = $gateway->charges()->create($order['total'], 'tok_test_visa_4242', $order['payload']);
@@ -326,7 +297,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_with_invalid_access_key()
     {
-        $gateway = PayMe::make(array_merge($this->credentials['conekta'], ['private_key' => 'invalid_key']));
+        $gateway = $this->getPayMe(['private_key' => 'invalid_key']);
 
         $charge = $gateway->charges()->create(1000, 'tok_test_visa_4242');
 
@@ -336,9 +307,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_retrieve_all_events()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $events = $gateway->events()->all();
+        $events = $this->getPayMe()->events()->all();
 
         $this->assertNotEmpty($events[0]->data()['data']);
         $this->assertInternalType('array', $events[0]->data()['data']);
@@ -352,9 +321,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_retrieve_a_single_event($events)
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $event = $gateway->events()->find($events[0]->data()['id']);
+        $event = $this->getPayMe()->events()->find($events[0]->data()['id']);
 
         $this->assertCount(1, $event);
     }
@@ -362,9 +329,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_retrieve_a_nonexistent_event()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $event = $gateway->events()->find('qiq');
+        $event = $this->getPayMe()->events()->find('qiq');
 
         $this->assertEquals('failed', $event->status);
     }
@@ -372,9 +337,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_get_all_hooks()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
-
-        $webhooks = $gateway->webhooks()->all();
+        $webhooks = $this->getPayMe()->webhooks()->all();
 
         $this->assertFalse(array_key_exists('success', $webhooks));
     }
@@ -385,12 +348,12 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_create_and_delete_a_webhook()
     {
-        $gateway = PayMe::make($this->credentials['conekta']);
+        $hooks = $this->getPayMe()->webhooks();
 
-        $webhooks = $gateway->webhooks()->all();
+        $webhooks = $hooks->all();
         if (count($webhooks) === 10) {
             $deletable = $webhooks[count($webhooks) - 1];
-            $gateway->webhooks()->delete($deletable['id']);
+            $hooks->delete($deletable['id']);
         }
 
         $url = 'http://payme.com/hook/'.time().'-'.rand(100, 999);
@@ -410,10 +373,10 @@ class ConektaTest extends AbstractFunctionalTestCase
             'development_enabled' => 1,
         ];
 
-        $created = $gateway->webhooks()->create($payload)->data();
+        $created = $hooks->create($payload)->data();
 
-        $webhook = $gateway->webhooks()->find($created['id']);
-        $gateway->webhooks()->delete($created['id']);
+        $webhook = $hooks->find($created['id']);
+        $hooks->delete($created['id']);
 
         $this->assertSame($created['url'], $webhook->data()['url']);
     }

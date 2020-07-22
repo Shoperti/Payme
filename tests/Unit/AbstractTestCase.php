@@ -50,6 +50,15 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $this->assertSame($message, $response->message());
     }
 
+    protected function activePaymentTest($payload)
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($payload);
+
+        $this->assertTrue($response->success());
+        $this->assertSame('active', (string) $response->status());
+        $this->assertSame('Transaction approved', $response->message());
+    }
+
     protected function authorizedPaymentTest($payload)
     {
         $response = $this->gateway->generateResponseFromRawResponse($payload);

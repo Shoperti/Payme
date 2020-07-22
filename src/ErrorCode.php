@@ -24,23 +24,23 @@ class ErrorCode
      * @var string[]
      */
     protected $codes = [
-        'incorrect_number',
-        'invalid_number',
-        'invalid_expiry_date',
-        'invalid_cvc',
-        'expired_card',
-        'incorrect_cvc',
-        'incorrect_zip',
         'incorrect_address',
+        'incorrect_cvc',
+        'incorrect_number',
         'incorrect_pin',
+        'incorrect_zip',
+        'invalid_cvc',
+        'invalid_expiry_date',
+        'invalid_number',
+        'expired_card',
         'card_declined',
         'processing_error',
         'call_issuer',
         'pick_up_card',
-        'config_error',
         'insufficient_funds',
         'suspected_fraud',
         'invalid_encryption',
+        'config_error',
     ];
 
     /**
