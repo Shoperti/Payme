@@ -29,7 +29,7 @@ class PaypalPlusTest extends AbstractFunctionalTestCase
     {
         $gateway = $this->getPayMe();
 
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
 
         $amount = $order['total'];
         $payload = $order['payload'];
@@ -65,7 +65,7 @@ class PaypalPlusTest extends AbstractFunctionalTestCase
     {
         $gateway = $this->getPayMe();
 
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
 
         $amount = $order['total'];
         $payload = $order['payload'];

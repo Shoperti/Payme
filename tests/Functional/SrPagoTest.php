@@ -36,7 +36,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_valid_token()
     {
-        $payload = $this->getOrderPayload();
+        $payload = $this->getOrderData();
         $token = $this->getValidTestToken();
 
         $charge = $this->getPayMe()->charges()->create($payload['total'], $token, $payload['payload']);
@@ -54,7 +54,7 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_with_invalid_card()
     {
-        $payload = $this->getOrderPayload();
+        $payload = $this->getOrderData();
 
         $token = $this->getValidTestToken([
             'number' => '5504174401458735',

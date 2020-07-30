@@ -16,7 +16,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_create_a_charge()
     {
-        $orderData = $this->getOrderPayload();
+        $orderData = $this->getOrderData();
         $charge = $this->getPayMe()->charges()->create($orderData['total'], 'SetExpressCheckout', $orderData['payload']);
 
         $this->assertFalse($charge->success());
@@ -27,7 +27,7 @@ class PaypalExpressTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_create_a_charge()
     {
-        $orderData = $this->getOrderPayload();
+        $orderData = $this->getOrderData();
         $charge = $this->getPayMe()->charges()->create($orderData['total'] - 100, 'SetExpressCheckout', $orderData['payload']);
 
         $this->assertFalse($charge->success());

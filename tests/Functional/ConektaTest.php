@@ -42,7 +42,7 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_charge_an_order_with_customer_token($data)
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
 
         $total = $order['total'];
         $payload = $order['payload'];
@@ -153,7 +153,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_invalid_card_token()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -169,7 +169,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_insufficient_funds_token()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -185,7 +185,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_oxxo()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -207,7 +207,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_spei()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -229,7 +229,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_card_token()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $total = $order['total'];
         $payload = $order['payload'];
 
@@ -275,7 +275,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     public function it_should_succeed_to_partially_refund_a_charge()
     {
         $gateway = $this->getPayMe();
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
 
         $charge = $gateway->charges()->create($order['total'], 'tok_test_visa_4242', $order['payload']);
         $prevResponse = $charge->data();
@@ -351,7 +351,7 @@ class ConektaTest extends AbstractFunctionalTestCase
         $hooks = $this->getPayMe()->webhooks();
 
         $webhooks = $hooks->all();
-        if (count($webhooks) === 10) {
+        if (is_array($webhooks) && count($webhooks) === 10) {
             $deletable = $webhooks[count($webhooks) - 1];
             $hooks->delete($deletable['id']);
         }

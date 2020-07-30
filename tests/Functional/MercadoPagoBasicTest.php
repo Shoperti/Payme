@@ -16,7 +16,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_create_a_charge()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $payload = $order['payload'];
         $amount = $order['total'];
 
@@ -30,7 +30,7 @@ class MercadoPagoBasicTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_create_a_charge()
     {
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $payload = $order['payload'];
         $amount = $order['total'] / 2;
 

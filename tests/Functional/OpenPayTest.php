@@ -40,7 +40,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $payMe */
         $payMe = $this->getPayMe();
 
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $amount = $order['total'];
         $payload = $order['payload'];
 
@@ -68,7 +68,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $payMe */
         $payMe = $this->getPayMe();
 
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $amount = $order['total'];
         $payload = $order['payload'];
 
@@ -98,7 +98,7 @@ class OpenPayTest extends AbstractFunctionalTestCase
 
         $cardNumber = '4242424242424242';
 
-        $order = $this->getOrderPayload();
+        $order = $this->getOrderData();
         $amount = $order['total'];
         $payload = $order['payload'];
 

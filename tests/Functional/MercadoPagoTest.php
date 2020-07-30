@@ -18,7 +18,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = $gateway ?: $this->getPayMe();
 
-        $order = $this->getOrderPayload($payload ?: []);
+        $order = $this->getOrderData($payload ?: []);
 
         $payload = $order['payload'];
         $amount = $order['total'];
@@ -50,7 +50,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         $token = $this->getToken(
             $this->getCredentials(),
             $cardNumber,
-            $this->getOrderPayload()['payload']
+            $this->getOrderData()['payload']
         );
 
         $payload = [

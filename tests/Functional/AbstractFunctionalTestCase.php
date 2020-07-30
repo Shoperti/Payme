@@ -33,9 +33,9 @@ abstract class AbstractFunctionalTestCase extends \PHPUnit_Framework_TestCase
         return $credentials[$this->gatewayData['config']];
     }
 
-    protected function getOrderPayload(array $customData = [])
+    protected function getOrderData(array $customData = [])
     {
-        $order = include __DIR__.'/stubs/orderPayload.php';
+        $order = include __DIR__.'/stubs/orderData.php';
 
         $order['payload'] = array_merge($order['payload'], $customData);
 
