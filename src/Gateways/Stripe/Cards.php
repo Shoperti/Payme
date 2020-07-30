@@ -6,11 +6,11 @@ use Shoperti\PayMe\Contracts\CardInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 
-/**
- * This is the Stripe cards class.
- *
- * @author Joseph Cohen <joseph.cohen@dinkbit.com>
- */
+ /**
+  * This is the Stripe cards class.
+  *
+  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+  */
  class Cards extends AbstractApi implements CardInterface
  {
      /**
