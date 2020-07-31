@@ -2,7 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\OpenPay\Charges;
 use Shoperti\PayMe\Gateways\OpenPay\OpenPayGateway;
 
 class OpenPayTest extends AbstractFunctionalTestCase
@@ -10,7 +9,6 @@ class OpenPayTest extends AbstractFunctionalTestCase
     protected $gatewayData = [
         'config'  => 'open_pay',
         'gateway' => OpenPayGateway::class,
-        'charges' => Charges::class,
     ];
 
     /** @test */
@@ -37,26 +35,17 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_store_payment()
     {
-        /** @var \Shoperti\PayMe\PayMe $payMe */
-        $payMe = $this->getPayMe();
-
-        $order = $this->getOrderData();
-        $amount = $order['total'];
-        $payload = $order['payload'];
-
-        $method = 'store';
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $payMe->charges()->create($amount, $method, $payload);
+        $response = $this->successfulChargeRequest('store');
 
         $data = $response->data();
+        list($amount, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($response->success());
-        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
-        $this->assertSame('store', $data['method']);
-        $this->assertSame('in_progress', $data['status']);
         $this->assertSame('charge', $response->type());
+        $this->assertSame('pending', $response->status());
         $this->assertSame($data['id'], $response->reference());
+        $this->assertRegExp('#https://(sandbox-)?api.openpay.mx/barcode/.+#', $response->authorization());
+
+        $this->assertEquals($this->getPayMe()->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);
@@ -65,26 +54,19 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_bank_transfer()
     {
-        /** @var \Shoperti\PayMe\PayMe $payMe */
-        $payMe = $this->getPayMe();
-
-        $order = $this->getOrderData();
-        $amount = $order['total'];
-        $payload = $order['payload'];
-
-        $method = 'bank_account';
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $payMe->charges()->create($amount, $method, $payload);
+        $response = $this->successfulChargeRequest('bank_account');
 
         $data = $response->data();
+        list($amount, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($response->success());
-        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertSame('charge', $response->type());
+        $this->assertSame('pending', $response->status());
+        $this->assertSame($data['id'], $response->reference());
+        $this->assertRegExp('#\d{18}#', $response->authorization());
+
+        $this->assertEquals($this->getPayMe()->getGateway()->amount($amount), "{$data['amount']}");
         $this->assertSame('bank_account', $data['method']);
         $this->assertSame('in_progress', $data['status']);
-        $this->assertSame('charge', $response->type());
-        $this->assertSame($data['id'], $response->reference());
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);
@@ -93,29 +75,20 @@ class OpenPayTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_a_token_with_params()
     {
-        /** @var \Shoperti\PayMe\PayMe $payMe */
-        $payMe = $this->getPayMe();
+        list($amount, $payload) = array_values($this->getOrderData());
 
-        $cardNumber = '4242424242424242';
-
-        $order = $this->getOrderData();
-        $amount = $order['total'];
-        $payload = $order['payload'];
-
-        $token = $this->getToken($this->getCredentials(), $cardNumber, $payload);
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $payMe->charges()->create($amount, $token, $payload);
+        $response = $this->successfulChargeRequest($this->getToken($this->getCredentials(), '4242424242424242', $payload));
 
         $data = $response->data();
 
-        $this->assertTrue($response->success());
-        $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['amount']}");
-        $this->assertSame('card', $data['method']);
-        $this->assertSame('completed', $data['status']);
         $this->assertSame('charge', $response->type());
+        $this->assertSame('paid', $response->status());
         $this->assertSame($data['id'], $response->reference());
         $this->assertSame($data['authorization'], $response->authorization());
+
+        $this->assertEquals($this->getPayMe()->getGateway()->amount($amount), "{$data['amount']}");
+        $this->assertSame('card', $data['method']);
+        $this->assertSame('completed', $data['status']);
         $this->assertSame($payload['first_name'], $data['customer']['name']);
         $this->assertSame($payload['last_name'], $data['customer']['last_name']);
         $this->assertSame($payload['currency'], $data['currency']);

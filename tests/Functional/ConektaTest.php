@@ -2,7 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\Conekta\Charges;
 use Shoperti\PayMe\Gateways\Conekta\ConektaGateway;
 
 class ConektaTest extends AbstractFunctionalTestCase
@@ -10,7 +9,6 @@ class ConektaTest extends AbstractFunctionalTestCase
     protected $gatewayData = [
         'config'  => 'conekta',
         'gateway' => ConektaGateway::class,
-        'charges' => Charges::class,
     ];
 
     /** @test */
@@ -42,16 +40,16 @@ class ConektaTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_charge_an_order_with_customer_token($data)
     {
-        $order = $this->getOrderData();
-
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, $data['id'], $payload);
+        $charge = $this->successfulChargeRequest($data['id']);
 
         $response = $charge->data();
+        list($_, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($charge->success());
+        $this->assertEquals('order', $charge->type());
+        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals($response['charges']['data'][0]['id'], $charge->reference());
+        $this->assertEquals($response['charges']['data'][0]['payment_method']['auth_code'], $charge->authorization());
+
         $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
         $this->assertSame(2, count($response['line_items']['data']));
         $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
@@ -153,11 +151,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_invalid_card_token()
     {
-        $order = $this->getOrderData();
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_card_declined', $payload);
+        $charge = $this->chargeRequest('tok_test_card_declined');
 
         $response = $charge->data();
 
@@ -169,11 +163,7 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_to_charge_an_order_with_insufficient_funds_token()
     {
-        $order = $this->getOrderData();
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_insufficient_funds', $payload);
+        $charge = $this->chargeRequest('tok_test_insufficient_funds');
 
         $response = $charge->data();
 
@@ -185,21 +175,20 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_oxxo()
     {
-        $order = $this->getOrderData();
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, 'oxxo_cash', $payload);
+        $charge = $this->successfulChargeRequest('oxxo_cash');
 
         $response = $charge->data();
+        list($_, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($charge->success());
+        $this->assertEquals('order', $charge->type());
+        $this->assertEquals('pending', $charge->status());
+        $this->assertSame($response['charges']['data'][0]['id'], $charge->reference());
+        $this->assertSame($response['charges']['data'][0]['payment_method']['reference'], $charge->authorization());
+
         $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
         $this->assertSame(2, count($response['line_items']['data']));
         $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
         $this->assertSame($payload['name'], $response['customer_info']['name']);
-        $this->assertSame($charge->reference(), $response['charges']['data'][0]['id']);
-        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['payment_method']['reference']);
 
         return $response;
     }
@@ -207,21 +196,20 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_generate_a_charge_with_spei()
     {
-        $order = $this->getOrderData();
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, 'spei', $payload);
+        $charge = $this->successfulChargeRequest('spei');
 
         $response = $charge->data();
+        list($_, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($charge->success());
+        $this->assertEquals('order', $charge->type());
+        $this->assertEquals('pending', $charge->status());
+        $this->assertSame($response['charges']['data'][0]['id'], $charge->reference());
+        $this->assertSame($response['charges']['data'][0]['payment_method']['clabe'], $charge->authorization());
+
         $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
         $this->assertSame(2, count($response['line_items']['data']));
         $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
         $this->assertSame($payload['name'], $response['customer_info']['name']);
-        $this->assertSame($charge->reference(), $response['charges']['data'][0]['id']);
-        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['payment_method']['clabe']);
 
         return $response;
     }
@@ -229,21 +217,20 @@ class ConektaTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_card_token()
     {
-        $order = $this->getOrderData();
-        $total = $order['total'];
-        $payload = $order['payload'];
-
-        $charge = $this->getPayMe()->charges()->create($total, 'tok_test_visa_4242', $payload);
+        $charge = $this->successfulChargeRequest('tok_test_visa_4242');
 
         $response = $charge->data();
+        list($_, $payload) = array_values($this->getOrderData());
 
-        $this->assertTrue($charge->success());
+        $this->assertEquals('order', $charge->type());
+        $this->assertEquals('paid', $charge->status());
+        $this->assertSame($response['charges']['data'][0]['id'], $charge->reference());
+        $this->assertSame($response['charges']['data'][0]['payment_method']['auth_code'], $charge->authorization());
+
         $this->assertSame($payload['shipping_address']['city'], $response['shipping_contact']['address']['city']);
         $this->assertSame(2, count($response['line_items']['data']));
         $this->assertNotSame($response['line_items']['data'][0]['description'], $response['line_items']['data'][1]['description']);
         $this->assertSame($payload['name'], $response['customer_info']['name']);
-        $this->assertSame($charge->reference(), $response['charges']['data'][0]['id']);
-        $this->assertSame($charge->authorization(), $response['charges']['data'][0]['payment_method']['auth_code']);
 
         return $response;
     }

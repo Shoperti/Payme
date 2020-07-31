@@ -2,7 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\Manual\Charges;
 use Shoperti\PayMe\Gateways\Manual\ManualGateway;
 
 class ManualTest extends AbstractFunctionalTestCase
@@ -10,17 +9,17 @@ class ManualTest extends AbstractFunctionalTestCase
     protected $gatewayData = [
         'config'  => 'manual',
         'gateway' => ManualGateway::class,
-        'charges' => Charges::class,
     ];
 
     /** @test */
     public function it_should_succeed_to_perform_a_charge()
     {
-        $charge = $this->getPayMe()->charges()->create(1000, 'payment');
+        $charge = $this->successfulChargeRequest('payment', 1000, null);
 
-        $this->assertTrue($charge->success());
         $this->assertEquals('charge', $charge->type());
         $this->assertEquals('pending', $charge->status());
+        $this->assertEquals(null, $charge->reference());
+        $this->assertEquals(null, $charge->authorization());
     }
 
     /** @test */

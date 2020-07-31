@@ -10,7 +10,7 @@ return [
         'notify_url'     => 'http://example.com/notify',
         'cancel_url'     => 'http://example.com/cancel',
         'enabled_brands' => [],
-        'reference'      => 'order_'.time().rand(10000, 99999),
+        'reference'      => 'payme_order_'.time().rand(10000, 99999),
         'currency'       => 'MXN',
         'name'           => 'François Hollande',
         'first_name'     => 'François',

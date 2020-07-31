@@ -2,39 +2,33 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\MercadoPagoBasic\Charges;
 use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
 
 class MercadoPagoBasicTest extends AbstractFunctionalTestCase
 {
     protected $gatewayData = [
-        'config'  => 'mercadopago_basic',
-        'gateway' => MercadoPagoBasicGateway::class,
-        'charges' => Charges::class,
+        'config'     => 'mercadopago_basic',
+        'gateway'    => MercadoPagoBasicGateway::class,
+        'isRedirect' => true,
     ];
 
     /** @test */
     public function it_should_succeed_to_create_a_charge()
     {
-        $order = $this->getOrderData();
-        $payload = $order['payload'];
-        $amount = $order['total'];
+        $charge = $this->successfulChargeRequest('regular_payment');
 
-        $charge = $this->getPayMe()->charges()->create($amount, 'regular_payment', $payload);
+        $data = $charge->data();
 
-        $this->assertFalse($charge->success());
-        $this->assertTrue($charge->isRedirect());
+        $this->assertEquals(null, $charge->type());
+        $this->assertEquals('pending', $charge->status());
+        $this->assertEquals($data['id'], $charge->reference());
         $this->assertRegExp('#https://.*\.mercadopago\.com.+/checkout/#', $charge->authorization());
     }
 
     /** @test */
     public function it_should_fail_to_create_a_charge()
     {
-        $order = $this->getOrderData();
-        $payload = $order['payload'];
-        $amount = $order['total'] / 2;
-
-        $charge = $this->getPayMe()->charges()->create((int) ($amount), 'regular_payment', $payload);
+        $charge = $this->chargeRequest('regular_payment', (int) $this->getOrderData()['total'] / 2);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());

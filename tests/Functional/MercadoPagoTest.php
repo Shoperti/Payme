@@ -2,7 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\MercadoPago\Charges;
 use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 
 class MercadoPagoTest extends AbstractFunctionalTestCase
@@ -10,7 +9,6 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     protected $gatewayData = [
         'config'  => 'mercadopago',
         'gateway' => MercadoPagoGateway::class,
-        'charges' => Charges::class,
     ];
 
     private function paymentTest($payload, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)
@@ -18,10 +16,7 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = $gateway ?: $this->getPayMe();
 
-        $order = $this->getOrderData($payload ?: []);
-
-        $payload = $order['payload'];
-        $amount = $order['total'];
+        list($amount, $payload) = array_values($this->getOrderData($payload ?: []));
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->charges()->create($amount, $token, $payload);
@@ -47,10 +42,12 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
     {
         $cardNumber = '5031755734530604';
 
+        list($amount, $payload) = array_values($this->getOrderData());
+
         $token = $this->getToken(
             $this->getCredentials(),
             $cardNumber,
-            $this->getOrderData()['payload']
+            $payload
         );
 
         $payload = [
@@ -59,7 +56,17 @@ class MercadoPagoTest extends AbstractFunctionalTestCase
             ],
         ];
 
-        return $this->paymentTest($payload, $token, true, 'approved', 'credit_card');
+        $charge = $this->successfulChargeRequest($token, null, $payload);
+
+        $response = $charge->data();
+
+        $this->assertEquals('regular_payment', $charge->type());
+        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals($response['id'], $charge->reference());
+        $this->assertEquals(null, $charge->authorization());
+        $this->assertSame('credit_card', $response['payment_type_id']);
+
+        return [$response, $amount, $charge];
     }
 
     /** @test */
