@@ -2,15 +2,14 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\PaypalPlus\Charges;
 use Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway;
 
 class PaypalPlusTest extends AbstractFunctionalTestCase
 {
     protected $gatewayData = [
-        'config'  => 'paypal_plus',
-        'gateway' => PaypalPlusGateway::class,
-        'charges' => Charges::class,
+        'config'     => 'paypal_plus',
+        'gateway'    => PaypalPlusGateway::class,
+        'isRedirect' => true,
     ];
 
     /** @test */
@@ -27,16 +26,7 @@ class PaypalPlusTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_fail_charging_with_invalid_token()
     {
-        $gateway = $this->getPayMe();
-
-        $order = $this->getOrderPayload();
-
-        $amount = $order['total'];
-        $payload = $order['payload'];
-        $payload['token'] = 'invalid-token';
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->charges()->create($amount, 'request', $payload);
+        $response = $this->chargeRequest('request', null, ['token' => 'invalid-token']);
 
         $this->assertFalse($response->success());
         $this->assertSame('failed', (string) $response->status());
@@ -63,28 +53,20 @@ class PaypalPlusTest extends AbstractFunctionalTestCase
      */
     public function it_should_succeed_to_request_a_charge($token)
     {
-        $gateway = $this->getPayMe();
-
-        $order = $this->getOrderPayload();
-
-        $amount = $order['total'];
-        $payload = $order['payload'];
-        $payload['token'] = $token;
-        $payload['continue_url'] = 'https://myserver.com/show-form';
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $gateway->charges()->create($amount, 'request', $payload);
+        $response = $this->successfulChargeRequest('request', null, [
+            'token'        => $token,
+            'continue_url' => 'https://myserver.com/show-form',
+        ]);
 
         $data = $response->data();
 
-        $this->assertTrue($response->success());
-        $this->assertSame($data['id'], $response->reference());
-        $this->assertTrue($response->test());
-        $this->assertStringStartsWith('https://myserver.com/show-form/?approval_url=https%3A%2F%2Fwww.sandbox.paypal.com%2Fcgi-bin%2Fwebscr%3Fcmd%3D_express-checkout%26token%3D', $response->authorization());
-        $this->assertSame('pending', (string) $response->status());
-        $this->assertEmpty($response->errorCode());
-        $this->assertSame($data['intent'], $response->type());
         $this->assertSame('sale', $response->type());
+        $this->assertSame($data['intent'], $response->type());
+        $this->assertSame('pending', $response->status());
+        $this->assertSame($data['id'], $response->reference());
+        $this->assertStringStartsWith('https://myserver.com/show-form/?approval_url=https%3A%2F%2Fwww.sandbox.paypal.com%2Fcgi-bin%2Fwebscr%3Fcmd%3D_express-checkout%26token%3D', $response->authorization());
+
+        $this->assertTrue($response->test());
     }
 
     /**

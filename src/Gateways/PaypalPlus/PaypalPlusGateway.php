@@ -294,7 +294,7 @@ class PaypalPlusGateway extends AbstractGateway
 
         return (new Response())->setRaw($response)->map([
             'isRedirect'    => $isRedirect,
-            'success'       => $success,
+            'success'       => $success && !$isRedirect,
             'reference'     => $reference,
             'message'       => $message,
             'test'          => $this->config['test'],

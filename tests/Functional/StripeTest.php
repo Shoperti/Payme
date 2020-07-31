@@ -2,56 +2,51 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\Stripe\Charges;
 use Shoperti\PayMe\Gateways\Stripe\StripeGateway;
 
 class StripeTest extends AbstractFunctionalTestCase
 {
     protected $gatewayData = [
-        'config'  => 'stripe',
-        'gateway' => StripeGateway::class,
-        'charges' => Charges::class,
+        'config'     => 'stripe',
+        'gateway'    => StripeGateway::class,
     ];
 
     /** @test */
     public function is_should_succeed_to_charge_a_token()
     {
-        $token = $this->createToken();
+        $charge = $this->successfulChargeRequest($this->createToken(), 10000, null);
 
-        $charge = $this->getPayMe()->charges()->create(1000, $token);
+        $data = $charge->data();
 
-        $this->assertTrue($charge->success());
-    }
-
-    /** @test */
-    public function is_should_fail_to_charge_a_token()
-    {
-        $charge = $this->getPayMe()->charges()->create(1000, 'tok_test_card_declined');
-
-        $this->assertFalse($charge->success());
+        $this->assertEquals('charge', $charge->type());
+        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals($data['id'], $charge->reference());
+        $this->assertStringStartsWith('ch_', $charge->reference());
+        $this->assertStringStartsWith('txn_', $charge->authorization());
     }
 
     /** @test */
     public function is_should_succeed_to_charge_a_token_with_params()
     {
-        $token = $this->createToken();
+        $charge = $this->successfulChargeRequest($this->createToken());
 
-        $charge = $this->getPayMe()->charges()->create(1000, $token, [
-            'reference' => 'order_1',
-        ]);
+        $data = $charge->data();
 
-        $response = $charge->data();
+        $this->assertEquals('charge', $charge->type());
+        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals($data['id'], $charge->reference());
+        $this->assertStringStartsWith('ch_', $charge->reference());
+        $this->assertStringStartsWith('txn_', $charge->authorization());
 
-        $this->assertTrue($charge->success());
-        $this->assertSame($response['metadata']['reference'], 'order_1');
+        $this->assertStringStartsWith('payme_order_', $data['metadata']['reference']);
     }
 
     /** @test */
-    public function it_sould_fail_with_invalid_access_key()
+    public function it_should_fail_with_invalid_access_key()
     {
         $gateway = $this->getPayMe(['private_key' => 'invalid_key']);
 
-        $charge = $gateway->charges()->create(1000, 'tok_test_card_declined');
+        $charge = $gateway->charges()->create(1000, null);
 
         $this->assertSame($charge->message(), 'Invalid API Key provided: invalid_key');
     }

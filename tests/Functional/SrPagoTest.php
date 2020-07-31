@@ -2,7 +2,6 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\SrPago\Charges;
 use Shoperti\PayMe\Gateways\SrPago\Encryption;
 use Shoperti\PayMe\Gateways\SrPago\SrPagoGateway;
 
@@ -11,7 +10,6 @@ class SrPagoTest extends AbstractFunctionalTestCase
     protected $gatewayData = [
         'config'  => 'sr_pago',
         'gateway' => SrPagoGateway::class,
-        'charges' => Charges::class,
     ];
 
     /** @test */
@@ -36,33 +34,27 @@ class SrPagoTest extends AbstractFunctionalTestCase
     /** @test */
     public function it_should_succeed_to_charge_an_order_with_valid_token()
     {
-        $payload = $this->getOrderPayload();
-        $token = $this->getValidTestToken();
-
-        $charge = $this->getPayMe()->charges()->create($payload['total'], $token, $payload['payload']);
+        $charge = $this->successfulChargeRequest($this->getValidTestToken());
 
         $response = $charge->data();
 
-        $this->assertTrue($charge->success());
         $this->assertEquals('CARD', $charge->type());
-        $this->assertEquals($charge->reference(), $response['result']['transaction']);
-        $this->assertStringStartsWith('order_', $charge->reference());
-        $this->assertEquals($charge->authorization(), $response['result']['recipe']['authorization_code']);
+        $this->assertEquals('authorized', $charge->status());
+        $this->assertStringStartsWith('payme_order_', $charge->reference());
+        $this->assertEquals($response['result']['transaction'], $charge->reference());
+        $this->assertEquals($response['result']['recipe']['authorization_code'], $charge->authorization());
+
         $this->assertEquals('Transaction approved', $charge->message());
     }
 
     /** @test */
     public function it_should_fail_to_charge_with_invalid_card()
     {
-        $payload = $this->getOrderPayload();
-
         $token = $this->getValidTestToken([
             'number' => '5504174401458735',
         ]);
 
-        $charge = $this->getPayMe()->charges()->create($payload['total'], $token, $payload['payload']);
-
-        $response = $charge->data();
+        $charge = $this->chargeRequest($token);
 
         $this->assertFalse($charge->success());
         $this->assertNotNull($charge->message);

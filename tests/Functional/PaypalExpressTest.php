@@ -2,32 +2,34 @@
 
 namespace Shoperti\Tests\PayMe\Functional;
 
-use Shoperti\PayMe\Gateways\PaypalExpress\Charges;
 use Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway;
 
 class PaypalExpressTest extends AbstractFunctionalTestCase
 {
     protected $gatewayData = [
-        'config'  => 'paypal',
-        'gateway' => PaypalExpressGateway::class,
-        'charges' => Charges::class,
+        'config'     => 'paypal',
+        'gateway'    => PaypalExpressGateway::class,
+        'isRedirect' => true,
     ];
 
     /** @test */
     public function it_should_succeed_to_create_a_charge()
     {
-        $orderData = $this->getOrderPayload();
-        $charge = $this->getPayMe()->charges()->create($orderData['total'], 'SetExpressCheckout', $orderData['payload']);
+        $charge = $this->successfulChargeRequest('SetExpressCheckout');
 
-        $this->assertFalse($charge->success());
-        $this->assertTrue($charge->isRedirect());
+        $data = $charge->data();
+
+        $this->assertEquals(null, $charge->type());
+        $this->assertSame('pending', $charge->status());
+        $this->assertSame($data['TOKEN'], $charge->reference());
+        $this->assertRegExp('#EC-.{17}#', $charge->reference());
         $this->assertContains('https://www.sandbox.paypal.com/cgi-bin/webscr', $charge->authorization());
     }
 
     /** @test */
     public function it_should_fail_to_create_a_charge()
     {
-        $orderData = $this->getOrderPayload();
+        $orderData = $this->getOrderData();
         $charge = $this->getPayMe()->charges()->create($orderData['total'] - 100, 'SetExpressCheckout', $orderData['payload']);
 
         $this->assertFalse($charge->success());
