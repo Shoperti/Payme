@@ -122,7 +122,7 @@ class PayMe
     /**
      * Set the current config array.
      *
-     * @param string[]
+     * @param string[] $config
      *
      * @return $this
      */
