@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\Bogus\BogusGateway;
-
-class BogusTest extends AbstractFunctionalTestCase
+class BogusTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'bogus',
-        'gateway' => BogusGateway::class,
+        'config' => 'bogus',
     ];
 
     /** @test */

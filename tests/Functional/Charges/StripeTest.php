@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\Stripe\StripeGateway;
-
-class StripeTest extends AbstractFunctionalTestCase
+class StripeTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'     => 'stripe',
-        'gateway'    => StripeGateway::class,
+        'config' => 'stripe',
     ];
 
     /** @test */

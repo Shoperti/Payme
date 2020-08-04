@@ -19,7 +19,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     {
         parent::setUp();
 
-        // on this gateway, a flag is set on the payload before calling the parse method
+        // on this gateway, a flag is set on the response payload before calling the parse method
         $this->gateway->preprocessPayload = function ($response) {
             $response['isRedirect'] = false;
 

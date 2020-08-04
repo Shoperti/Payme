@@ -9,6 +9,12 @@ use Shoperti\PayMe\Support\Helper;
 /**
  * This is the PayMe class.
  *
+ * @method \Shoperti\PayMe\Contracts\CardInterface     cards()
+ * @method \Shoperti\PayMe\Contracts\ChargeInterface   charges()
+ * @method \Shoperti\PayMe\Contracts\CustomerInterface customers()
+ * @method \Shoperti\PayMe\Contracts\EventInterface    events()
+ * @method \Shoperti\PayMe\Contracts\WebhookInterface  webhooks()
+ *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
 class PayMe
@@ -116,7 +122,7 @@ class PayMe
     /**
      * Set the current config array.
      *
-     * @param string[]
+     * @param string[] $config
      *
      * @return $this
      */

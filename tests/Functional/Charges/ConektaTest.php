@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\Conekta\ConektaGateway;
-
-class ConektaTest extends AbstractFunctionalTestCase
+class ConektaTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'conekta',
-        'gateway' => ConektaGateway::class,
+        'config' => 'conekta',
     ];
 
     /** @test */
@@ -289,82 +286,5 @@ class ConektaTest extends AbstractFunctionalTestCase
         $charge = $gateway->charges()->create(1000, 'tok_test_visa_4242');
 
         $this->assertSame($charge->message(), 'Acceso no autorizado.');
-    }
-
-    /** @test */
-    public function it_should_retrieve_all_events()
-    {
-        $events = $this->getPayMe()->events()->all();
-
-        $this->assertNotEmpty($events[0]->data()['data']);
-        $this->assertInternalType('array', $events[0]->data()['data']);
-
-        return $events;
-    }
-
-    /**
-     * @test
-     * @depends it_should_retrieve_all_events
-     */
-    public function it_should_retrieve_a_single_event($events)
-    {
-        $event = $this->getPayMe()->events()->find($events[0]->data()['id']);
-
-        $this->assertCount(1, $event);
-    }
-
-    /** @test */
-    public function it_should_fail_to_retrieve_a_nonexistent_event()
-    {
-        $event = $this->getPayMe()->events()->find('qiq');
-
-        $this->assertEquals('failed', $event->status);
-    }
-
-    /** @test */
-    public function it_should_get_all_hooks()
-    {
-        $webhooks = $this->getPayMe()->webhooks()->all();
-
-        $this->assertFalse(array_key_exists('success', $webhooks));
-    }
-
-    /**
-     * @test
-     * depends it_should_get_all_hooks
-     */
-    public function it_should_create_and_delete_a_webhook()
-    {
-        $hooks = $this->getPayMe()->webhooks();
-
-        $webhooks = $hooks->all();
-        if (is_array($webhooks) && count($webhooks) === 10) {
-            $deletable = $webhooks[count($webhooks) - 1];
-            $hooks->delete($deletable['id']);
-        }
-
-        $url = 'http://payme.com/hook/'.time().'-'.rand(100, 999);
-
-        $payload = [
-            'events' => [
-                'charge.created', 'charge.paid', 'charge.under_fraud_review',
-                'charge.fraudulent', 'charge.refunded', 'charge.created',
-                'charge.chargeback.created', 'charge.chargeback.updated',
-                'charge.chargeback.under_review', 'charge.chargeback.lost',
-                'charge.chargeback.won', 'subscription.created', 'subscription.paused',
-                'subscription.resumed', 'subscription.canceled', 'subscription.expired',
-                'subscription.updated', 'subscription.paid', 'subscription.payment_failed',
-            ],
-            'url'                 => $url,
-            'production_enabled'  => 1,
-            'development_enabled' => 1,
-        ];
-
-        $created = $hooks->create($payload)->data();
-
-        $webhook = $hooks->find($created['id']);
-        $hooks->delete($created['id']);
-
-        $this->assertSame($created['url'], $webhook->data()['url']);
     }
 }
