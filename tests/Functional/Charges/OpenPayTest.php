@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\OpenPay\OpenPayGateway;
-
-class OpenPayTest extends AbstractFunctionalTestCase
+class OpenPayTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'open_pay',
-        'gateway' => OpenPayGateway::class,
+        'config' => 'open_pay',
     ];
 
     /** @test */
@@ -139,58 +136,6 @@ class OpenPayTest extends AbstractFunctionalTestCase
         $this->assertSame($response['refund']['id'], $response->reference());
         $this->assertSame($response['refund']['authorization'], $response->authorization());
         $this->assertEquals($payMe->getGateway()->amount($amount), "{$data['refund']['amount']}");
-    }
-
-    /** @test */
-    public function it_should_create_get_and_delete_a_webhook()
-    {
-        $url = 'https://httpbin.org/post';
-
-        $gateway = $this->getPayMe();
-
-        $payload = [
-            'url'         => $url,
-            'event_types' => [
-                'charge.refunded',
-                'charge.failed',
-                'charge.cancelled',
-                'charge.created',
-                'charge.succeeded',
-                'charge.rescored.to.decline',
-                'subscription.charge.failed',
-                'payout.created',
-                'payout.succeeded',
-                'payout.failed',
-                'transfer.succeeded',
-                'fee.succeeded',
-                'fee.refund.succeeded',
-                'spei.received',
-                'chargeback.created',
-                'chargeback.rejected',
-                'chargeback.accepted',
-                'order.created',
-                'order.activated',
-                'order.payment.received',
-                'order.completed',
-                'order.expired',
-                'order.cancelled',
-                'order.payment.cancelled',
-            ],
-        ];
-
-        /** @var \Shoperti\PayMe\Contracts\WebhookInterface $openPayHooks */
-        $openPayHooks = $gateway->webhooks();
-
-        /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
-        $response = $openPayHooks->create($payload);
-
-        $data = $response->data();
-
-        $webhook = $openPayHooks->find($data['id']);
-
-        $openPayHooks->delete($data['id']);
-
-        $this->assertSame($data['url'], $webhook->data()['url']);
     }
 
     /**

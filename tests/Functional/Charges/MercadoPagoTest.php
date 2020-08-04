@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
-
-class MercadoPagoTest extends AbstractFunctionalTestCase
+class MercadoPagoTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'mercadopago',
-        'gateway' => MercadoPagoGateway::class,
+        'config' => 'mercadopago',
     ];
 
     private function paymentTest($payload, $token, $success, $responseStatus = null, $responseType = null, $gateway = null)

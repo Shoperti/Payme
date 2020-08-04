@@ -1,15 +1,13 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
 use Shoperti\PayMe\Gateways\SrPago\Encryption;
-use Shoperti\PayMe\Gateways\SrPago\SrPagoGateway;
 
-class SrPagoTest extends AbstractFunctionalTestCase
+class SrPagoTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'sr_pago',
-        'gateway' => SrPagoGateway::class,
+        'config' => 'sr_pago',
     ];
 
     /** @test */

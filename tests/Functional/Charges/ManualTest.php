@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\Manual\ManualGateway;
-
-class ManualTest extends AbstractFunctionalTestCase
+class ManualTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config'  => 'manual',
-        'gateway' => ManualGateway::class,
+        'config' => 'manual',
     ];
 
     /** @test */

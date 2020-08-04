@@ -1,14 +1,11 @@
 <?php
 
-namespace Shoperti\Tests\PayMe\Functional;
+namespace Shoperti\Tests\PayMe\Functional\Charges;
 
-use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
-
-class MercadoPagoBasicTest extends AbstractFunctionalTestCase
+class MercadoPagoBasicTest extends AbstractTest
 {
     protected $gatewayData = [
         'config'     => 'mercadopago_basic',
-        'gateway'    => MercadoPagoBasicGateway::class,
         'isRedirect' => true,
     ];
 

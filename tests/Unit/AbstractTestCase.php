@@ -50,6 +50,15 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $this->assertSame($message, $response->message());
     }
 
+    protected function failedTPaymentTest($payload, $message = '')
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($payload);
+
+        $this->assertFalse($response->success());
+        $this->assertSame('failed', (string) $response->status());
+        $this->assertSame($message, $response->message());
+    }
+
     protected function activePaymentTest($payload)
     {
         $response = $this->gateway->generateResponseFromRawResponse($payload);
@@ -104,15 +113,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $this->assertSame('Charged back', $response->message());
     }
 
-    protected function failedTPaymentTest($payload, $message = '')
-    {
-        $response = $this->gateway->generateResponseFromRawResponse($payload);
-
-        $this->assertFalse($response->success());
-        $this->assertSame('failed', (string) $response->status());
-        $this->assertSame($message, $response->message());
-    }
-
     /**
      * Returns an subclass instance of the given gateway.
      *
@@ -124,7 +124,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @param string $innerMethod
      * @param array  $innerMethodExtraParams
      *
-     * @return \Shoperti\PayMe\Gateways\Conekta\AbstractGateway
+     * @return \Shoperti\PayMe\Gateways\AbstractGateway
      */
     private function makeGateway($gatewayClass, $config, $innerMethod = null, $innerMethodExtraParams = [])
     {
