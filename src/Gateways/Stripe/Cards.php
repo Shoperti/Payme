@@ -25,11 +25,13 @@ class Cards extends AbstractApi implements CardInterface
     {
         if (isset($options['customer'])) {
             $params['card'] = $creditcard;
+
             return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers/'.$options['customer'].'/cards'), $params);
         } else {
             $params['email'] = Arr::get($options, 'email');
             $params['description'] = Arr::get($options, 'name');
             $params['card'] = $creditcard;
+
             return $this->gateway->commit('post', $this->gateway->buildUrlFromString('customers'), $params);
         }
     }
