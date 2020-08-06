@@ -43,7 +43,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * charges()->create()
-     * Test for successful charge creation using a gateway that redirects
+     * Test for successful charge creation using a gateway that redirects.
      */
     protected function createSuccessfulChargeWithRedirectTest($payload, $message = 'Transaction approved')
     {
