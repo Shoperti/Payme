@@ -11,7 +11,10 @@ class ConektaGatewayTest extends AbstractTestCase
         'config' => 'conekta',
     ];
 
-    /** @test */
+    /**
+     * @test
+     * charges()->create()
+     */
     public function it_should_parse_an_approved_payment()
     {
         $this->approvedPaymentTest($this->getApprovedPayment());

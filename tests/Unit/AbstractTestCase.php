@@ -41,6 +41,19 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $this->assertSame($message, $response->message());
     }
 
+    /**
+     * charges()->create()
+     * Test for successful charge creation using a gateway that redirects
+     */
+    protected function createSuccessfulChargeWithRedirectTest($payload, $message = 'Transaction approved')
+    {
+        $response = $this->gateway->generateResponseFromRawResponse($payload);
+
+        $this->assertFalse($response->success());
+        $this->assertSame('pending', (string) $response->status());
+        $this->assertSame($message, $response->message());
+    }
+
     protected function pendingPaymentTest($payload, $message = 'Transaction approved')
     {
         $response = $this->gateway->generateResponseFromRawResponse($payload);

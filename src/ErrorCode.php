@@ -32,6 +32,8 @@ class ErrorCode
         'invalid_cvc',
         'invalid_expiry_date',
         'invalid_number',
+        'invalid_amount',
+        'invalid_state', // something misconfigured with the remote resources so the action cannot be performed
         'expired_card',
         'card_declined',
         'processing_error',
