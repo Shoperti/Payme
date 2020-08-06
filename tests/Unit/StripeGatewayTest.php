@@ -77,9 +77,9 @@ class StripeGatewayTest extends AbstractTestCase
             'payment_method'         => null,
             'payment_method_options' => [
                 'card' => [
-                'installments'           => null,
-                'network'                => null,
-                'request_three_d_secure' => 'automatic',
+                    'installments'           => null,
+                    'network'                => null,
+                    'request_three_d_secure' => 'automatic',
                 ],
             ],
             'payment_method_types' => [
@@ -230,9 +230,9 @@ class StripeGatewayTest extends AbstractTestCase
             'payment_method'         => 'pm_1H77j9CiECZYUTf4KhEik68x',
             'payment_method_options' => [
                 'card' => [
-                'installments'           => null,
-                'network'                => null,
-                'request_three_d_secure' => 'automatic',
+                    'installments'           => null,
+                    'network'                => null,
+                    'request_three_d_secure' => 'automatic',
                 ],
             ],
             'payment_method_types' => [
