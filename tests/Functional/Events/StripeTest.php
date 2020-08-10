@@ -10,7 +10,7 @@ class StripeTest extends AbstractTest
     ];
 
     /** @test */
-    public function it_can_retrieve_a_single_and_all_events()
+    public function it_can_retrieve_all_and_single_events()
     {
         $events = $this->getPayMe()->events()->all();
 
@@ -18,5 +18,7 @@ class StripeTest extends AbstractTest
         $this->assertInternalType('array', $events[0]->data()['data']);
 
         $event = $this->getPayMe()->events()->find($events[0]->data()['id']);
+
+        $this->assertTrue($event->success());
     }
 }

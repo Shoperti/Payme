@@ -5,35 +5,36 @@ namespace Shoperti\Tests\PayMe\Functional\Charges;
 class StripeTest extends AbstractTest
 {
     protected $gatewayData = [
-        'config' => 'stripe',
+        'config'     => 'stripe',
+        'isRedirect' => true,
     ];
 
     /** @test */
     public function is_should_succeed_to_charge_a_token()
     {
-        $charge = $this->successfulChargeRequest($this->createToken(), 10000, null);
+        $charge = $this->successfulChargeRequest(null, 10000, null);
 
         $data = $charge->data();
 
-        $this->assertEquals('charge', $charge->type());
-        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals('payment_intent', $charge->type());
+        $this->assertEquals('pending', $charge->status());
         $this->assertEquals($data['id'], $charge->reference());
-        $this->assertStringStartsWith('ch_', $charge->reference());
-        $this->assertStringStartsWith('txn_', $charge->authorization());
+        $this->assertStringStartsWith('pi_', $charge->reference());
+        $this->assertStringStartsWith('?reference=pi_', $charge->authorization());
     }
 
     /** @test */
     public function is_should_succeed_to_charge_a_token_with_params()
     {
-        $charge = $this->successfulChargeRequest($this->createToken());
+        $charge = $this->successfulChargeRequest(null);
 
         $data = $charge->data();
 
-        $this->assertEquals('charge', $charge->type());
-        $this->assertEquals('paid', $charge->status());
+        $this->assertEquals('payment_intent', $charge->type());
+        $this->assertEquals('pending', $charge->status());
         $this->assertEquals($data['id'], $charge->reference());
-        $this->assertStringStartsWith('ch_', $charge->reference());
-        $this->assertStringStartsWith('txn_', $charge->authorization());
+        $this->assertStringStartsWith('pi_', $charge->reference());
+        $this->assertStringStartsWith('?reference=pi_', $charge->authorization());
 
         $this->assertStringStartsWith('payme_order_', $data['metadata']['reference']);
     }
@@ -49,28 +50,28 @@ class StripeTest extends AbstractTest
     }
 
     /** @test */
-    public function it_can_retrieve_a_single_and_all_events()
+    public function it_should_fail_with_invalid_amount()
     {
-        $events = $this->getPayMe()->events()->all();
+        $gateway = $this->getPayMe();
 
-        $this->assertNotEmpty($events[0]->data()['data']);
-        $this->assertInternalType('array', $events[0]->data()['data']);
+        $charge = $gateway->charges()->create(1, null);
 
-        $event = $this->getPayMe()->events()->find($events[0]->data()['id']);
+        $this->assertFalse($charge->success());
+        $this->assertNull($charge->type());
+        $this->assertEquals('declined', $charge->status());
+        $this->assertEquals('invalid_amount', $charge->errorCode());
     }
 
-    protected function createToken(array $parameters = [])
+    /** @test */
+    public function it_should_fail_with_invalid_payload()
     {
-        $customer = $this->getPayMe()->customers()->create(array_merge([
-            'email' => 'john@doe.com',
-            'card'  => [
-                'exp_month' => 10,
-                'cvc'       => 314,
-                'exp_year'  => 2020,
-                'number'    => '4242424242424242',
-            ],
-        ], $parameters))->data();
+        $gateway = $this->getPayMe();
 
-        return $customer['id'];
+        $charge = $gateway->charges()->create(null, ['currency' => null]);
+
+        $this->assertFalse($charge->success());
+        $this->assertNull($charge->type());
+        $this->assertEquals('declined', $charge->status());
+        $this->assertEquals('config_error', $charge->errorCode());
     }
 }

@@ -13,7 +13,10 @@ class PaypalPlusGatewayTest extends AbstractTestCase
         'innerMethodExtraParams' => [200],
     ];
 
-    /** @test */
+    /**
+     * @test
+     * charges()->complete()
+     */
     public function it_should_parse_an_approved_payment()
     {
         $this->approvedPaymentTest($this->getApprovedPayment());

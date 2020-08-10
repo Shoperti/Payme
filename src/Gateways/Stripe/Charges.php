@@ -26,13 +26,9 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function create($amount, $payment, $options = [])
     {
-        $params = [];
+        $params = $this->addOrder($amount, $options);
 
-        $params = $this->addOrder($params, $amount, $options);
-        $params = $this->addCard($params, $payment, $options);
-        $params = $this->addCustomer($params, $payment, $options);
-
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('charges'), $params);
+        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('payment_intents'), $params, $options);
     }
 
     /**
@@ -45,7 +41,7 @@ class Charges extends AbstractApi implements ChargeInterface
      */
     public function get($id, $options = [])
     {
-        throw new BadMethodCallException();
+        return $this->gateway->commit('get', $this->gateway->buildUrlFromString(sprintf('payment_intents/%s', $id)));
     }
 
     /**
@@ -77,60 +73,20 @@ class Charges extends AbstractApi implements ChargeInterface
     /**
      * Add order params to request.
      *
-     * @param string[] $params
      * @param int      $money
      * @param string[] $options
      *
      * @return array
      */
-    protected function addOrder(array $params, $money, array $options)
+    protected function addOrder($money, array $options)
     {
         $params['description'] = Helper::ascii(Arr::get($options, 'description', 'PayMe Purchase'));
         $params['currency'] = Arr::get($options, 'currency', $this->gateway->getCurrency());
         $params['amount'] = $this->gateway->amount($money);
+        $params['metadata'] = ['integration_check' => 'accept_a_payment'];
 
         if (isset($options['reference'])) {
             $params['metadata']['reference'] = Arr::get($options, 'reference');
-        }
-
-        return $params;
-    }
-
-    /**
-     * Add payment method to request.
-     *
-     * @param string[] $params
-     * @param mixed    $payment
-     * @param string[] $options
-     *
-     * @return array
-     */
-    protected function addCard(array $params, $payment, array $options)
-    {
-        if (is_string($payment)) {
-            if (Helper::startsWith($payment, 'cus')) {
-                $params['customer'] = $payment;
-            } else {
-                $params['source'] = $payment;
-            }
-        }
-
-        return $params;
-    }
-
-    /**
-     * Add customer to request.
-     *
-     * @param string[] $params
-     * @param string   $creditcard
-     * @param string[] $options
-     *
-     * @return array
-     */
-    protected function addCustomer(array $params, $creditcard, array $options)
-    {
-        if (array_key_exists('customer', $options)) {
-            $params['customer'] = $options['customer'];
         }
 
         return $params;

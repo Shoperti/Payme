@@ -13,6 +13,7 @@ use Shoperti\PayMe\Support\Arr;
  * This is the stripe gateway class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
+ * @author Arturo Rodríguez <arturo.rodriguez@dinkbit.com>
  */
 class StripeGateway extends AbstractGateway
 {
@@ -87,8 +88,6 @@ class StripeGateway extends AbstractGateway
             'uname'            => php_uname(),
         ];
 
-        $success = false;
-
         $request = [
             'exceptions'      => false,
             'timeout'         => '80',
@@ -110,81 +109,138 @@ class StripeGateway extends AbstractGateway
 
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
-        if ($rawResponse->getStatusCode() == 200) {
+        if ($rawResponse->getStatusCode() === 200) {
             $response = $this->parseResponse($rawResponse->getBody());
         } else {
             $response = $this->responseError($rawResponse->getBody());
         }
 
-        return $this->respond($success, $response);
+        return $this->respond($response, $options);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
-     * @param bool  $success
      * @param array $response
+     * @param array $request
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($success, $response)
+    protected function respond($response, $request)
     {
-        if (Arr::get($response, 'object') !== 'list') {
-            $success = (!array_key_exists('error', $response));
+        if (Arr::get($response, 'object') === 'list') {
+            $responses = [];
 
-            return $this->mapResponse($success, $response);
+            foreach ($response['data'] as $subResponse) {
+                $responses[] = $this->mapResponse($subResponse, $request);
+            }
+
+            return $responses;
         }
 
-        $responses = [];
-
-        foreach ($response['data'] as $responds) {
-            $success = (!array_key_exists('error', $responds));
-
-            $responses[] = $this->mapResponse($success, $responds);
-        }
-
-        return $responses;
+        return $this->mapResponse($response, $request);
     }
 
     /**
      * Map HTTP response to transaction object.
      *
-     * @param bool  $success
-     * @param array $response
+     * @param array $rawResponse
+     * @param array $request
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    public function mapResponse($rawResponse, $request)
     {
-        $rawResponse = $response;
+        // if there's an inner object (e.g. when getting an event) use it as data source
+        $response = array_key_exists('type', $rawResponse) && isset($rawResponse['data']['object'])
+            ? $rawResponse['data']['object']
+            : $rawResponse;
 
-        if (array_key_exists('type', $response) && isset($response['data']['object'])) {
-            $response = $response['data']['object'];
-        }
+        $type = Arr::get($rawResponse, 'type') ?: Arr::get($response, 'object');
+        $isTest = array_key_exists('livemode', $response) ? !$response['livemode'] : false;
+        $success = !array_key_exists('error', $response);
 
-        return (new Response())->setRaw($rawResponse)->map([
-            'isRedirect'      => false,
-            'success'         => $success,
-            'reference'       => $success ? $response['id'] : Arr::get($response['error'], 'charge', 'error'),
-            'message'         => $success ? 'Transaction approved' : $response['error']['message'],
-            'test'            => array_key_exists('livemode', $response) ? !$response['livemode'] : false,
-            'authorization'   => $success ? Arr::get($response, 'balance_transaction', '') : false,
-            'status'          => $success ? $this->getStatus(Arr::get($response, 'paid', true)) : new Status('failed'),
-            'errorCode'       => $success ? null : $this->getErrorCode($response['error']),
-            'type'            => array_key_exists('type', $rawResponse) ? $rawResponse['type'] : Arr::get($rawResponse, 'object'),
+        $status = $this->getStatus($response);
+        $isCharge = $type === 'payment_intent';
+        $isRedirect = $isCharge && (string) $status === 'pending';
+
+        $result = [
+            // when mapping a payment intent, success must be false if redirect is needed
+            'success' => $success && !$isRedirect,
+            'test'    => $isTest,
+            'type'    => $type,
+            'status'  => $status,
+        ];
+
+        $result = array_merge($result, $success ? [
+            'isRedirect'    => $isRedirect,
+            'errorCode'     => null,
+            'reference'     => Arr::get($response, 'id'), // may not exist, e.g. balance objects
+            'message'       => $isCharge ? 'Transaction approved' : 'success',
+            'authorization' => $isCharge
+                ? Arr::get($request, 'continue_url')."?reference={$response['client_secret']}"
+                : null,
+        ] : [
+            'isRedirect'    => false,
+            'errorCode'     => $this->getErrorCode($response['error']),
+            'reference'     => Arr::get($response['error'], 'charge'),
+            'message'       => Arr::get($response['error'], 'message'),
+            'authorization' => null,
         ]);
+
+        return (new Response())->setRaw($rawResponse)->map($result);
     }
 
     /**
      * Map Stripe response to status object.
      *
-     * @param string $status
+     * @param array $response
      *
      * @return \Shoperti\PayMe\Status
      */
-    protected function getStatus($status)
+    protected function getStatus(array $response)
     {
-        return $status ? new Status('paid') : new Status('pending');
+        if (isset($response['error'])) {
+            return new Status('declined');
+        }
+
+        $type = Arr::get($response, 'object');
+
+        if ($type === 'payment_intent') {
+            switch (Arr::get($response, 'status', null)) {
+                case 'canceled':
+                    return new Status('canceled');
+
+                case 'processing':
+                case 'requires_action':
+                case 'requires_capture':
+                case 'requires_confirmation':
+                    return new Status('pending');
+
+                // When the PaymentIntent is created or if the payment attempt fails
+                case 'requires_payment_method':
+                    $isRecent = $response['last_payment_error'] === null;
+
+                    return $isRecent ? new Status('pending') : new Status('declined');
+
+                case 'succeeded':
+                    return $response['amount_received'] >= $response['amount']
+                        ? new Status('paid')
+                        : new Status('partially_paid');
+            }
+
+            return new Status('pending');
+        }
+
+        if ($type === 'webhook_endpoint') {
+            return Arr::get($response, 'deleted')
+                ? new Status('canceled')
+                : (Arr::get($response, 'status') === 'enabled'
+                    ? new Status('authorized')
+                    : new Status('pending'));
+        }
+
+        return new Status('pending');
     }
 
     /**
@@ -202,20 +258,31 @@ class StripeGateway extends AbstractGateway
             case 'invalid_expiry_month':
             case 'invalid_expiry_year':
                 return new ErrorCode('invalid_expiry_date');
-                break;
-            case 'invalid_number':
-            case 'incorrect_number':
-            case 'invalid_cvc':
-            case 'incorrect_zip':
+
             case 'card_declined':
             case 'expired_card':
+            case 'incorrect_address':
+            case 'incorrect_cvc':
+            case 'incorrect_number':
+            case 'incorrect_zip':
+            case 'invalid_cvc':
+            case 'invalid_number':
             case 'processing_error':
                 return new ErrorCode($code);
-                break;
+
+            case 'amount_too_large':
+            case 'amount_too_small':
+            case 'invalid_charge_amount':
+                return new ErrorCode('invalid_amount');
+
+            case 'balance_insufficient':
+                return new ErrorCode('insufficient_funds');
+
             case 'missing':
-                return new ErrorCode('config_error');
-                break;
+                return new ErrorCode('invalid_state');
         }
+
+        return new ErrorCode('config_error');
     }
 
     /**
