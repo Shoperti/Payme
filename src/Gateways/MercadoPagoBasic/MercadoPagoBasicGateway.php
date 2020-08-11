@@ -2,7 +2,9 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
+use Exception;
 use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
@@ -124,7 +126,11 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
         $response['topic'] = Arr::get($options, 'topic');
 
-        return $this->respond($response, $rawResponse->getStatusCode());
+        try {
+            return $this->respond($response, $rawResponse->getStatusCode());
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**

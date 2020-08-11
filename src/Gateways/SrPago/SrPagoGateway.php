@@ -2,6 +2,7 @@
 
 namespace Shoperti\PayMe\Gateways\SrPago;
 
+use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\TransferException;
@@ -11,6 +12,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
@@ -200,7 +202,11 @@ class SrPagoGateway extends AbstractGateway
             ? $this->parseResponse($raw->getBody())
             : $this->responseError($raw->getBody(), $statusCode);
 
-        return $this->respond($response);
+        try {
+            return $this->respond($response);
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**

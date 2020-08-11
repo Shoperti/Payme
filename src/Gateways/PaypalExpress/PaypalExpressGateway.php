@@ -2,10 +2,12 @@
 
 namespace Shoperti\PayMe\Gateways\PaypalExpress;
 
+use Exception;
 use GuzzleHttp\ClientInterface;
 use InvalidArgumentException;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
@@ -163,13 +165,15 @@ class PaypalExpressGateway extends AbstractGateway
 
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
-        if ($rawResponse->getStatusCode() == 200) {
-            $response = $this->parseResponse((string) $rawResponse->getBody());
-        } else {
-            $response = $this->responseError((string) $rawResponse->getBody());
-        }
+        $response = $rawResponse->getStatusCode() == 200
+            ? $this->parseResponse((string) $rawResponse->getBody())
+            : $this->responseError((string) $rawResponse->getBody());
 
-        return $this->respond($response, $params, $options);
+        try {
+            return $this->respond($response, $params, $options);
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**

@@ -2,8 +2,10 @@
 
 namespace Shoperti\PayMe\Gateways\Conekta;
 
+use Exception;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
@@ -121,7 +123,11 @@ class ConektaGateway extends AbstractGateway
             ? $this->parseResponse($rawResponse->getBody())
             : $this->responseError($rawResponse->getBody(), $statusCode);
 
-        return $this->respond($response);
+        try {
+            return $this->respond($response);
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**
