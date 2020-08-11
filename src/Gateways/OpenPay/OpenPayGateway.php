@@ -282,7 +282,9 @@ class OpenPayGateway extends AbstractGateway
      */
     protected function getStatus(array $response)
     {
-        switch ($status = Arr::get($response, 'status', 'paid')) {
+        $status = Arr::get($response, 'status', 'paid');
+
+        switch ($status) {
             case 'active':
             case 'trial':
             case 'unpaid':

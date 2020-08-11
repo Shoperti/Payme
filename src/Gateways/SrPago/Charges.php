@@ -178,7 +178,7 @@ class Charges extends AbstractApi implements ChargeInterface
                     'memberPhone'           => Arr::get($options, 'phone'),
                 ],
                 'items' => [
-                    'item' => $this->addItems($params, $options),
+                    'item' => $this->addItems($options),
                 ],
             ],
         ]);
@@ -191,7 +191,7 @@ class Charges extends AbstractApi implements ChargeInterface
      *
      * @return array
      */
-    protected function addItems($params, $options)
+    protected function addItems($options)
     {
         $items = [];
 

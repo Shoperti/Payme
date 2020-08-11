@@ -95,8 +95,7 @@ class SrPagoGateway extends AbstractGateway
 
     public function __construct(array $config)
     {
-        Arr::requires($config, ['private_key']);
-        Arr::requires($config, ['secret_key']);
+        Arr::requires($config, ['private_key', 'secret_key']);
 
         $this->applicationKey = Arr::get($config, 'private_key');
         $this->applicationSecret = Arr::get($config, 'secret_key');
