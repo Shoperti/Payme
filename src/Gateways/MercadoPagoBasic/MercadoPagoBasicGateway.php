@@ -4,8 +4,8 @@ namespace Shoperti\PayMe\Gateways\MercadoPagoBasic;
 
 use Exception;
 use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
-use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
