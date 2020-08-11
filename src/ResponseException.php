@@ -30,7 +30,7 @@ class ResponseException extends Exception
     }
 
     /**
-     * Gets the raw response.
+     * Get the raw response.
      *
      * @return array|null
      */
