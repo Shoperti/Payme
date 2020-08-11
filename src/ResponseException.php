@@ -34,7 +34,7 @@ class ResponseException extends Exception
      *
      * @return array|null
      */
-    protected function getResponse()
+    public function getResponse()
     {
         return $this->response;
     }
