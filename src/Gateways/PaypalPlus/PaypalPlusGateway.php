@@ -2,9 +2,11 @@
 
 namespace Shoperti\PayMe\Gateways\PaypalPlus;
 
+use Exception;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
@@ -166,7 +168,11 @@ class PaypalPlusGateway extends AbstractGateway
 
         $response = $this->responseToArray($rawResponse);
 
-        $response = $this->respond($response, $params, $options, $rawResponse->getStatusCode());
+        try {
+            $response = $this->respond($response, $params, $options, $rawResponse->getStatusCode());
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
 
         return $response;
     }

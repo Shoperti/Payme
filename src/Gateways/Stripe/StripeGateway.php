@@ -2,10 +2,12 @@
 
 namespace Shoperti\PayMe\Gateways\Stripe;
 
+use Exception;
 use GuzzleHttp\ClientInterface;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
@@ -109,13 +111,15 @@ class StripeGateway extends AbstractGateway
 
         $rawResponse = $this->getHttpClient()->{$method}($url, $request);
 
-        if ($rawResponse->getStatusCode() === 200) {
-            $response = $this->parseResponse($rawResponse->getBody());
-        } else {
-            $response = $this->responseError($rawResponse->getBody());
-        }
+        $response = $rawResponse->getStatusCode() === 200
+            ? $this->parseResponse($rawResponse->getBody())
+            : $this->responseError($rawResponse->getBody());
 
-        return $this->respond($response, $options);
+        try {
+            return $this->respond($response, $options);
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**

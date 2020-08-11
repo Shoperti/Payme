@@ -2,9 +2,11 @@
 
 namespace Shoperti\PayMe\Gateways\MercadoPago;
 
+use Exception;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
@@ -113,7 +115,11 @@ class MercadoPagoGateway extends AbstractGateway
 
         $response = $this->parseResponse($rawResponse);
 
-        return $this->respond($response, $rawResponse->getStatusCode());
+        try {
+            return $this->respond($response, $rawResponse->getStatusCode());
+        } catch (Exception $e) {
+            throw new ResponseException($e, $response);
+        }
     }
 
     /**
@@ -130,7 +136,7 @@ class MercadoPagoGateway extends AbstractGateway
 
         return 200 <= $code && $code <= 499
             ? json_decode($body, true)
-            : json_decode($body, true) ?: $this->jsonError($body);
+            : (json_decode($body, true) ?: $this->jsonError($body));
     }
 
     /**
