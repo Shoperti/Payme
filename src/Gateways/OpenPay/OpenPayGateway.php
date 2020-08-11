@@ -5,8 +5,8 @@ namespace Shoperti\PayMe\Gateways\OpenPay;
 use Exception;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
-use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 

@@ -12,8 +12,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Shoperti\PayMe\ErrorCode;
 use Shoperti\PayMe\Gateways\AbstractGateway;
-use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Response;
+use Shoperti\PayMe\ResponseException;
 use Shoperti\PayMe\Status;
 use Shoperti\PayMe\Support\Arr;
 
