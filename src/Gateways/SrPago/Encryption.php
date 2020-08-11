@@ -3,7 +3,7 @@
 /**
  * Sr. Pago (https://srpago.com).
  *
- * @link      https://api.srpago.com
+ * @see https://api.srpago.com
  *
  * @copyright Copyright (c) 2016 SR PAGO
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
@@ -59,7 +59,7 @@ M8SmGGsTo3V0L+Ni9bNJHa8CAwEAAQ==
 
         $data = base64_encode($resultData);
 
-        return ['key'=>$key, 'data'=>$data];
+        return ['key' => $key, 'data' => $data];
     }
 
     /**
