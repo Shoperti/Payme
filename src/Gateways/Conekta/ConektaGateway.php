@@ -207,7 +207,7 @@ class ConektaGateway extends AbstractGateway
             'message'       => $message,
             'test'          => $isTest,
             'authorization' => $authorization,
-            'status'        => $success ? $this->getStatus(Arr::get($response, 'payment_status', 'paid')) : new Status('failed'),
+            'status'        => $success ? $this->getStatus($response) : new Status('failed'),
             'errorCode'     => $success ? null : $this->getErrorCode($response),
             'type'          => $type,
         ]);
@@ -320,12 +320,14 @@ class ConektaGateway extends AbstractGateway
     /**
      * Map Conekta response to status object.
      *
-     * @param string $status
+     * @param array $response
      *
      * @return \Shoperti\PayMe\Status
      */
-    protected function getStatus($status)
+    protected function getStatus($response)
     {
+        $status = Arr::get($response, 'payment_status') ?: Arr::get($response, 'status');
+
         switch ($status) {
             case 'pending_payment':
                 return new Status('pending');
@@ -335,6 +337,7 @@ class ConektaGateway extends AbstractGateway
             case 'paused':
             case 'active':
             case 'canceled':
+            case 'expired':
                 return new Status($status);
             case 'in_trial':
                 return new Status('trial');
