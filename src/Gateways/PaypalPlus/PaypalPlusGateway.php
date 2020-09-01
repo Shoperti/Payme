@@ -354,16 +354,12 @@ class PaypalPlusGateway extends AbstractGateway
 
         if ($type === 'sale') {
             $transaction = Arr::last($response['transactions']);
-            $resource = Arr::last($transaction['related_resources']);
+            $resources = Arr::get($transaction, 'related_resources', [[]]);
+            $sale = Arr::get($resources[0], 'sale');
 
-            if ($resource) {
-                $state = isset($resource['sale']) ? Arr::get($resource['sale'], 'state') : null;
-            } else {
-                $state = Arr::get($response, 'state');
-            }
-
-            $reference = $resource ? $resource['sale']['id'] : $response['id'];
-            $authorization = $resource ? $response['id'] : null;
+            $reference = $sale ? $sale['id'] : $response['id'];
+            $authorization = $sale ? $response['id'] : null;
+            $state = $sale ? Arr::get($sale, 'state') : Arr::get($response, 'state');
 
             $success = in_array($state, $this->successPaymentStatuses);
             $status = $this->getPaymentStatus($state);
