@@ -119,15 +119,15 @@ class PaypalPlusGateway extends AbstractGateway
         ];
 
         $request = array_merge($this->requestTemplate, $payload);
-        $rawResponse = $this->getHttpClient()->post($this->buildUrlFromString('oauth2/token'), $request);
-        $rawResponse = $this->responseToArray($rawResponse);
+
+        $response = $this->performRequest('post', $this->buildUrlFromString('oauth2/token'), $request)['body'];
 
         return [
-            'token'  => Arr::get($rawResponse, 'access_token'),
-            'type'   => Arr::get($rawResponse, 'token_type'),
-            'scope'  => Arr::get($rawResponse, 'scope'),
-            'expiry' => isset($rawResponse['expires_in'])
-                ? time() + Arr::get($rawResponse, 'expires_in')
+            'token'  => Arr::get($response, 'access_token'),
+            'type'   => Arr::get($response, 'token_type'),
+            'scope'  => Arr::get($response, 'scope'),
+            'expiry' => isset($response['expires_in'])
+                ? time() + Arr::get($response, 'expires_in')
                 : null,
         ];
     }
@@ -164,30 +164,31 @@ class PaypalPlusGateway extends AbstractGateway
         $request['headers']['Authorization'] = "Bearer {$token}";
         $request[$payloadKey] = $params;
 
-        $rawResponse = $this->getHttpClient()->$method($url, $request);
-
-        $response = $this->responseToArray($rawResponse);
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            $response = $this->respond($response, $params, $options, $rawResponse->getStatusCode());
+            return $this->respond($response['body'], [
+                'request'    => $params,
+                'options'    => $options,
+                'statusCode' => $response['code'],
+            ]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
-
-        return $response;
     }
 
     /**
-     * Parse JSON response to array.
+     * Perform the request and return the parsed response and http code.
      *
-     * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
      *
-     * @return array
+     * @return array ['code' => http code, 'body' => [the response]]
      */
-    protected function responseToArray($rawResponse)
+    protected function performRequest($method, $url, $payload)
     {
-        $body = (string) $rawResponse->getBody();
-        $code = $rawResponse->getStatusCode();
+        list($body, $code, $rawResponse) = $this->makeRequest($method, $url, $payload);
 
         if ($code !== 204) {
             $response = json_decode($body, true);
@@ -198,8 +199,16 @@ class PaypalPlusGateway extends AbstractGateway
             $response = '';
         }
 
-        return (200 <= $code && $code <= 299 ? $response : ($response ?: $this->jsonError($rawResponse)))
-            ?: [];
+        $data = 200 <= $code && $code <= 299
+            ? $response
+            : ($response ?: $this->jsonError($rawResponse));
+
+        $data = $data ?: [];
+
+        return [
+            'code' => $code,
+            'body' => $data,
+        ];
     }
 
     /**
@@ -222,17 +231,19 @@ class PaypalPlusGateway extends AbstractGateway
     }
 
     /**
-     * Configure the raw response before the mapping.
+     * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param array $request
-     * @param array $options
-     * @param int   $statusCode
+     * @param array $more
      *
-     * @return array
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response, $request, $options, $statusCode)
+    public function respond($response, $more = [])
     {
+        $request = $more['request'];
+        $options = $more['options'];
+        $statusCode = $more['statusCode'];
+
         if (array_key_exists('webhooks', $response)) {
             $results = [];
             foreach ($response['webhooks'] as $result) {

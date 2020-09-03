@@ -163,30 +163,51 @@ class PaypalExpressGateway extends AbstractGateway
             $request['body'] = $params;
         }
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
-
-        $response = $rawResponse->getStatusCode() == 200
-            ? $this->parseResponse((string) $rawResponse->getBody())
-            : $this->responseError((string) $rawResponse->getBody());
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response, $params, $options);
+            return $this->respond($response['body'], ['request' => $params, 'options' => $options]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
     }
 
     /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array ['code' => http code, 'body' => [the response]]
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $code == 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
+    }
+
+    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param array $request
-     * @param array $options
+     * @param array $more
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response, $request, $options)
+    public function respond($response, $more = [])
     {
+        $request = $more['request'];
+        $options = $more['options'];
+
         $success = isset($response['ACK']) && in_array($response['ACK'], ['Success', 'SuccessWithWarning']);
 
         if (array_key_exists('INVALID', $response) || array_key_exists('VERIFIED', $response)) {

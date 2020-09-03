@@ -7,9 +7,9 @@ use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 class MercadoPagoGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'                  => MercadoPagoGateway::class,
-        'config'                 => 'mercadopago',
-        'innerMethodExtraParams' => [200],
+        'class'     => MercadoPagoGateway::class,
+        'config'    => 'mercadopago',
+        'moreParam' => 200,
     ];
 
     /** @test */
@@ -59,7 +59,7 @@ class MercadoPagoGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_empty_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getEmptyPayment());
+        $response = $this->parseResponse($this->getEmptyPayment());
 
         $this->assertFalse($response->success());
         $this->assertSame('pending', (string) $response->status());

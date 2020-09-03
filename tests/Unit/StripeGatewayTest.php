@@ -7,9 +7,9 @@ use Shoperti\PayMe\Gateways\Stripe\StripeGateway;
 class StripeGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'                  => StripeGateway::class,
-        'config'                 => 'stripe',
-        'innerMethodExtraParams' => ['[]'],
+        'class'     => StripeGateway::class,
+        'config'    => 'stripe',
+        'moreParam' => ['continue_url' => null],
     ];
 
     /**

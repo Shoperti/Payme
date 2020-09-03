@@ -10,23 +10,10 @@ use Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway;
 class PaypalExpressGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'                  => PaypalExpressGateway::class,
-        'config'                 => 'paypal',
-        'innerMethod'            => 'respond',
-        'innerMethodExtraParams' => ['[]', '[]'],
+        'class'     => PaypalExpressGateway::class,
+        'config'    => 'paypal',
+        'moreParam' => ['request' => [], 'options' => ['isRedirect' => false]],
     ];
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        // on this gateway, a flag is set on the payload before calling the parse method
-        $this->gateway->preprocessPayload = function ($response) {
-            $response['isRedirect'] = false;
-
-            return $response;
-        };
-    }
 
     /** @test */
     public function it_should_parse_an_approved_payment()

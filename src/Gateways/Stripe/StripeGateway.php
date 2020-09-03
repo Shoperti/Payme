@@ -109,17 +109,36 @@ class StripeGateway extends AbstractGateway
             $request['body'] = $params;
         }
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
-
-        $response = $rawResponse->getStatusCode() === 200
-            ? $this->parseResponse($rawResponse->getBody())
-            : $this->responseError($rawResponse->getBody());
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response, $options);
+            return $this->respond($response['body'], $options);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
+    }
+
+    /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array ['code' => http code, 'body' => [the response]]
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $code === 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
     }
 
     /**
@@ -130,7 +149,7 @@ class StripeGateway extends AbstractGateway
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response, $request)
+    public function respond($response, $request = null)
     {
         if (Arr::get($response, 'object') === 'list') {
             $responses = [];

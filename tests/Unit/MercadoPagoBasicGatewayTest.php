@@ -10,9 +10,9 @@ use Shoperti\PayMe\Gateways\MercadoPagoBasic\MercadoPagoBasicGateway;
 class MercadoPagoBasicGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'                  => MercadoPagoBasicGateway::class,
-        'config'                 => 'mercadopago_basic',
-        'innerMethodExtraParams' => [200],
+        'class'     => MercadoPagoBasicGateway::class,
+        'config'    => 'mercadopago_basic',
+        'moreParam' => 200,
     ];
 
     public function setUp()
@@ -20,10 +20,8 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
         parent::setUp();
 
         // on this gateway, a flag is set on the response payload before calling the parse method
-        $this->gateway->preprocessPayload = function ($response) {
-            $response['isRedirect'] = false;
-
-            return $response;
+        $this->gatewayData['preprocessPayload'] = function ($response) {
+            return array_merge($response, ['isRedirect' => false]);
         };
     }
 
@@ -55,7 +53,7 @@ class MercadoPagoBasicGatewayTest extends AbstractTestCase
     /** @test */
     public function it_should_parse_an_empty_payment()
     {
-        $response = $this->gateway->generateResponseFromRawResponse($this->getEmptyPayment());
+        $response = $this->parseResponse($this->getEmptyPayment());
 
         $this->assertTrue($response->success());
         $this->assertSame('pending', (string) $response->status());

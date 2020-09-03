@@ -194,18 +194,36 @@ class SrPagoGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
-        $raw = $this->getHttpClient()->{$method}($url, $request);
-        $statusCode = $raw->getStatusCode();
-
-        $response = $statusCode == 200
-            ? $this->parseResponse($raw->getBody())
-            : $this->responseError($raw->getBody(), $statusCode);
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response);
+            return $this->respond($response['body']);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
+    }
+
+    /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $code == 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body, $code);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
     }
 
     /**
@@ -282,13 +300,14 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
-     * Single response.
+     * Respond with an array of responses or a single response.
      *
      * @param array $response
+     * @param null  $_
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response)
+    public function respond($response, $_ = null)
     {
         $success = Arr::get($response, 'success');
 
