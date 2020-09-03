@@ -165,6 +165,37 @@ class MercadoPagoGateway extends AbstractGateway
     }
 
     /**
+     * Map HTTP response to transaction object.
+     *
+     * @param bool  $success
+     * @param array $response
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function mapResponse($success, $response)
+    {
+        $type = Arr::get($response, 'operation_type');
+
+        list($reference, $authorization) = $success
+            ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
+            : [Arr::get($response, 'id'), null];
+
+        $message = $this->getClientMessage($response);
+
+        return (new Response())->setRaw($response)->map([
+            'isRedirect'    => false,
+            'success'       => $success,
+            'reference'     => $reference,
+            'message'       => $message,
+            'test'          => array_key_exists('live_mode', $response) ? !$response['live_mode'] : false,
+            'authorization' => $authorization,
+            'status'        => $this->getStatus($response),
+            'errorCode'     => $success ? null : $this->getErrorCode($response),
+            'type'          => $type,
+        ]);
+    }
+
+    /**
      * Check if it's a successful response.
      *
      * @param array $response
@@ -196,37 +227,6 @@ class MercadoPagoGateway extends AbstractGateway
         }
 
         return $success;
-    }
-
-    /**
-     * Map HTTP response to transaction object.
-     *
-     * @param bool  $success
-     * @param array $response
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    public function mapResponse($success, $response)
-    {
-        $type = Arr::get($response, 'operation_type');
-
-        list($reference, $authorization) = $success
-            ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
-            : [Arr::get($response, 'id'), null];
-
-        $message = $this->getClientMessage($response);
-
-        return (new Response())->setRaw($response)->map([
-            'isRedirect'    => false,
-            'success'       => $success,
-            'reference'     => $reference,
-            'message'       => $message,
-            'test'          => array_key_exists('live_mode', $response) ? !$response['live_mode'] : false,
-            'authorization' => $authorization,
-            'status'        => $this->getStatus($response),
-            'errorCode'     => $success ? null : $this->getErrorCode($response),
-            'type'          => $type,
-        ]);
     }
 
     /**

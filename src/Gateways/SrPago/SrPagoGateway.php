@@ -227,79 +227,6 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
-     * Get the request url.
-     *
-     * @return string
-     */
-    protected function getRequestUrl()
-    {
-        return $this->isTest ? $this->sandboxEndpoint : $this->endpoint;
-    }
-
-    /**
-     * Get auth connection token.
-     *
-     * @return string
-     */
-    public function getConnectionToken()
-    {
-        return $this->connectionToken;
-    }
-
-    /**
-     * Get the key for the application.
-     *
-     * @return string
-     */
-    public function getApplicationKey()
-    {
-        return $this->applicationKey;
-    }
-
-    /**
-     * Parse JSON response to array.
-     *
-     * @param string $body
-     *
-     * @return array|null
-     */
-    protected function parseResponse($body)
-    {
-        return json_decode($body, true);
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    protected function responseError($body, $httpCode)
-    {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse, $httpCode)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
-
-        return [
-            'message_to_purchaser' => $msg,
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
@@ -348,6 +275,26 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
+     * Get auth connection token.
+     *
+     * @return string
+     */
+    public function getConnectionToken()
+    {
+        return $this->connectionToken;
+    }
+
+    /**
+     * Get the key for the application.
+     *
+     * @return string
+     */
+    public function getApplicationKey()
+    {
+        return $this->applicationKey;
+    }
+
+    /**
      * Get the transaction type.
      *
      * @param array $rawResponse
@@ -374,5 +321,58 @@ class SrPagoGateway extends AbstractGateway
         }
 
         return new ErrorCode($this->errorCodeMap[$code]);
+    }
+
+    /**
+     * Parse JSON response to array.
+     *
+     * @param string $body
+     *
+     * @return array|null
+     */
+    protected function parseResponse($body)
+    {
+        return json_decode($body, true);
+    }
+
+    /**
+     * Get error response from server or fallback to general error.
+     *
+     * @param string $body
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    protected function responseError($body, $httpCode)
+    {
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
+    }
+
+    /**
+     * Default JSON response.
+     *
+     * @param string $rawResponse
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    public function jsonError($rawResponse, $httpCode)
+    {
+        $msg = 'API Response not valid.';
+        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
+
+        return [
+            'message_to_purchaser' => $msg,
+        ];
+    }
+
+    /**
+     * Get the request url.
+     *
+     * @return string
+     */
+    protected function getRequestUrl()
+    {
+        return $this->isTest ? $this->sandboxEndpoint : $this->endpoint;
     }
 }

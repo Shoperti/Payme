@@ -212,25 +212,6 @@ class PaypalPlusGateway extends AbstractGateway
     }
 
     /**
-     * Default JSON response.
-     *
-     * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
-     *
-     * @return array
-     */
-    protected function jsonError($rawResponse)
-    {
-        return [
-            'name'    => 'REQUEST_ERROR',
-            'message' => $rawResponse->getReasonPhrase() ?: 'Unable to process request.',
-            'details' => [
-                'issue' => (string) $rawResponse->getBody(),
-                'code'  => $rawResponse->getStatusCode(),
-            ],
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
@@ -496,6 +477,25 @@ class PaypalPlusGateway extends AbstractGateway
             default:
                 return new ErrorCode('config_error');
         }
+    }
+
+    /**
+     * Default JSON response.
+     *
+     * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
+     *
+     * @return array
+     */
+    protected function jsonError($rawResponse)
+    {
+        return [
+            'name'    => 'REQUEST_ERROR',
+            'message' => $rawResponse->getReasonPhrase() ?: 'Unable to process request.',
+            'details' => [
+                'issue' => (string) $rawResponse->getBody(),
+                'code'  => $rawResponse->getStatusCode(),
+            ],
+        ];
     }
 
     /**
