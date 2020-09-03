@@ -427,24 +427,6 @@ class ConektaGateway extends AbstractGateway
     }
 
     /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse, $httpCode)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
-
-        return [
-            'message_to_purchaser' => $msg,
-        ];
-    }
-
-    /**
      * Get the request url.
      *
      * @return string

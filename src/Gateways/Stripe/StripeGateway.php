@@ -133,7 +133,7 @@ class StripeGateway extends AbstractGateway
 
         $response = $code === 200
             ? $this->parseResponse($body)
-            : $this->responseError($body);
+            : $this->responseError($body, $code);
 
         return [
             'code' => $code,
@@ -323,30 +323,14 @@ class StripeGateway extends AbstractGateway
     /**
      * Get error response from server or fallback to general error.
      *
-     * @param string $responseBody
+     * @param string $body
+     * @param int    $httpCode
      *
      * @return array
      */
-    protected function responseError($responseBody)
+    protected function responseError($body, $httpCode)
     {
-        return $this->parseResponse($responseBody) ?: $this->jsonError($responseBody);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
-
-        return [
-            'error' => ['message' => $msg],
-        ];
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**

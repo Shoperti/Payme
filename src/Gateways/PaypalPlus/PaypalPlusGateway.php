@@ -201,7 +201,7 @@ class PaypalPlusGateway extends AbstractGateway
 
         $data = 200 <= $code && $code <= 299
             ? $response
-            : ($response ?: $this->jsonError($rawResponse));
+            : ($response ?: $this->jsonError($rawResponse, $code));
 
         $data = $data ?: [];
 
@@ -483,17 +483,18 @@ class PaypalPlusGateway extends AbstractGateway
      * Default JSON response.
      *
      * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
+     * @param int                                                    $httpCode
      *
      * @return array
      */
-    protected function jsonError($rawResponse)
+    protected function jsonError($rawResponse, $httpCode)
     {
         return [
             'name'    => 'REQUEST_ERROR',
             'message' => $rawResponse->getReasonPhrase() ?: 'Unable to process request.',
             'details' => [
                 'issue' => (string) $rawResponse->getBody(),
-                'code'  => $rawResponse->getStatusCode(),
+                'code'  => $httpCode,
             ],
         ];
     }

@@ -135,7 +135,7 @@ class MercadoPagoGateway extends AbstractGateway
 
         $response = 200 <= $code && $code <= 499
             ? json_decode($body, true)
-            : (json_decode($body, true) ?: $this->jsonError($body));
+            : (json_decode($body, true) ?: $this->jsonError($body, $code));
 
         return [
             'code' => $code,
@@ -439,23 +439,6 @@ class MercadoPagoGateway extends AbstractGateway
             : str_replace('_', ' ', $code);
 
         return ucfirst($message);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
-
-        return [
-            'message' => $msg,
-        ];
     }
 
     /**
