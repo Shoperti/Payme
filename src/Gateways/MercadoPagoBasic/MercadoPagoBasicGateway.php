@@ -125,7 +125,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         $response['body']['topic'] = Arr::get($options, 'topic');
 
         try {
-            return $this->respond($response['body'], $response['code']);
+            return $this->respond($response['body'], ['code' => $response['code']]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }

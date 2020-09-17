@@ -7,9 +7,9 @@ use Shoperti\PayMe\Gateways\MercadoPago\MercadoPagoGateway;
 class MercadoPagoGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'     => MercadoPagoGateway::class,
-        'config'    => 'mercadopago',
-        'moreParam' => 200,
+        'class'  => MercadoPagoGateway::class,
+        'config' => 'mercadopago',
+        'params' => ['code' => 200],
     ];
 
     /** @test */

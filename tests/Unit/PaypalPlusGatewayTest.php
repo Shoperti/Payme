@@ -7,9 +7,9 @@ use Shoperti\PayMe\Gateways\PaypalPlus\PaypalPlusGateway;
 class PaypalPlusGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'     => PaypalPlusGateway::class,
-        'config'    => 'paypal_plus',
-        'moreParam' => ['request' => [], 'options' => [], 'statusCode' => 200],
+        'class'  => PaypalPlusGateway::class,
+        'config' => 'paypal_plus',
+        'params' => ['request' => [], 'options' => [], 'statusCode' => 200],
     ];
 
     /**

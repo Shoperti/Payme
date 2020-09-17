@@ -58,20 +58,20 @@ class BogusGateway extends AbstractGateway
 
         $success = $params['transaction'] == 'success';
 
-        return $this->respond($response, $success);
+        return $this->respond($response, ['success' => $success]);
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param bool  $success
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $success = null)
+    public function respond($response, $params = [])
     {
-        return $this->mapResponse($success, $response);
+        return $this->mapResponse($params['success'], $response);
     }
 
     /**

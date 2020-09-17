@@ -215,15 +215,15 @@ class PaypalPlusGateway extends AbstractGateway
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param array $more
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $more = [])
+    public function respond($response, $params = [])
     {
-        $request = $more['request'];
-        $options = $more['options'];
-        $statusCode = $more['statusCode'];
+        $request = $params['request'];
+        $options = $params['options'];
+        $statusCode = $params['statusCode'];
 
         if (array_key_exists('webhooks', $response)) {
             $results = [];

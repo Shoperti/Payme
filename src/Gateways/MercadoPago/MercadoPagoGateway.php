@@ -114,7 +114,7 @@ class MercadoPagoGateway extends AbstractGateway
         $response = $this->performRequest($method, $authUrl, $request);
 
         try {
-            return $this->respond($response['body'], $response['code']);
+            return $this->respond($response['body'], ['code' => $response['code']]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
@@ -147,21 +147,21 @@ class MercadoPagoGateway extends AbstractGateway
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param int   $code
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $code = null)
+    public function respond($response, $params = [])
     {
         if (isset($response[0])) {
             foreach ($response as $responseItem) {
-                $responses[] = $this->respond($responseItem, $code);
+                $responses[] = $this->respond($responseItem, $params['code']);
             }
 
             return $responses;
         }
 
-        return $this->mapResponse($this->isSuccess($response, $code), $response);
+        return $this->mapResponse($this->isSuccess($response, $params['code']), $response);
     }
 
     /**

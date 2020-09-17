@@ -143,12 +143,12 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     protected function parseResponse($response)
     {
-        $more = isset($this->gatewayData['moreParam']) ? $this->gatewayData['moreParam'] : null;
+        $params = isset($this->gatewayData['params']) ? $this->gatewayData['params'] : null;
 
         $response = isset($this->gatewayData['preprocessPayload'])
             ? $this->gatewayData['preprocessPayload']($response)
             : $response;
 
-        return $this->gateway->respond($response, $more);
+        return $this->gateway->respond($response, $params);
     }
 }

@@ -52,11 +52,11 @@ interface GatewayInterface
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param mixed $more
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $more = null);
+    public function respond($response, $params = []);
 
     /**
      * Map an HTTP response to transaction object.

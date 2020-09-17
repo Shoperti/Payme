@@ -10,9 +10,9 @@ use Shoperti\PayMe\Gateways\PaypalExpress\PaypalExpressGateway;
 class PaypalExpressGatewayTest extends AbstractTestCase
 {
     protected $gatewayData = [
-        'class'     => PaypalExpressGateway::class,
-        'config'    => 'paypal',
-        'moreParam' => ['request' => [], 'options' => ['isRedirect' => false]],
+        'class'  => PaypalExpressGateway::class,
+        'config' => 'paypal',
+        'params' => ['request' => [], 'options' => ['isRedirect' => false]],
     ];
 
     /** @test */

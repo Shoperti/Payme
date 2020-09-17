@@ -199,14 +199,14 @@ class PaypalExpressGateway extends AbstractGateway
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param array $more
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $more = [])
+    public function respond($response, $params = [])
     {
-        $request = $more['request'];
-        $options = $more['options'];
+        $request = $params['request'];
+        $options = $params['options'];
 
         $success = isset($response['ACK']) && in_array($response['ACK'], ['Success', 'SuccessWithWarning']);
 

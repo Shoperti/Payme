@@ -155,11 +155,11 @@ class OpenPayGateway extends AbstractGateway
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param null  $_
+     * @param array $_
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function respond($response, $_ = null)
+    public function respond($response, $_ = [])
     {
         if ($response === null) {
             return $this->mapResponse(true, []);
