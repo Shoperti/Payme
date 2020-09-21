@@ -111,53 +111,88 @@ class MercadoPagoGateway extends AbstractGateway
 
         $authUrl = sprintf('%s?access_token=%s', $url, $this->config['private_key']);
 
-        $rawResponse = $this->getHttpClient()->{$method}($authUrl, $request);
-
-        $response = $this->parseResponse($rawResponse);
+        $response = $this->performRequest($method, $authUrl, $request);
 
         try {
-            return $this->respond($response, $rawResponse->getStatusCode());
+            return $this->respond($response['body'], ['code' => $response['code']]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
     }
 
     /**
-     * Parse JSON response to array.
+     * Perform the request and return the parsed response and http code.
      *
-     * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
      *
      * @return array
      */
-    protected function parseResponse($rawResponse)
+    protected function performRequest($method, $url, $payload)
     {
-        $body = $rawResponse->getBody();
-        $code = $rawResponse->getStatusCode();
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
 
-        return 200 <= $code && $code <= 499
+        $response = 200 <= $code && $code <= 499
             ? json_decode($body, true)
-            : (json_decode($body, true) ?: $this->jsonError($body));
+            : (json_decode($body, true) ?: $this->jsonError($body, $code));
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
-     * @param int   $code
+     * @param array $params
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response, $code)
+    public function respond($response, $params = [])
     {
         if (isset($response[0])) {
             foreach ($response as $responseItem) {
-                $responses[] = $this->respond($responseItem, $code);
+                $responses[] = $this->respond($responseItem, $params['code']);
             }
 
             return $responses;
         }
 
-        return $this->mapResponse($this->isSuccess($response, $code), $response);
+        return $this->mapResponse($this->isSuccess($response, $params['code']), $response);
+    }
+
+    /**
+     * Map HTTP response to transaction object.
+     *
+     * @param bool  $success
+     * @param array $response
+     *
+     * @return \Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function mapResponse($success, $response)
+    {
+        $type = Arr::get($response, 'operation_type');
+
+        list($reference, $authorization) = $success
+            ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
+            : [Arr::get($response, 'id'), null];
+
+        $message = $this->getClientMessage($response);
+
+        return (new Response())->setRaw($response)->map([
+            'isRedirect'    => false,
+            'success'       => $success,
+            'reference'     => $reference,
+            'message'       => $message,
+            'test'          => array_key_exists('live_mode', $response) ? !$response['live_mode'] : false,
+            'authorization' => $authorization,
+            'status'        => $this->getStatus($response),
+            'errorCode'     => $success ? null : $this->getErrorCode($response),
+            'type'          => $type,
+        ]);
     }
 
     /**
@@ -192,37 +227,6 @@ class MercadoPagoGateway extends AbstractGateway
         }
 
         return $success;
-    }
-
-    /**
-     * Map HTTP response to transaction object.
-     *
-     * @param bool  $success
-     * @param array $response
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    public function mapResponse($success, $response)
-    {
-        $type = Arr::get($response, 'operation_type');
-
-        list($reference, $authorization) = $success
-            ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
-            : [Arr::get($response, 'id'), null];
-
-        $message = $this->getClientMessage($response);
-
-        return (new Response())->setRaw($response)->map([
-            'isRedirect'    => false,
-            'success'       => $success,
-            'reference'     => $reference,
-            'message'       => $message,
-            'test'          => array_key_exists('live_mode', $response) ? !$response['live_mode'] : false,
-            'authorization' => $authorization,
-            'status'        => $this->getStatus($response),
-            'errorCode'     => $success ? null : $this->getErrorCode($response),
-            'type'          => $type,
-        ]);
     }
 
     /**
@@ -435,23 +439,6 @@ class MercadoPagoGateway extends AbstractGateway
             : str_replace('_', ' ', $code);
 
         return ucfirst($message);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
-
-        return [
-            'message' => $msg,
-        ];
     }
 
     /**

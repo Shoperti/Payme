@@ -103,7 +103,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
 
         $oauthUrl = $this->buildUrlFromString('oauth/token');
 
-        $authRawResponse = $this->getHttpClient()->post($oauthUrl, [
+        $response = $this->performRequest('post', $oauthUrl, [
             'json' => [
                 'client_id'     => $this->config['client_id'],
                 'client_secret' => $this->config['client_secret'],
@@ -112,22 +112,20 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
         ]);
 
         if (!$this->oauthToken) {
-            $authResponse = $this->parseResponse($authRawResponse);
+            $authResponse = $response['body'];
 
             $this->oauthToken = Arr::get($authResponse, 'access_token');
         }
 
         $authUrl = sprintf('%s?access_token=%s', $url, $this->oauthToken);
 
-        $rawResponse = $this->getHttpClient()->{$method}($authUrl, $request);
+        $response = $this->performRequest($method, $authUrl, $request);
 
-        $response = $this->parseResponse($rawResponse);
-
-        $response['isRedirect'] = Arr::get($options, 'isRedirect', false);
-        $response['topic'] = Arr::get($options, 'topic');
+        $response['body']['isRedirect'] = Arr::get($options, 'isRedirect', false);
+        $response['body']['topic'] = Arr::get($options, 'topic');
 
         try {
-            return $this->respond($response, $rawResponse->getStatusCode());
+            return $this->respond($response['body'], ['code' => $response['code']]);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }

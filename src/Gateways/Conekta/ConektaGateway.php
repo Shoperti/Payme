@@ -116,28 +116,47 @@ class ConektaGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
-        $statusCode = $rawResponse->getStatusCode();
-
-        $response = $statusCode == 200
-            ? $this->parseResponse($rawResponse->getBody())
-            : $this->responseError($rawResponse->getBody(), $statusCode);
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response);
+            return $this->respond($response['body']);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
     }
 
     /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $code == 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body, $code);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
+    }
+
+    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
+     * @param array $_
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response)
+    public function respond($response, $_ = [])
     {
         if (Arr::get($response, 'object') === 'list') {
             if (!empty($response['data'])) {
@@ -405,24 +424,6 @@ class ConektaGateway extends AbstractGateway
     protected function responseError($body, $httpCode)
     {
         return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse, $httpCode)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
-
-        return [
-            'message_to_purchaser' => $msg,
-        ];
     }
 
     /**

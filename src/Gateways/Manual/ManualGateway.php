@@ -46,7 +46,20 @@ class ManualGateway extends AbstractGateway
      */
     public function commit($method, $url, $params = [], $options = [])
     {
-        return $this->mapResponse(true, $params);
+        return $this->respond($params);
+    }
+
+    /**
+     * Respond with an array of responses or a single response.
+     *
+     * @param array $response
+     * @param array $_
+     *
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function respond($response, $_ = [])
+    {
+        return $this->mapResponse(true, $response);
     }
 
     /**

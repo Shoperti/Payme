@@ -109,17 +109,36 @@ class StripeGateway extends AbstractGateway
             $request['body'] = $params;
         }
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
-
-        $response = $rawResponse->getStatusCode() === 200
-            ? $this->parseResponse($rawResponse->getBody())
-            : $this->responseError($rawResponse->getBody());
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response, $options);
+            return $this->respond($response['body'], $options);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
+    }
+
+    /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array ['code' => http code, 'body' => [the response]]
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $code === 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body, $code);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
     }
 
     /**
@@ -130,7 +149,7 @@ class StripeGateway extends AbstractGateway
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response, $request)
+    public function respond($response, $request = null)
     {
         if (Arr::get($response, 'object') === 'list') {
             $responses = [];
@@ -304,30 +323,14 @@ class StripeGateway extends AbstractGateway
     /**
      * Get error response from server or fallback to general error.
      *
-     * @param string $responseBody
+     * @param string $body
+     * @param int    $httpCode
      *
      * @return array
      */
-    protected function responseError($responseBody)
+    protected function responseError($body, $httpCode)
     {
-        return $this->parseResponse($responseBody) ?: $this->jsonError($responseBody);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response API {$rawResponse})";
-
-        return [
-            'error' => ['message' => $msg],
-        ];
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**

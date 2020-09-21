@@ -89,6 +89,23 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
+     * Perform the request and return the response & the http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array [0 => the response string, 1 => the http code int, 2 => the raw response object]
+     */
+    protected function makeRequest($method, $url, $payload)
+    {
+        /** @var \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse */
+        $rawResponse = $this->getHttpClient()->{$method}($url, $payload);
+
+        return [(string) $rawResponse->getBody(), $rawResponse->getStatusCode(), $rawResponse];
+    }
+
+    /**
      * Build request url from string.
      *
      * @param string $endpoint
@@ -250,5 +267,23 @@ abstract class AbstractGateway implements GatewayInterface
             '.',
             ''
         );
+    }
+
+    /**
+     * Default JSON response.
+     *
+     * @param string $rawResponse
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    protected function jsonError($rawResponse, $httpCode)
+    {
+        $msg = 'API Response not valid.';
+        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
+
+        return [
+            'message_to_purchaser' => $msg,
+        ];
     }
 }

@@ -194,101 +194,47 @@ class SrPagoGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
-        $raw = $this->getHttpClient()->{$method}($url, $request);
-        $statusCode = $raw->getStatusCode();
-
-        $response = $statusCode == 200
-            ? $this->parseResponse($raw->getBody())
-            : $this->responseError($raw->getBody(), $statusCode);
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response);
+            return $this->respond($response['body']);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
     }
 
     /**
-     * Get the request url.
+     * Perform the request and return the parsed response and http code.
      *
-     * @return string
-     */
-    protected function getRequestUrl()
-    {
-        return $this->isTest ? $this->sandboxEndpoint : $this->endpoint;
-    }
-
-    /**
-     * Get auth connection token.
-     *
-     * @return string
-     */
-    public function getConnectionToken()
-    {
-        return $this->connectionToken;
-    }
-
-    /**
-     * Get the key for the application.
-     *
-     * @return string
-     */
-    public function getApplicationKey()
-    {
-        return $this->applicationKey;
-    }
-
-    /**
-     * Parse JSON response to array.
-     *
-     * @param string $body
-     *
-     * @return array|null
-     */
-    protected function parseResponse($body)
-    {
-        return json_decode($body, true);
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
      *
      * @return array
      */
-    protected function responseError($body, $httpCode)
+    protected function performRequest($method, $url, $payload)
     {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
-    }
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
 
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse, $httpCode)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
+        $response = $code == 200
+            ? $this->parseResponse($body)
+            : $this->responseError($body, $code);
 
         return [
-            'message_to_purchaser' => $msg,
+            'code' => $code,
+            'body' => $response,
         ];
     }
 
     /**
-     * Single response.
+     * Respond with an array of responses or a single response.
      *
      * @param array $response
+     * @param null  $_
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response)
+    public function respond($response, $_ = null)
     {
         $success = Arr::get($response, 'success');
 
@@ -329,6 +275,26 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
+     * Get auth connection token.
+     *
+     * @return string
+     */
+    public function getConnectionToken()
+    {
+        return $this->connectionToken;
+    }
+
+    /**
+     * Get the key for the application.
+     *
+     * @return string
+     */
+    public function getApplicationKey()
+    {
+        return $this->applicationKey;
+    }
+
+    /**
      * Get the transaction type.
      *
      * @param array $rawResponse
@@ -355,5 +321,40 @@ class SrPagoGateway extends AbstractGateway
         }
 
         return new ErrorCode($this->errorCodeMap[$code]);
+    }
+
+    /**
+     * Parse JSON response to array.
+     *
+     * @param string $body
+     *
+     * @return array|null
+     */
+    protected function parseResponse($body)
+    {
+        return json_decode($body, true);
+    }
+
+    /**
+     * Get error response from server or fallback to general error.
+     *
+     * @param string $body
+     * @param int    $httpCode
+     *
+     * @return array
+     */
+    protected function responseError($body, $httpCode)
+    {
+        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
+    }
+
+    /**
+     * Get the request url.
+     *
+     * @return string
+     */
+    protected function getRequestUrl()
+    {
+        return $this->isTest ? $this->sandboxEndpoint : $this->endpoint;
     }
 }

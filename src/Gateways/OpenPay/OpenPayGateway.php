@@ -119,42 +119,47 @@ class OpenPayGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
-        $rawResponse = $this->getHttpClient()->{$method}($url, $request);
-
-        $response = $this->parseResponse($rawResponse);
+        $response = $this->performRequest($method, $url, $request);
 
         try {
-            return $this->respond($response);
+            return $this->respond($response['body']);
         } catch (Exception $e) {
             throw new ResponseException($e, $response);
         }
     }
 
     /**
-     * Parse JSON response to array.
+     * Perform the request and return the parsed response and http code.
      *
-     * @param \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
      *
-     * @return array
+     * @return array ['code' => http code, 'body' => [the response]]
      */
-    protected function parseResponse($rawResponse)
+    protected function performRequest($method, $url, $payload)
     {
-        $body = $rawResponse->getBody();
-        $code = $rawResponse->getStatusCode();
+        list($body, $code) = $this->makeRequest($method, $url, $payload);
 
-        return 200 <= $code && $code <= 299
+        $response = 200 <= $code && $code <= 299
             ? json_decode($body, true)
             : (json_decode($body, true) ?: $this->jsonError($body, $code));
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
     }
 
     /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
+     * @param array $_
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    protected function respond($response)
+    public function respond($response, $_ = [])
     {
         if ($response === null) {
             return $this->mapResponse(true, []);
@@ -356,24 +361,6 @@ class OpenPayGateway extends AbstractGateway
         ];
 
         return new ErrorCode($codeMap[$code]);
-    }
-
-    /**
-     * Default JSON response.
-     *
-     * @param string $rawResponse
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    public function jsonError($rawResponse, $httpCode)
-    {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
-
-        return [
-            'message_to_purchaser' => $msg,
-        ];
     }
 
     /**

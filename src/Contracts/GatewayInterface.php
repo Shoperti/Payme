@@ -49,6 +49,16 @@ interface GatewayInterface
     public function commit($method, $url, $params = [], $options = []);
 
     /**
+     * Respond with an array of responses or a single response.
+     *
+     * @param array $response
+     * @param array $params
+     *
+     * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
+     */
+    public function respond($response, $params = []);
+
+    /**
      * Map an HTTP response to transaction object.
      *
      * @param bool  $success
