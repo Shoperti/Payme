@@ -59,18 +59,17 @@ class ManualGateway extends AbstractGateway
      */
     public function respond($response, $_ = [])
     {
-        return $this->mapResponse(true, $response);
+        return $this->mapResponse($response);
     }
 
     /**
      * Map HTTP response to transaction object.
      *
-     * @param bool  $success
      * @param array $response
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($response)
     {
         return (new Response())->setRaw($response)->map([
             'isRedirect'    => false,

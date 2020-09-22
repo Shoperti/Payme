@@ -82,7 +82,7 @@ class BogusGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         return (new Response())->setRaw($response)->map([
             'isRedirect'    => false,

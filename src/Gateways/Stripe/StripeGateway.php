@@ -149,7 +149,7 @@ class StripeGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($rawResponse, $request)
+    protected function mapResponse($rawResponse, $request)
     {
         // if there's an inner object (e.g. when getting an event) use it as data source
         $response = array_key_exists('type', $rawResponse) && isset($rawResponse['data']['object'])

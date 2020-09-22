@@ -255,7 +255,7 @@ class PaypalPlusGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($response, $statusCode)
+    protected function mapResponse($response, $statusCode)
     {
         // IPN response
         if (in_array(Arr::get($response, 'body'), ['VERIFIED', 'INVALID'])) {

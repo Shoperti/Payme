@@ -180,7 +180,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         if (array_key_exists('collection', $response)) {
             $response = array_merge($response, $response['collection']);

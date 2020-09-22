@@ -179,7 +179,7 @@ class OpenPayGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         $type = $this->getType($response);
 

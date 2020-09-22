@@ -59,16 +59,6 @@ interface GatewayInterface
     public function respond($response, $params = []);
 
     /**
-     * Map an HTTP response to transaction object.
-     *
-     * @param bool  $success
-     * @param array $response
-     *
-     * @return \Shoperti\PayMe\Contracts\ResponseInterface
-     */
-    public function mapResponse($success, $response);
-
-    /**
      * Build request url from string.
      *
      * @param string $endpoint

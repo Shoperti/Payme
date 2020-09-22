@@ -226,7 +226,7 @@ class SrPagoGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         $authorization = Arr::get($response['result']['recipe'], 'authorization_code');
         $type = $this->getType($response);
