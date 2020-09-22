@@ -114,7 +114,7 @@ class SrPagoGateway extends AbstractGateway
         $stack = HandlerStack::create();
 
         $stack->push(Middleware::retry(function ($retries, RequestInterface $request, ResponseInterface $response = null, TransferException $exception = null) {
-            $parsed = $this->parseResponse($response->getBody());
+            $parsed = $this->parseResponse($response);
 
             // Be aware that this gateway validation error responses may be an HTTP 500 code.
             return $retries < 3 && (
@@ -204,29 +204,6 @@ class SrPagoGateway extends AbstractGateway
     }
 
     /**
-     * Perform the request and return the parsed response and http code.
-     *
-     * @param string $method
-     * @param string $url
-     * @param array  $payload
-     *
-     * @return array
-     */
-    protected function performRequest($method, $url, $payload)
-    {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
-
-        $response = $code == 200
-            ? $this->parseResponse($body)
-            : $this->responseError($body, $code);
-
-        return [
-            'code' => $code,
-            'body' => $response,
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
@@ -249,7 +226,7 @@ class SrPagoGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         $authorization = Arr::get($response['result']['recipe'], 'authorization_code');
         $type = $this->getType($response);
@@ -321,31 +298,6 @@ class SrPagoGateway extends AbstractGateway
         }
 
         return new ErrorCode($this->errorCodeMap[$code]);
-    }
-
-    /**
-     * Parse JSON response to array.
-     *
-     * @param string $body
-     *
-     * @return array|null
-     */
-    protected function parseResponse($body)
-    {
-        return json_decode($body, true);
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    protected function responseError($body, $httpCode)
-    {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**

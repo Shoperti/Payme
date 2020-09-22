@@ -173,29 +173,6 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Perform the request and return the parsed response and http code.
-     *
-     * @param string $method
-     * @param string $url
-     * @param array  $payload
-     *
-     * @return array ['code' => http code, 'body' => [the response]]
-     */
-    protected function performRequest($method, $url, $payload)
-    {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
-
-        $response = $code == 200
-            ? $this->parseResponse($body)
-            : $this->responseError($body, $code);
-
-        return [
-            'code' => $code,
-            'body' => $response,
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
@@ -227,7 +204,7 @@ class PaypalExpressGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         $rawResponse = $response;
 
@@ -403,32 +380,19 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Parse body response to array.
+     * Parse the response to an array.
      *
-     * @param string $body
-     *
-     * @return array
-     */
-    protected function parseResponse($body)
-    {
-        $response = [];
-
-        parse_str($body, $response);
-
-        return $response;
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
+     * @param \Psr\Http\Message\ResponseInterface $response
      *
      * @return array
      */
-    protected function responseError($body, $httpCode)
+    protected function parseResponse($response)
     {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
+        $result = [];
+
+        parse_str((string) $response->getBody(), $result);
+
+        return $result;
     }
 
     /**

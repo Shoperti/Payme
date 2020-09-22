@@ -119,29 +119,6 @@ class StripeGateway extends AbstractGateway
     }
 
     /**
-     * Perform the request and return the parsed response and http code.
-     *
-     * @param string $method
-     * @param string $url
-     * @param array  $payload
-     *
-     * @return array ['code' => http code, 'body' => [the response]]
-     */
-    protected function performRequest($method, $url, $payload)
-    {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
-
-        $response = $code === 200
-            ? $this->parseResponse($body)
-            : $this->responseError($body, $code);
-
-        return [
-            'code' => $code,
-            'body' => $response,
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
@@ -172,7 +149,7 @@ class StripeGateway extends AbstractGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($rawResponse, $request)
+    protected function mapResponse($rawResponse, $request)
     {
         // if there's an inner object (e.g. when getting an event) use it as data source
         $response = array_key_exists('type', $rawResponse) && isset($rawResponse['data']['object'])
@@ -306,31 +283,6 @@ class StripeGateway extends AbstractGateway
         }
 
         return new ErrorCode('config_error');
-    }
-
-    /**
-     * Parse JSON response to array.
-     *
-     * @param string $body
-     *
-     * @return array
-     */
-    protected function parseResponse($body)
-    {
-        return json_decode($body, true);
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    protected function responseError($body, $httpCode)
-    {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**

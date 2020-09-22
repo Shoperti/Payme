@@ -132,47 +132,6 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
     }
 
     /**
-     * Check if it's a successful response.
-     *
-     * @param array $response
-     * @param int   $code
-     *
-     * @return bool
-     */
-    protected function isSuccess($response, $code)
-    {
-        if ($code !== 200 && $code !== 201) {
-            return false;
-        }
-
-        if (isset($response['error'])) {
-            return false;
-        }
-
-        if (!empty(Arr::get($response, 'payments'))) {
-            return in_array($this->getPaymentStatus($response), $this->successPaymentStatuses);
-        }
-
-        return true;
-    }
-
-    /**
-     * Get the status from the last payment.
-     *
-     * @param array $response
-     *
-     * @return string
-     */
-    protected function getPaymentStatus($response)
-    {
-        $lastPayment = Arr::last($response['payments']);
-
-        // approved, in_process, pending, rejected, cancelled
-        // on testing at least, payments may be empty
-        return $lastPayment ? Arr::get($lastPayment, 'status', 'other') : 'no_payment';
-    }
-
-    /**
      * Map HTTP response to transaction object.
      *
      * @param bool  $success
@@ -180,7 +139,7 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function mapResponse($success, $response)
+    protected function mapResponse($success, $response)
     {
         if (array_key_exists('collection', $response)) {
             $response = array_merge($response, $response['collection']);
@@ -219,6 +178,47 @@ class MercadoPagoBasicGateway extends MercadoPagoGateway
             'errorCode'       => $success ? null : $this->getErrorCode($response),
             'type'            => Arr::get($response, 'topic'),
         ]);
+    }
+
+    /**
+     * Check if it's a successful response.
+     *
+     * @param array $response
+     * @param int   $code
+     *
+     * @return bool
+     */
+    protected function isSuccess($response, $code)
+    {
+        if ($code !== 200 && $code !== 201) {
+            return false;
+        }
+
+        if (isset($response['error'])) {
+            return false;
+        }
+
+        if (!empty(Arr::get($response, 'payments'))) {
+            return in_array($this->getPaymentStatus($response), $this->successPaymentStatuses);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the status from the last payment.
+     *
+     * @param array $response
+     *
+     * @return string
+     */
+    protected function getPaymentStatus($response)
+    {
+        $lastPayment = Arr::last($response['payments']);
+
+        // approved, in_process, pending, rejected, cancelled
+        // on testing at least, payments may be empty
+        return $lastPayment ? Arr::get($lastPayment, 'status', 'other') : 'no_payment';
     }
 
     /**
