@@ -131,11 +131,11 @@ class MercadoPagoGateway extends AbstractGateway
      */
     protected function performRequest($method, $url, $payload)
     {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
+        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
 
         $response = 200 <= $code && $code <= 499
-            ? json_decode($body, true)
-            : (json_decode($body, true) ?: $this->jsonError($body, $code));
+            ? $this->parseResponse($rawResponse)
+            : $this->responseError($rawResponse);
 
         return [
             'code' => $code,

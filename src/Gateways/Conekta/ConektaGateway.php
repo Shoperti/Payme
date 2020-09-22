@@ -136,11 +136,11 @@ class ConektaGateway extends AbstractGateway
      */
     protected function performRequest($method, $url, $payload)
     {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
+        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
 
         $response = $code == 200
-            ? $this->parseResponse($body)
-            : $this->responseError($body, $code);
+            ? $this->parseResponse($rawResponse)
+            : $this->responseError($rawResponse);
 
         return [
             'code' => $code,
@@ -399,31 +399,6 @@ class ConektaGateway extends AbstractGateway
         $code = Arr::get($response, 'type');
 
         return new ErrorCode($code === 'processing_error' ? $code : 'config_error');
-    }
-
-    /**
-     * Parse JSON response to array.
-     *
-     * @param string $body
-     *
-     * @return array|null
-     */
-    protected function parseResponse($body)
-    {
-        return json_decode($body, true);
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
-     *
-     * @return array
-     */
-    protected function responseError($body, $httpCode)
-    {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
     }
 
     /**

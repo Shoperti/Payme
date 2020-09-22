@@ -95,14 +95,14 @@ abstract class AbstractGateway implements GatewayInterface
      * @param string $url
      * @param array  $payload
      *
-     * @return array [0 => the response string, 1 => the http code int, 2 => the raw response object]
+     * @return array [0 => the raw response object, 1 => the http code int, 2 => the response string]
      */
     protected function makeRequest($method, $url, $payload)
     {
-        /** @var \GuzzleHttp\Message\Response|\GuzzleHttp\Psr7\Response $rawResponse */
-        $rawResponse = $this->getHttpClient()->{$method}($url, $payload);
+        /** @var \Psr\Http\Message\ResponseInterface $rawResponse */
+        $rawResponse = $this->getHttpClient()->request($method, $url, $payload);
 
-        return [(string) $rawResponse->getBody(), $rawResponse->getStatusCode(), $rawResponse];
+        return [$rawResponse, $rawResponse->getStatusCode(), (string) $rawResponse->getBody()];
     }
 
     /**
@@ -270,20 +270,49 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
-     * Default JSON response.
+     * Parse the response to an array.
      *
-     * @param string $rawResponse
-     * @param int    $httpCode
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return array|null
+     */
+    protected function parseResponse($response)
+    {
+        return json_decode((string) $response->getBody(), true);
+    }
+
+    /**
+     * Get the error response or fallback to a general error.
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
      *
      * @return array
      */
-    protected function jsonError($rawResponse, $httpCode)
+    protected function responseError($response)
     {
-        $msg = 'API Response not valid.';
-        $msg .= " (Raw response: '{$rawResponse}', HTTP code: {$httpCode})";
+        return $this->parseResponse($response) ?: $this->jsonError($response);
+    }
+
+    /**
+     * Default error response.
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return array
+     */
+    protected function jsonError($response)
+    {
+        $code = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        $msg = $response->getReasonPhrase() ?: 'Unable to process request.';
 
         return [
-            'message_to_purchaser' => $msg,
+            'name'                 => 'REQUEST_ERROR',
+            'message_to_purchaser' => "$msg ($code)",
+            'error'                => [
+                'issue' => $body,
+                'code'  => $code,
+            ],
         ];
     }
 }

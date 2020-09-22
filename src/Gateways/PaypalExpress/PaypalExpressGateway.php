@@ -183,11 +183,11 @@ class PaypalExpressGateway extends AbstractGateway
      */
     protected function performRequest($method, $url, $payload)
     {
-        list($body, $code) = $this->makeRequest($method, $url, $payload);
+        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
 
         $response = $code == 200
-            ? $this->parseResponse($body)
-            : $this->responseError($body, $code);
+            ? $this->parseResponse($rawResponse)
+            : $this->responseError($rawResponse);
 
         return [
             'code' => $code,
@@ -403,32 +403,19 @@ class PaypalExpressGateway extends AbstractGateway
     }
 
     /**
-     * Parse body response to array.
+     * Parse the response to an array.
      *
-     * @param string $body
-     *
-     * @return array
-     */
-    protected function parseResponse($body)
-    {
-        $response = [];
-
-        parse_str($body, $response);
-
-        return $response;
-    }
-
-    /**
-     * Get error response from server or fallback to general error.
-     *
-     * @param string $body
-     * @param int    $httpCode
+     * @param \Psr\Http\Message\ResponseInterface $response
      *
      * @return array
      */
-    protected function responseError($body, $httpCode)
+    protected function parseResponse($response)
     {
-        return $this->parseResponse($body) ?: $this->jsonError($body, $httpCode);
+        $result = [];
+
+        parse_str((string) $response->getBody(), $result);
+
+        return $result;
     }
 
     /**
