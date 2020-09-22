@@ -33,7 +33,7 @@ interface ResponseInterface
     /**
      * Get if gateway is in test mode.
      *
-     * @return string
+     * @return bool
      */
     public function test();
 
