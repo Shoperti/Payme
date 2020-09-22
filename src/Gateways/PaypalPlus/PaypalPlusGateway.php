@@ -190,13 +190,13 @@ class PaypalPlusGateway extends AbstractGateway
     {
         list($rawResponse, $code, $body) = $this->makeRequest($method, $url, $payload);
 
-        if ($code !== 204) {
+        if ($code === 204) {
+            $response = '';
+        } else {
             $response = json_decode($body, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $response = ['body' => trim($body)];
             }
-        } else {
-            $response = '';
         }
 
         $data = 200 <= $code && $code <= 299
