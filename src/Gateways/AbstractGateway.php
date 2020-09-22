@@ -106,6 +106,41 @@ abstract class AbstractGateway implements GatewayInterface
     }
 
     /**
+     * Perform the request and return the parsed response and http code.
+     *
+     * @param string $method
+     * @param string $url
+     * @param array  $payload
+     *
+     * @return array ['code' => http code, 'body' => [the response]]
+     */
+    protected function performRequest($method, $url, $payload)
+    {
+        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
+
+        $response = $this->isValidResponse($code)
+            ? $this->parseResponse($rawResponse)
+            : $this->responseError($rawResponse);
+
+        return [
+            'code' => $code,
+            'body' => $response,
+        ];
+    }
+
+    /**
+     * Check if response from performed request is valid.
+     *
+     * @param int $code
+     *
+     * @return bool
+     */
+    protected function isValidResponse($code)
+    {
+        return $code === 200;
+    }
+
+    /**
      * Build request url from string.
      *
      * @param string $endpoint

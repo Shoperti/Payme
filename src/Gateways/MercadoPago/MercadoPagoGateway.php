@@ -121,26 +121,15 @@ class MercadoPagoGateway extends AbstractGateway
     }
 
     /**
-     * Perform the request and return the parsed response and http code.
+     * Check if response from performed request is valid.
      *
-     * @param string $method
-     * @param string $url
-     * @param array  $payload
+     * @param int $code
      *
-     * @return array
+     * @return bool
      */
-    protected function performRequest($method, $url, $payload)
+    protected function isValidResponse($code)
     {
-        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
-
-        $response = 200 <= $code && $code <= 499
-            ? $this->parseResponse($rawResponse)
-            : $this->responseError($rawResponse);
-
-        return [
-            'code' => $code,
-            'body' => $response,
-        ];
+        return 200 <= $code && $code <= 499;
     }
 
     /**

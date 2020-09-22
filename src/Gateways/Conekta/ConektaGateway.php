@@ -126,29 +126,6 @@ class ConektaGateway extends AbstractGateway
     }
 
     /**
-     * Perform the request and return the parsed response and http code.
-     *
-     * @param string $method
-     * @param string $url
-     * @param array  $payload
-     *
-     * @return array
-     */
-    protected function performRequest($method, $url, $payload)
-    {
-        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
-
-        $response = $code == 200
-            ? $this->parseResponse($rawResponse)
-            : $this->responseError($rawResponse);
-
-        return [
-            'code' => $code,
-            'body' => $response,
-        ];
-    }
-
-    /**
      * Respond with an array of responses or a single response.
      *
      * @param array $response
