@@ -19,7 +19,7 @@ Begin by installing this package through Composer. Edit your project's `composer
 
 ```json
 "require": {
-  "shoperti/payme": "3.0-dev"
+  "shoperti/payme": "4.0-dev"
 }
 ```
 
