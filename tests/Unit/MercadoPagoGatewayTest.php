@@ -62,7 +62,7 @@ class MercadoPagoGatewayTest extends AbstractTestCase
         $response = $this->parseResponse($this->getEmptyPayment());
 
         $this->assertFalse($response->success());
-        $this->assertSame('pending', (string) $response->status());
+        $this->assertSame('pending', $response->status());
     }
 
     private function getApprovedPayment()

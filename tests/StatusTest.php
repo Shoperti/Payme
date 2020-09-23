@@ -11,7 +11,7 @@ class StatusTest extends \PHPUnit_Framework_TestCase
     {
         $status = new Status('paid');
 
-        $this->assertEquals((string) $status, 'paid');
+        $this->assertSame('paid', (string) $status);
     }
 
     /**
@@ -20,6 +20,6 @@ class StatusTest extends \PHPUnit_Framework_TestCase
      */
     public function it_throws_exception_when_invalid_status()
     {
-        $status = new Status('foo');
+        new Status('foo');
     }
 }

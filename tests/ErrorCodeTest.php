@@ -11,7 +11,7 @@ class ErrorCodeTest extends \PHPUnit_Framework_TestCase
     {
         $status = new ErrorCode('card_declined');
 
-        $this->assertEquals((string) $status, 'card_declined');
+        $this->assertSame('card_declined', (string) $status);
     }
 
     /**
@@ -20,6 +20,6 @@ class ErrorCodeTest extends \PHPUnit_Framework_TestCase
      */
     public function it_throws_exception_when_invalid_status()
     {
-        $status = new ErrorCode('foo');
+        new ErrorCode('foo');
     }
 }
