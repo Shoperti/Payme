@@ -51,6 +51,8 @@ class OpenPayTest extends AbstractTest
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $openPayHooks->create($payload);
 
+        $this->assertTrue($response->success());
+
         $data = $response->data();
 
         $webhook = $openPayHooks->find($data['id']);

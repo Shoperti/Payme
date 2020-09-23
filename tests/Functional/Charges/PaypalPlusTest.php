@@ -26,7 +26,7 @@ class PaypalPlusTest extends AbstractTest
         $response = $this->chargeRequest('request', null, ['token' => 'invalid-token']);
 
         $this->assertFalse($response->success());
-        $this->assertSame('failed', (string) $response->status());
+        $this->assertSame('failed', $response->status());
     }
 
     /** @test */
@@ -124,7 +124,7 @@ class PaypalPlusTest extends AbstractTest
         $this->assertSame('VERIFIED', $response->message());
         $this->assertTrue($response->test());
         $this->assertSame($payload['txn_id'], $response->authorization());
-        $this->assertSame('paid', (string) $response->status());
+        $this->assertSame('paid', $response->status());
         $this->assertEmpty($response->errorCode());
         $this->assertSame($payload['txn_type'], $response->type());
     }
