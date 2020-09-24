@@ -165,7 +165,7 @@ class MercadoPagoGateway extends AbstractGateway
     {
         $type = Arr::get($response, 'operation_type');
 
-        list($reference, $authorization) = $success
+        [$reference, $authorization] = $success
             ? [Arr::get($response, 'id'), Arr::get($response, 'authorization_code')]
             : [Arr::get($response, 'id'), null];
 

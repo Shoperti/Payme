@@ -188,7 +188,7 @@ class PaypalPlusGateway extends AbstractGateway
      */
     protected function performRequest($method, $url, $payload)
     {
-        list($rawResponse, $code, $body) = $this->makeRequest($method, $url, $payload);
+        [$rawResponse, $code, $body] = $this->makeRequest($method, $url, $payload);
 
         if ($code === 204) {
             $response = '';

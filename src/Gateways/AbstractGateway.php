@@ -116,7 +116,7 @@ abstract class AbstractGateway implements GatewayInterface
      */
     protected function performRequest($method, $url, $payload)
     {
-        list($rawResponse, $code) = $this->makeRequest($method, $url, $payload);
+        [$rawResponse, $code] = $this->makeRequest($method, $url, $payload);
 
         $response = $this->isValidResponse($code)
             ? $this->parseResponse($rawResponse)

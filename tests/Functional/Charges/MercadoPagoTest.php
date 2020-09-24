@@ -13,7 +13,7 @@ class MercadoPagoTest extends AbstractTest
         /** @var \Shoperti\PayMe\PayMe $gateway */
         $gateway = $gateway ?: $this->getPayMe();
 
-        list($amount, $payload) = array_values($this->getOrderData($payload ?: []));
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData($payload ?: []);
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $gateway->charges()->create($amount, $token, $payload);
@@ -39,7 +39,7 @@ class MercadoPagoTest extends AbstractTest
     {
         $cardNumber = '5031755734530604';
 
-        list($amount, $payload) = array_values($this->getOrderData());
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData();
 
         $token = $this->getToken(
             $this->getCredentials(),
@@ -134,7 +134,7 @@ class MercadoPagoTest extends AbstractTest
         /** @var \Shoperti\PayMe\PayMe $payMe */
         $payMe = $this->getPayMe();
 
-        list($response, $amount) = $responseAndAmount;
+        [$response, $amount] = $responseAndAmount;
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $payMe->charges()->refund($amount, $response['id']);

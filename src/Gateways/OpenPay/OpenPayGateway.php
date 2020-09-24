@@ -183,7 +183,7 @@ class OpenPayGateway extends AbstractGateway
     {
         $type = $this->getType($response);
 
-        list($reference, $authorization) = $success
+        [$reference, $authorization] = $success
             ? $this->getReferences($response, $type)
             : [Arr::get($response, 'request_id'), null];
 

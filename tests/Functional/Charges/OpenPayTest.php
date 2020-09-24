@@ -35,7 +35,7 @@ class OpenPayTest extends AbstractTest
         $response = $this->successfulChargeRequest('store');
 
         $data = $response->data();
-        list($amount, $payload) = array_values($this->getOrderData());
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData();
 
         $this->assertSame('charge', $response->type());
         $this->assertSame('pending', $response->status());
@@ -54,7 +54,7 @@ class OpenPayTest extends AbstractTest
         $response = $this->successfulChargeRequest('bank_account');
 
         $data = $response->data();
-        list($amount, $payload) = array_values($this->getOrderData());
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData();
 
         $this->assertSame('charge', $response->type());
         $this->assertSame('pending', $response->status());
@@ -72,7 +72,7 @@ class OpenPayTest extends AbstractTest
     /** @test */
     public function it_should_succeed_to_charge_a_token_with_params()
     {
-        list($amount, $payload) = array_values($this->getOrderData());
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData();
 
         $response = $this->successfulChargeRequest($this->getToken($this->getCredentials(), '4242424242424242', $payload));
 
@@ -124,7 +124,7 @@ class OpenPayTest extends AbstractTest
         /** @var \Shoperti\PayMe\PayMe $payMe */
         $payMe = $this->getPayMe();
 
-        list($response, $amount) = $responseAndAmount;
+        [$response, $amount] = $responseAndAmount;
 
         /** @var \Shoperti\PayMe\Contracts\ResponseInterface $response */
         $response = $payMe->charges()->refund($amount, $response['id']);

@@ -15,7 +15,7 @@ abstract class AbstractTest extends AbstractFunctionalTestCase
      */
     protected function successfulChargeRequest($token, $amount = null, $payload = [])
     {
-        list($amount, $payload) = $this->fixOrderData($amount, $payload);
+        [$amount, $payload] = $this->fixOrderData($amount, $payload);
 
         $isRedirect = array_key_exists('isRedirect', $this->gatewayData)
             ? $this->gatewayData['isRedirect']
@@ -43,7 +43,7 @@ abstract class AbstractTest extends AbstractFunctionalTestCase
      */
     protected function chargeRequest($token, $amount = null, $payload = [])
     {
-        list($amount, $payload) = $this->fixOrderData($amount, $payload);
+        [$amount, $payload] = $this->fixOrderData($amount, $payload);
 
         return $this->getPayMe()->charges()->create($amount, $token, $payload);
     }
