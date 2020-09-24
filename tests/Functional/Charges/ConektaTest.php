@@ -40,7 +40,7 @@ class ConektaTest extends AbstractTest
         $charge = $this->successfulChargeRequest($data['id']);
 
         $response = $charge->data();
-        list($_, $payload) = array_values($this->getOrderData());
+        ['payload' => $payload] = $this->getOrderData();
 
         $this->assertEquals('order', $charge->type());
         $this->assertEquals('paid', $charge->status());
@@ -175,7 +175,7 @@ class ConektaTest extends AbstractTest
         $charge = $this->successfulChargeRequest('oxxo_cash');
 
         $response = $charge->data();
-        list($_, $payload) = array_values($this->getOrderData());
+        ['payload' => $payload] = $this->getOrderData();
 
         $this->assertEquals('order', $charge->type());
         $this->assertEquals('pending', $charge->status());
@@ -196,7 +196,7 @@ class ConektaTest extends AbstractTest
         $charge = $this->successfulChargeRequest('spei');
 
         $response = $charge->data();
-        list($_, $payload) = array_values($this->getOrderData());
+        ['payload' => $payload] = $this->getOrderData();
 
         $this->assertEquals('order', $charge->type());
         $this->assertEquals('pending', $charge->status());
@@ -217,7 +217,7 @@ class ConektaTest extends AbstractTest
         $charge = $this->successfulChargeRequest('tok_test_visa_4242');
 
         $response = $charge->data();
-        list($_, $payload) = array_values($this->getOrderData());
+        ['payload' => $payload] = $this->getOrderData();
 
         $this->assertEquals('order', $charge->type());
         $this->assertEquals('paid', $charge->status());

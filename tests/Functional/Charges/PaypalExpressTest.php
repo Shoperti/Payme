@@ -26,8 +26,9 @@ class PaypalExpressTest extends AbstractTest
     /** @test */
     public function it_should_fail_to_create_a_charge()
     {
-        $orderData = $this->getOrderData();
-        $charge = $this->getPayMe()->charges()->create($orderData['total'] - 100, 'SetExpressCheckout', $orderData['payload']);
+        ['total' => $amount, 'payload' => $payload] = $this->getOrderData();
+
+        $charge = $this->getPayMe()->charges()->create($amount - 100, 'SetExpressCheckout', $payload);
 
         $this->assertFalse($charge->success());
         $this->assertTrue($charge->isRedirect());

@@ -173,7 +173,7 @@ class ConektaGateway extends AbstractGateway
         }
 
         $type = $this->getType($rawResponse);
-        list($reference, $authorization) = $success ? $this->getReferences($response, $type) : [null, null];
+        [$reference, $authorization] = $success ? $this->getReferences($response, $type) : [null, null];
 
         $message = '';
 
