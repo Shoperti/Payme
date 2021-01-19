@@ -101,7 +101,7 @@ class PaypalPlusGateway extends AbstractGateway
             'connect_timeout' => '30',
             'headers'         => [
                 'Content-Type' => 'application/json',
-                'User-Agent'   => "PaypalPlus/{$this->apiVersion} PayMeBindings/{$this->config['version']}",
+                'User-Agent'   => "PayPalPlus/{$this->apiVersion} PayMeBindings/{$this->config['version']}",
             ],
         ];
     }
@@ -139,12 +139,15 @@ class PaypalPlusGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
+     * @param string[] $customHeaders
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [])
+    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
     {
         $request = $this->requestTemplate;
+
+        $request['headers'] = array_merge($request['headers'], $customHeaders);
 
         $token = Arr::get($options, 'token');
 

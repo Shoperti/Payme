@@ -9,7 +9,7 @@ Supported Gateways:
 * Manual
 * MercadoPago
 * OpenPay
-* Paypal Express / Plus
+* PayPal Express / Plus
 * Sr Pago
 * Stripe
 

@@ -16,9 +16,11 @@ class Events extends AbstractApi implements EventInterface
     /**
      * Find all events.
      *
+     * @param string[] $headers
+     *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all()
+    public function all($headers = [])
     {
         throw new BadMethodCallException();
     }
@@ -28,10 +30,11 @@ class Events extends AbstractApi implements EventInterface
      *
      * @param int|string $id
      * @param array      $options
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [])
+    public function find($id, array $options = [], $headers = [])
     {
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString('payments').'/'.$id);
     }

@@ -20,10 +20,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param int|float $amount
      * @param mixed     $payment
      * @param string[]  $options
+     * @param string[]  $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($amount, $payment, $options = [])
+    public function create($amount, $payment, $options = [], $headers = [])
     {
         $params = [];
 
@@ -40,12 +41,13 @@ class Charges extends AbstractApi implements ChargeInterface
     /**
      * Get a charge.
      *
-     * @param string $id
-     * @param array  $options
+     * @param string   $id
+     * @param array    $options
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function get($id, $options = [])
+    public function get($id, $options = [], $headers = [])
     {
         throw new BadMethodCallException();
     }
@@ -54,10 +56,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * Complete a charge.
      *
      * @param string[] $options
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function complete($options = [])
+    public function complete($options = [], $headers = [])
     {
         $orderId = Arr::get($options, 'merchant_order_id');
 
@@ -85,10 +88,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param int|float $amount
      * @param string    $reference
      * @param string[]  $options
+     * @param string[]  $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function refund($amount, $reference, array $options = [])
+    public function refund($amount, $reference, array $options = [], $headers = [])
     {
         $url = sprintf($this->gateway->buildUrlFromString('collections').'/%s/refunds', $reference);
 

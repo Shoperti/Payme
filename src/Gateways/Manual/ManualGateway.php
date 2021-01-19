@@ -41,10 +41,11 @@ class ManualGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
+     * @param string[] $customHeaders
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [])
+    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
     {
         return $this->respond($params);
     }

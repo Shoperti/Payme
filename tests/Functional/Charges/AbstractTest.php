@@ -10,10 +10,11 @@ abstract class AbstractTest extends AbstractFunctionalTestCase
      * @param mixed      $token
      * @param null|mixed $amount
      * @param mixed      $payload
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface $response
      */
-    protected function successfulChargeRequest($token, $amount = null, $payload = [])
+    protected function successfulChargeRequest($token, $amount = null, $payload = [], $headers = [])
     {
         [$amount, $payload] = $this->fixOrderData($amount, $payload);
 
@@ -21,7 +22,7 @@ abstract class AbstractTest extends AbstractFunctionalTestCase
             ? $this->gatewayData['isRedirect']
             : false;
 
-        $charge = $this->chargeRequest($token, $amount, $payload);
+        $charge = $this->chargeRequest($token, $amount, $payload, $headers);
 
         $this->assertSame($isRedirect, $charge->isRedirect());
 
@@ -38,14 +39,15 @@ abstract class AbstractTest extends AbstractFunctionalTestCase
      * @param mixed      $token
      * @param null|mixed $amount
      * @param mixed      $payload
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface $response
      */
-    protected function chargeRequest($token, $amount = null, $payload = [])
+    protected function chargeRequest($token, $amount = null, $payload = [], $headers = [])
     {
         [$amount, $payload] = $this->fixOrderData($amount, $payload);
 
-        return $this->getPayMe()->charges()->create($amount, $token, $payload);
+        return $this->getPayMe()->charges()->create($amount, $token, $payload, $headers);
     }
 
     private function fixOrderData($amount, $payload)

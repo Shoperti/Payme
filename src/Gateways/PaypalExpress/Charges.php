@@ -21,10 +21,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param int|float $amount
      * @param mixed     $payment
      * @param string[]  $options
+     * @param string[]  $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($amount, $payment, $options = [])
+    public function create($amount, $payment, $options = [], $headers = [])
     {
         $params = [];
 
@@ -36,20 +37,27 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addOrder($params, $amount, $options);
         $params = $this->addBN($params, $options);
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params, [
-            'isRedirect' => true,
-        ]);
+        $options = ['isRedirect' => true];
+
+        return $this->gateway->commit(
+            'post',
+            $this->gateway->buildUrlFromString(''),
+            $params,
+            $options,
+            $headers
+        );
     }
 
     /**
      * Get a charge.
      *
-     * @param string $id
-     * @param array  $options
+     * @param string   $id
+     * @param array    $options
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function get($id, $options = [])
+    public function get($id, $options = [], $headers = [])
     {
         throw new BadMethodCallException();
     }
@@ -58,10 +66,11 @@ class Charges extends AbstractApi implements ChargeInterface
      * Complete a charge.
      *
      * @param string[] $options
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function complete($options = [])
+    public function complete($options = [], $headers = [])
     {
         $params = [];
 
@@ -83,7 +92,13 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addLineItems($params, $options);
         $params = $this->addBN($params, $options);
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString(''), $params);
+        return $this->gateway->commit(
+            'post',
+            $this->gateway->buildUrlFromString(''),
+            $params,
+            [],
+            $headers
+        );
     }
 
     /**
@@ -95,7 +110,7 @@ class Charges extends AbstractApi implements ChargeInterface
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function refund($amount, $reference, array $options = [])
+    public function refund($amount, $reference, array $options = [], $headers = [])
     {
         throw new BadMethodCallException();
     }
@@ -126,7 +141,7 @@ class Charges extends AbstractApi implements ChargeInterface
      * Add order line items param.
      *
      * @param string[] $params
-     * @param string[] $options
+     * @param array    $options
      *
      * @return array
      */
