@@ -17,10 +17,11 @@ class Events extends PaypalExpressEvents
      *
      * @param int|string $id
      * @param array      $options
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [])
+    public function find($id, array $options = [], $headers = [])
     {
         $event = Arr::get($options, 'resource_type');
 
@@ -28,10 +29,12 @@ class Events extends PaypalExpressEvents
             return $this->gateway->commit(
                 'get',
                 $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
-                ['token' => Arr::get($options, 'token')]
+                ['token' => Arr::get($options, 'token')],
+                [],
+                $headers
             );
         }
 
-        return parent::find($id, $options);
+        return parent::find($id, $options, $headers);
     }
 }

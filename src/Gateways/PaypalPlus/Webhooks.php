@@ -8,7 +8,7 @@ use Shoperti\PayMe\Gateways\AbstractApi;
 use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the Paypal plus webhooks class.
+ * This is the PayPal plus webhooks class.
  *
  * @see https://developer.paypal.com/docs/api/webhooks/v1/
  *
@@ -19,13 +19,20 @@ class Webhooks extends AbstractApi implements WebhookInterface
     /**
      * Get all webhooks.
      *
-     * @param array $params
+     * @param array    $params
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all($params = [])
+    public function all($params = [], $headers = [])
     {
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('notifications/webhooks'), [], $params);
+        return $this->gateway->commit(
+            'get',
+            $this->gateway->buildUrlFromString('notifications/webhooks'),
+            [],
+            $params,
+            $headers
+        );
     }
 
     /**
@@ -33,26 +40,34 @@ class Webhooks extends AbstractApi implements WebhookInterface
      *
      * @param int|string $id
      * @param array      $params
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null, $params = [])
+    public function find($id = null, $params = [], $headers = [])
     {
         if (!$id) {
             throw new InvalidArgumentException('We need an id');
         }
 
-        return $this->gateway->commit('get', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
+        return $this->gateway->commit(
+            'get',
+            $this->gateway->buildUrlFromString('notifications/webhooks/'.$id),
+            [],
+            $params,
+            $headers
+        );
     }
 
     /**
      * Create a webhook.
      *
-     * @param array $params
+     * @param array    $params
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($params = [])
+    public function create($params = [], $headers = [])
     {
         if (!array_key_exists('event_types', $params)) {
             $params['event_types'] = [[
@@ -60,17 +75,24 @@ class Webhooks extends AbstractApi implements WebhookInterface
             ]];
         }
 
-        return $this->gateway->commit('post', $this->gateway->buildUrlFromString('notifications/webhooks'), $params);
+        return $this->gateway->commit(
+            'post',
+            $this->gateway->buildUrlFromString('notifications/webhooks'),
+            $params,
+            [],
+            $headers
+        );
     }
 
     /**
      * Update a webhook.
      *
-     * @param array $params
+     * @param array    $params
+     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function update($params = [])
+    public function update($params = [], $headers = [])
     {
         $id = Arr::get($params, 'id', null);
 
@@ -79,7 +101,13 @@ class Webhooks extends AbstractApi implements WebhookInterface
         }
 
         // json_patch required
-        return $this->gateway->commit('patch', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
+        return $this->gateway->commit(
+            'patch',
+            $this->gateway->buildUrlFromString('notifications/webhooks/'.$id),
+            [],
+            $params,
+            $headers
+        );
     }
 
     /**
@@ -87,11 +115,18 @@ class Webhooks extends AbstractApi implements WebhookInterface
      *
      * @param int|string $id
      * @param array      $params
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function delete($id, $params = [])
+    public function delete($id, $params = [], $headers = [])
     {
-        return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('notifications/webhooks/'.$id), [], $params);
+        return $this->gateway->commit(
+            'delete',
+            $this->gateway->buildUrlFromString('notifications/webhooks/'.$id),
+            [],
+            $params,
+            $headers
+        );
     }
 }

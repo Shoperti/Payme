@@ -16,9 +16,11 @@ class Events extends AbstractApi implements EventInterface
     /**
      * Find all events.
      *
+     * @param string[] $headers
+     *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all()
+    public function all($headers = [])
     {
         throw new BadMethodCallException();
     }
@@ -28,10 +30,11 @@ class Events extends AbstractApi implements EventInterface
      *
      * @param int|string $id
      * @param array      $options
+     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [])
+    public function find($id, array $options = [], $headers = [])
     {
         if (empty($options)) {
             return $this->gateway->commit(
@@ -56,6 +59,6 @@ class Events extends AbstractApi implements EventInterface
             ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
             : 'https://ipnpb.paypal.com/cgi-bin/webscr';
 
-        return $this->gateway->commit('post', $url, $params);
+        return $this->gateway->commit('post', $url, $params, [], $headers);
     }
 }
