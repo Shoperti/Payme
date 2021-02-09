@@ -38,7 +38,7 @@ class Events extends AbstractApi implements EventInterface
             return $this->gateway->commit(
                 'post',
                 $this->gateway->buildUrlFromString(''),
-                ['METHOD' => 'GetTransactionDetails', 'TRANSACTIONID' => $id],
+                ['METHOD'  => 'GetTransactionDetails', 'TRANSACTIONID' => $id],
                 ['partner' => Arr::get($options, 'partner')]
             );
         }
