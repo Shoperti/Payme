@@ -37,9 +37,9 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addBN($params, $options);
 
         $options = [
-                'isRedirect' => true,
-                'partner'    => Arr::get($options, 'partner'),
-            ];
+            'isRedirect' => true,
+            'partner'    => Arr::get($options, 'partner'),
+        ];
 
         return $this->gateway->commit(
             'post',
