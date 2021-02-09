@@ -32,9 +32,7 @@ class PaypalPlusTest extends AbstractTest
     {
         $gateway = $this->getPayMe();
 
-        $tokenPayload = [
-            'token' => $token,
-        ];
+        $tokenPayload = ['token' => $token];
 
         $webhooks = $gateway->webhooks()->all($tokenPayload);
 
@@ -51,9 +49,7 @@ class PaypalPlusTest extends AbstractTest
     {
         $gateway = $this->getPayMe();
 
-        $tokenPayload = [
-            'token' => $token,
-        ];
+        $tokenPayload = ['token' => $token];
 
         $webhooks = $gateway->webhooks()->all($tokenPayload);
 
