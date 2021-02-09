@@ -215,8 +215,8 @@ class Charges extends AbstractApi implements ChargeInterface
             $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
             [],
             [
-                'token'   => Arr::get($options, 'token'),
-                'partner' => Arr::get($options, 'partner'),
+                'token'       => Arr::get($options, 'token'),
+                'application' => Arr::get($options, 'application'),
             ]
         );
     }
@@ -235,8 +235,8 @@ class Charges extends AbstractApi implements ChargeInterface
             $this->gateway->buildUrlFromString(sprintf('payments/payment/%s/execute', $options['payment'])),
             ['payer_id' => Arr::get($options, 'payer_id')],
             [
-                'token'   => Arr::get($options, 'token'),
-                'partner' => Arr::get($options, 'partner'),
+                'token'       => Arr::get($options, 'token'),
+                'application' => Arr::get($options, 'application'),
             ]
         );
     }

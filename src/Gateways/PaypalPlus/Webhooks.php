@@ -73,11 +73,7 @@ class Webhooks extends AbstractApi implements WebhookInterface
         return $this->gateway->commit(
             'post',
             $this->gateway->buildUrlFromString('notifications/webhooks'),
-            $params,
-            [
-                'token'   => Arr::get($params, 'token'),
-                'partner' => Arr::get($params, 'partner'),
-            ]
+            $params
         );
     }
 

@@ -28,11 +28,7 @@ class Events extends PaypalExpressEvents
             return $this->gateway->commit(
                 'get',
                 $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
-                [],
-                [
-                    'token'   => Arr::get($options, 'token'),
-                    'partner' => Arr::get($options, 'partner'),
-                ]
+                ['token' => Arr::get($options, 'token')]
             );
         }
 

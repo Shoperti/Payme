@@ -165,8 +165,8 @@ class PaypalPlusGateway extends AbstractGateway
 
         $request['headers']['Authorization'] = "Bearer {$token}";
 
-        if (isset($options['partner'])) {
-            $request['headers']['PayPal-Partner-Attribution-Id'] = $options['partner'];
+        if (isset($options['application'])) {
+            $request['headers']['PayPal-Partner-Attribution-Id'] = $options['application'];
         }
 
         $response = $this->performRequest($method, $url, $request);

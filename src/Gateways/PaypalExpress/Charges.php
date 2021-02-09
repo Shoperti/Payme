@@ -36,10 +36,7 @@ class Charges extends AbstractApi implements ChargeInterface
         $params = $this->addOrder($params, $amount, $options);
         $params = $this->addBN($params, $options);
 
-        $options = [
-            'isRedirect' => true,
-            'partner'    => Arr::get($options, 'partner'),
-        ];
+        $options = ['isRedirect' => true];
 
         return $this->gateway->commit(
             'post',
@@ -94,8 +91,7 @@ class Charges extends AbstractApi implements ChargeInterface
         return $this->gateway->commit(
             'post',
             $this->gateway->buildUrlFromString(''),
-            $params,
-            ['partner' => Arr::get($options, 'partner')]
+            $params
         );
     }
 

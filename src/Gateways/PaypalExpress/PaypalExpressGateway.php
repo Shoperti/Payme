@@ -155,10 +155,6 @@ class PaypalExpressGateway extends AbstractGateway
             ],
         ];
 
-        if (isset($options['partner'])) {
-            $request['headers']['PayPal-Partner-Attribution-Id'] = $options['partner'];
-        }
-
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $request['curl'] = static::$defaultCurlOptions;
             $request['form_params'] = $params;
