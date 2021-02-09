@@ -22,11 +22,10 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param int|float $amount
      * @param mixed     $payment
      * @param string[]  $options
-     * @param string[]  $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($amount, $payment, $options = [], $headers = [])
+    public function create($amount, $payment, $options = [])
     {
         $payload = [
             'intent'              => 'sale',
@@ -63,8 +62,7 @@ class Charges extends AbstractApi implements ChargeInterface
             'post',
             $this->gateway->buildUrlFromString('payments/payment'),
             $payload,
-            $options,
-            $headers
+            $options
         );
     }
 
@@ -205,20 +203,21 @@ class Charges extends AbstractApi implements ChargeInterface
     /**
      * Get a charge.
      *
-     * @param string   $id
-     * @param array    $options
-     * @param string[] $headers
+     * @param string $id
+     * @param array  $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function get($id, $options = [], $headers = [])
+    public function get($id, $options = [])
     {
         return $this->gateway->commit(
             'get',
             $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
-            ['token' => Arr::get($options, 'token')],
             [],
-            $headers
+            [
+                'token'   => Arr::get($options, 'token'),
+                'partner' => Arr::get($options, 'partner'),
+            ]
         );
     }
 
@@ -226,18 +225,19 @@ class Charges extends AbstractApi implements ChargeInterface
      * Complete a charge.
      *
      * @param string[] $options
-     * @param string[] $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function complete($options = [], $headers = [])
+    public function complete($options = [])
     {
         return $this->gateway->commit(
             'post',
             $this->gateway->buildUrlFromString(sprintf('payments/payment/%s/execute', $options['payment'])),
             ['payer_id' => Arr::get($options, 'payer_id')],
-            ['token'    => Arr::get($options, 'token')],
-            $headers
+            [
+                'token'   => Arr::get($options, 'token'),
+                'partner' => Arr::get($options, 'partner'),
+            ]
         );
     }
 
@@ -247,11 +247,10 @@ class Charges extends AbstractApi implements ChargeInterface
      * @param int|float $amount
      * @param string    $reference
      * @param string[]  $options
-     * @param string[]  $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function refund($amount, $reference, array $options = [], $headers = [])
+    public function refund($amount, $reference, array $options = [])
     {
         throw new BadMethodCallException();
     }

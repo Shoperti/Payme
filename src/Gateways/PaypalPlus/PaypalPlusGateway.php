@@ -53,7 +53,7 @@ class PaypalPlusGateway extends AbstractGateway
     protected $moneyFormat = 'dollars';
 
     /**
-     * PaypalPlus API version.
+     * PayPal Plus API version.
      *
      * @var string
      */
@@ -139,15 +139,12 @@ class PaypalPlusGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
-     * @param string[] $customHeaders
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $request = $this->requestTemplate;
-
-        $request['headers'] = array_merge($request['headers'], $customHeaders);
 
         $token = Arr::get($options, 'token');
 
@@ -164,8 +161,13 @@ class PaypalPlusGateway extends AbstractGateway
             ? (strpos($url, 'https://ipnpb.') === 0 ? 'form_params' : 'json')
             : 'query';
 
-        $request['headers']['Authorization'] = "Bearer {$token}";
         $request[$payloadKey] = $params;
+
+        $request['headers']['Authorization'] = "Bearer {$token}";
+
+        if (isset($options['partner'])) {
+            $request['headers']['PayPal-Partner-Attribution-Id'] = $options['partner'];
+        }
 
         $response = $this->performRequest($method, $url, $request);
 
@@ -445,7 +447,7 @@ class PaypalPlusGateway extends AbstractGateway
     }
 
     /**
-     * Map PayPalPlus response to error code object.
+     * Map the response to error code object.
      *
      * @param string|null $error
      *

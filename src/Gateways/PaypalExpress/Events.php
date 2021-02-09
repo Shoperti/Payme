@@ -5,9 +5,10 @@ namespace Shoperti\PayMe\Gateways\PaypalExpress;
 use BadMethodCallException;
 use Shoperti\PayMe\Contracts\EventInterface;
 use Shoperti\PayMe\Gateways\AbstractApi;
+use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the PaypalExpress events class.
+ * This is the PayPalExpress events class.
  *
  * @author Joseph Cohen <joseph.cohen@dinkbit.com>
  */
@@ -16,11 +17,9 @@ class Events extends AbstractApi implements EventInterface
     /**
      * Find all events.
      *
-     * @param string[] $headers
-     *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all($headers = [])
+    public function all()
     {
         throw new BadMethodCallException();
     }
@@ -30,17 +29,17 @@ class Events extends AbstractApi implements EventInterface
      *
      * @param int|string $id
      * @param array      $options
-     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [], $headers = [])
+    public function find($id, array $options = [])
     {
         if (empty($options)) {
             return $this->gateway->commit(
                 'post',
                 $this->gateway->buildUrlFromString(''),
-                ['METHOD' => 'GetTransactionDetails', 'TRANSACTIONID' => $id]
+                ['METHOD' => 'GetTransactionDetails', 'TRANSACTIONID' => $id],
+                ['partner' => Arr::get($options, 'partner')]
             );
         }
 
@@ -59,6 +58,11 @@ class Events extends AbstractApi implements EventInterface
             ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
             : 'https://ipnpb.paypal.com/cgi-bin/webscr';
 
-        return $this->gateway->commit('post', $url, $params, [], $headers);
+        return $this->gateway->commit(
+            'post',
+            $url,
+            $params,
+            ['partner' => Arr::get($options, 'partner')]
+        );
     }
 }

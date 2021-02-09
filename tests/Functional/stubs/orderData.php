@@ -5,6 +5,7 @@ return [
     'payload' => [
         'device_id'      => 'test',
         'application'    => 'PayMe_cart',
+        'partner'        => 'test_partner',
         'description'    => 'Awesome Store',
         'return_url'     => 'http://example.com/return',
         'notify_url'     => 'http://example.com/notify',

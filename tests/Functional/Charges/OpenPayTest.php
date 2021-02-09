@@ -158,7 +158,7 @@ class OpenPayTest extends AbstractTest
             'json' => [
                 'card_number'      => $cardNumber,
                 'holder_name'      => $payload['name'],
-                'expiration_year'  => '40',
+                'expiration_year'  => '30',
                 'expiration_month' => '12',
                 'cvv2'             => '123',
                 'method'           => 'token',

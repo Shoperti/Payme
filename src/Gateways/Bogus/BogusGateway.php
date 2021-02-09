@@ -49,11 +49,10 @@ class BogusGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
-     * @param string[] $customHeaders
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $response = [];
 
