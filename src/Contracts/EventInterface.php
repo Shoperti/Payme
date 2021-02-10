@@ -12,20 +12,17 @@ interface EventInterface
     /**
      * Find all events.
      *
-     * @param string[] $headers
-     *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all($headers = []);
+    public function all();
 
     /**
      * Find an event by its id.
      *
      * @param int|string $id
      * @param array      $options
-     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [], $headers = []);
+    public function find($id, array $options = []);
 }

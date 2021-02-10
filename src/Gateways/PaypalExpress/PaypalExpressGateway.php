@@ -136,11 +136,10 @@ class PaypalExpressGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
-     * @param string[] $customHeaders
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $params['VERSION'] = $this->config['version'];
         $params['USER'] = $this->config['username'];
@@ -155,8 +154,6 @@ class PaypalExpressGateway extends AbstractGateway
                 'User-Agent' => 'PaypalExpress/v1 PayMeBindings/'.$this->config['version'],
             ],
         ];
-
-        $request['headers'] = array_merge($request['headers'], $customHeaders);
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $request['curl'] = static::$defaultCurlOptions;

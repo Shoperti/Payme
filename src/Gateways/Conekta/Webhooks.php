@@ -17,12 +17,11 @@ class Webhooks extends AbstractApi implements WebhookInterface
     /**
      * Get all webhooks.
      *
-     * @param array    $params
-     * @param string[] $headers
+     * @param array $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function all($params = [], $headers = [])
+    public function all($params = [])
     {
         return $this->gateway->commit('get', $this->gateway->buildUrlFromString('webhooks'));
     }
@@ -32,11 +31,10 @@ class Webhooks extends AbstractApi implements WebhookInterface
      *
      * @param int|string $id
      * @param array      $params
-     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id = null, $params = [], $headers = [])
+    public function find($id = null, $params = [])
     {
         if (!$id) {
             throw new InvalidArgumentException('We need an id');
@@ -48,12 +46,11 @@ class Webhooks extends AbstractApi implements WebhookInterface
     /**
      * Create a webhook.
      *
-     * @param array    $params
-     * @param string[] $headers
+     * @param array $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function create($params = [], $headers = [])
+    public function create($params = [])
     {
         return $this->gateway->commit('post', $this->gateway->buildUrlFromString('webhooks'), $params);
     }
@@ -61,12 +58,11 @@ class Webhooks extends AbstractApi implements WebhookInterface
     /**
      * Update a webhook.
      *
-     * @param array    $params
-     * @param string[] $headers
+     * @param array $params
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function update($params = [], $headers = [])
+    public function update($params = [])
     {
         $id = Arr::get($params, 'id', null);
 
@@ -82,11 +78,10 @@ class Webhooks extends AbstractApi implements WebhookInterface
      *
      * @param int|string $id
      * @param array      $params
-     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function delete($id, $params = [], $headers = [])
+    public function delete($id, $params = [])
     {
         return $this->gateway->commit('delete', $this->gateway->buildUrlFromString('webhooks/'.$id));
     }

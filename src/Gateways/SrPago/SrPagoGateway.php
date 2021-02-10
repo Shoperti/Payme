@@ -166,15 +166,14 @@ class SrPagoGateway extends AbstractGateway
     /**
      * Commit an http request.
      *
-     * @param string   $method
-     * @param string   $url
-     * @param array    $params
-     * @param array    $options
-     * @param string[] $customHeaders
+     * @param string $method
+     * @param string $url
+     * @param array  $params
+     * @param array  $options
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         if (empty($this->connectionToken)) {
             $this->loginApplication();

@@ -90,11 +90,10 @@ class OpenPayGateway extends AbstractGateway
      * @param string   $url
      * @param string[] $params
      * @param string[] $options
-     * @param string[] $customHeaders
      *
      * @return array|\Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function commit($method, $url, $params = [], $options = [], $customHeaders = [])
+    public function commit($method, $url, $params = [], $options = [])
     {
         $userAgent = [
             'bindings_version' => $this->config['version'],

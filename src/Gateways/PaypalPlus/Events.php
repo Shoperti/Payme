@@ -6,7 +6,7 @@ use Shoperti\PayMe\Gateways\PaypalExpress\Events as PaypalExpressEvents;
 use Shoperti\PayMe\Support\Arr;
 
 /**
- * This is the PaypalPlus events class.
+ * This is the PayPal Plus events class.
  *
  * @author Arturo Rodríguez <arturo.rodriguez@dinkbit.com>
  */
@@ -17,11 +17,10 @@ class Events extends PaypalExpressEvents
      *
      * @param int|string $id
      * @param array      $options
-     * @param string[]   $headers
      *
      * @return \Shoperti\PayMe\Contracts\ResponseInterface
      */
-    public function find($id, array $options = [], $headers = [])
+    public function find($id, array $options = [])
     {
         $event = Arr::get($options, 'resource_type');
 
@@ -29,12 +28,10 @@ class Events extends PaypalExpressEvents
             return $this->gateway->commit(
                 'get',
                 $this->gateway->buildUrlFromString(sprintf('payments/payment/%s', $id)),
-                ['token' => Arr::get($options, 'token')],
-                [],
-                $headers
+                ['token' => Arr::get($options, 'token')]
             );
         }
 
-        return parent::find($id, $options, $headers);
+        return parent::find($id, $options);
     }
 }
