@@ -34,6 +34,7 @@ class StripeTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_create_a_webhook
      */
     public function it_should_delete_a_webhook($hookId)

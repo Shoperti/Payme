@@ -411,13 +411,13 @@ class PaypalPlusGateway extends AbstractGateway
                 return new Status('refunded');
             case 'denied':
                 return new Status('declined');
-            // payment general status
+                // payment general status
             case 'created':
             case 'approved':
                 return new Status('pending');
             case 'failed':
                 return new Status('failed');
-            // IPN status
+                // IPN status
             case 'Completed':
             case 'Processed':
                 return new Status('paid');
@@ -460,11 +460,11 @@ class PaypalPlusGateway extends AbstractGateway
             case 'INTERNAL_SERVICE_ERROR':
                 return new ErrorCode('processing_error');
 
-            // Bank decline, payment no approved
+                // Bank decline, payment no approved
             case 'INSTRUMENT_DECLINED':
                 return new ErrorCode('card_declined');
 
-            // PayPal risk decline, payment not approved
+                // PayPal risk decline, payment not approved
             case 'CREDIT_CARD_REFUSED':
             case 'TRANSACTION_REFUSED_BY_PAYPAL_RISK':
                 return new ErrorCode('suspected_fraud');

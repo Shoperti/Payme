@@ -125,6 +125,7 @@ class MercadoPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $responseAndAmount
@@ -148,6 +149,7 @@ class MercadoPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_create_a_charge_with_ticket
      *
      * @param array $dataAndAmount

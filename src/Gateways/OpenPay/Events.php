@@ -50,16 +50,19 @@ class Events extends AbstractApi implements EventInterface
             case 'charge.cancelled':
             case 'charge.failed':
             case 'charge.rescored.to.decline':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'chargeback.created':
             case 'chargeback.accepted':
             case 'chargeback.rejected':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'fee.refund.succeeded':
             case 'fee.succeeded':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'order.activated':
             case 'order.cancelled':
@@ -68,21 +71,26 @@ class Events extends AbstractApi implements EventInterface
             case 'order.expired':
             case 'order.payment.cancelled':
             case 'order.payment.received':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'payout.created':
             case 'payout.failed':
             case 'payout.succeeded':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'spei.received':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'subscription.charge.failed':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
 
             case 'transfer.succeeded':
-                $endpoint = 'charges'; break;
+                $endpoint = 'charges';
+                break;
         }
 
         if (!$endpoint) {
