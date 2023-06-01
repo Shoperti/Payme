@@ -24,6 +24,7 @@ class PaypalPlusTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_generate_a_token
      *
      * @param string $token
@@ -43,6 +44,7 @@ class PaypalPlusTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_get_all_hooks
      */
     public function it_should_create_and_delete_a_webhook($token)

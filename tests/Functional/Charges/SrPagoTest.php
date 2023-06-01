@@ -80,6 +80,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_create_a_new_customer
      * */
     public function it_should_update_customer_information($data)
@@ -100,6 +101,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_add_card_to_a_customer($data)
@@ -122,6 +124,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_find_a_customer($data)
@@ -135,6 +138,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_create_a_new_customer
      */
     public function it_should_delete_a_customer($data)
@@ -183,6 +187,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @expectedException BadMethodCallException
      */
     public function it_throws_charge_complete_method_call()
@@ -192,6 +197,7 @@ class SrPagoTest extends AbstractTest
 
     /**
      * @test
+     *
      * @expectedException BadMethodCallException
      */
     public function it_throws_charge_refund_method_call()

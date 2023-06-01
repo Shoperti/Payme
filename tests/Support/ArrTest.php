@@ -22,6 +22,7 @@ class ArrTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException InvalidArgumentException
      */
     public function it_validates_array_requires()

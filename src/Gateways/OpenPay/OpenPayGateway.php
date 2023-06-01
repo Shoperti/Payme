@@ -310,9 +310,6 @@ class OpenPayGateway extends AbstractGateway
     protected function getErrorCode(array $response)
     {
         $code = Arr::get($response, 'error_code', 1001);
-        if (!isset($codeMap[$code])) {
-            $code = 1001;
-        }
 
         $codeMap = [
             1000 => 'processing_error',     // OpenPay internal server error
@@ -348,6 +345,10 @@ class OpenPayGateway extends AbstractGateway
             3012 => 'card_declined',        // A bank authorization is required to make this payment
             4001 => 'insufficient_funds',   // The Openpay account has not enough
         ];
+
+        if (!isset($codeMap[$code])) {
+            $code = 1001;
+        }
 
         return new ErrorCode($codeMap[$code]);
     }

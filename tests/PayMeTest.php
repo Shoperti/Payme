@@ -16,16 +16,19 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException InvalidArgumentException
+     *
      * @expectedExceptionMessage A gateway must be specified.
      */
     public function it_throws_if_no_driver_specified()
     {
-        (new PayMe([]));
+        new PayMe([]);
     }
 
     /**
      * @expectedException InvalidArgumentException
+     *
      * @expectedExceptionMessage A gateway must be specified.
      */
     public function it_throws_if_no_driver_specified_on_make()
@@ -35,7 +38,9 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException InvalidArgumentException
+     *
      * @expectedExceptionMessage Unsupported gateway [foo].
      */
     public function it_thorws_on_not_gateway_supported()
@@ -45,7 +50,9 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException InvalidArgumentException
+     *
      * @expectedExceptionMessage Unsupported gateway [bar].
      */
     public function it_thorws_on_not_factory_specified()
@@ -108,7 +115,9 @@ class PayMeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException BadMethodCallException
+     *
      * @expectedExceptionMessage Undefined method [foo] called.
      */
     public function it_throws_on_unsupported_method_for_gateway()
