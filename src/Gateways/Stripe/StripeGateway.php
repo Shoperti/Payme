@@ -217,7 +217,7 @@ class StripeGateway extends AbstractGateway
                 case 'requires_confirmation':
                     return new Status('pending');
 
-                // When the PaymentIntent is created or if the payment attempt fails
+                    // When the PaymentIntent is created or if the payment attempt fails
                 case 'requires_payment_method':
                     $isRecent = $response['last_payment_error'] === null;
 

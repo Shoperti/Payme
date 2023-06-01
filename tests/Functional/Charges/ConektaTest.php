@@ -33,6 +33,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_create_a_new_customer
      */
     public function it_should_succeed_to_charge_an_order_with_customer_token($data)
@@ -57,6 +58,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_create_a_new_customer
      */
     public function it_should_find_a_customer($data)
@@ -74,6 +76,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_find_a_customer
      */
     public function it_should_create_a_customer_card($data)
@@ -96,6 +99,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_create_a_customer_card
      */
     public function it_should_update_a_customer($data)
@@ -118,6 +122,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_update_a_customer
      */
     public function it_should_delete_a_customer_card($data)
@@ -234,6 +239,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_charge_an_order_with_card_token
      */
     public function it_should_succeed_to_fully_refund_a_charge($prevResponse)
@@ -254,6 +260,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_charge_an_order_with_card_token
      */
     public function it_should_succeed_to_partially_refund_a_charge()

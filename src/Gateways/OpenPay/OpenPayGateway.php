@@ -345,7 +345,7 @@ class OpenPayGateway extends AbstractGateway
             3012 => 'card_declined',        // A bank authorization is required to make this payment
             4001 => 'insufficient_funds',   // The Openpay account has not enough
         ];
-        
+
         if (!isset($codeMap[$code])) {
             $code = 1001;
         }
