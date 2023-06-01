@@ -16,6 +16,7 @@ class ErrorCodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
      * @expectedException InvalidArgumentException
      */
     public function it_throws_exception_when_invalid_status()

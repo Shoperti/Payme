@@ -95,6 +95,7 @@ class OpenPayTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $dataAndAmount
@@ -115,6 +116,7 @@ class OpenPayTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_succeed_to_charge_a_token_with_params
      *
      * @param array $responseAndAmount

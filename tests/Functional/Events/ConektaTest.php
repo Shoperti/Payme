@@ -21,6 +21,7 @@ class ConektaTest extends AbstractTest
 
     /**
      * @test
+     *
      * @depends it_should_retrieve_all_events
      */
     public function it_should_retrieve_a_single_event($events)
