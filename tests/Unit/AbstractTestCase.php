@@ -7,7 +7,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     /**
      * The gateway being tested.
      *
-     * @var \Shoperti\PayMe\Gateways\Conekta\AbstractGateway
+     * @var \Shoperti\PayMe\Gateways\AbstractGateway
      */
     protected $gateway;
 
