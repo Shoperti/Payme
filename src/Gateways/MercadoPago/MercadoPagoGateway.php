@@ -109,6 +109,10 @@ class MercadoPagoGateway extends AbstractGateway
             $request[$method === 'get' ? 'query' : 'json'] = $params;
         }
 
+        if ($method === 'post') {
+            $request['headers']['X-Idempotency-Key'] = Arr::get($params, 'x-idempotency-key', $this->generateUUID());
+        }
+
         $authUrl = sprintf('%s?access_token=%s', $url, $this->config['private_key']);
 
         $response = $this->performRequest($method, $authUrl, $request);
@@ -438,5 +442,20 @@ class MercadoPagoGateway extends AbstractGateway
     protected function getRequestUrl()
     {
         return $this->endpoint.'/'.$this->apiVersion;
+    }
+
+    /**
+     * Generate UUID for Idempotency-Key header.
+     *
+     * @return string
+     */
+    protected function generateUUID()
+    {
+        $data = random_bytes(16);
+
+        $data[6] = chr(ord($data[6]) & 0x0F | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 }
